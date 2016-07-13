@@ -15,9 +15,9 @@ func GetLanguageByContent(filename string, content []byte) (lang string, safe bo
 	return GetLanguageByExtension(filename)
 }
 
-type langMatcher func([]byte) (string, bool)
+type languageMatcher func([]byte) (string, bool)
 
-var matchers = map[string]langMatcher{
+var matchers = map[string]languageMatcher{
 	".cl":  clExtLanguage,
 	".cls": clsExtLanguage,
 	".m":   mExtLanguage,

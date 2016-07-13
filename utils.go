@@ -8,6 +8,45 @@ import (
 	"gopkg.in/toqueteos/substring.v1"
 )
 
+func IsConfiguration(path string) bool {
+	lang, _ := GetLanguageByExtension(path)
+	_, is := configurationLanguages[lang]
+
+	return is
+}
+
+func IsDotFile(path string) bool {
+	return strings.HasPrefix(filepath.Base(path), ".")
+}
+
+func IsVendor(path string) bool {
+	return findIndex(path, vendorMatchers) >= 0
+}
+
+func IsDocumentation(path string) bool {
+	return findIndex(path, documentationMatchers) >= 0
+}
+
+func findIndex(path string, matchers substring.StringsMatcher) int {
+	return matchers.MatchIndex(path)
+}
+
+const sniffLen = 8000
+
+//IsBinary detects if data is a binary value based on:
+//http://git.kernel.org/cgit/git/git.git/tree/xdiff-interface.c?id=HEAD#n198
+func IsBinary(data []byte) bool {
+	if len(data) > sniffLen {
+		data = data[:sniffLen]
+	}
+
+	if bytes.IndexByte(data, byte(0)) == -1 {
+		return false
+	}
+
+	return true
+}
+
 // From github/linguist.
 // curl https://raw.githubusercontent.com/github/linguist/master/lib/linguist/vendor.yml | python -c 'import sys, yaml; l = yaml.load(sys.stdin.read()); print "var skipped = []*regexp.Regexp{\n" + "\n".join(["\tregexp.MustCompile(`" + i + "`)," for i in l]) + "\n}"'
 
@@ -241,46 +280,6 @@ var documentationMatchers = substring.Or(
 	substring.Regexp(`^[Ss]amples/`),
 )
 
-var configurationLanguages = []string{
-	"XML", "JSON", "TOML", "YAML", "INI", "SQL",
-}
-
-func VendorIndex(path string) int {
-	return findIndex(path, vendorMatchers)
-}
-
-func DocumentationIndex(path string) int {
-	return findIndex(path, documentationMatchers)
-}
-
-func findIndex(path string, matchers substring.StringsMatcher) int {
-	return matchers.MatchIndex(path)
-}
-
-func IsVendor(path string) bool {
-	return VendorIndex(path) >= 0
-}
-
-func IsDotFile(path string) bool {
-	return strings.HasPrefix(filepath.Base(path), ".")
-}
-
-func IsDocumentation(path string) bool {
-	return DocumentationIndex(path) >= 0
-}
-
-const sniffLen = 8000
-
-//IsBinary detects if data is a binary value based on:
-//http://git.kernel.org/cgit/git/git.git/tree/xdiff-interface.c?id=HEAD#n198
-func IsBinary(data []byte) bool {
-	if len(data) > sniffLen {
-		data = data[:sniffLen]
-	}
-
-	if bytes.IndexByte(data, byte(0)) == -1 {
-		return false
-	}
-
-	return true
+var configurationLanguages = map[string]bool{
+	"XML": true, "JSON": true, "TOML": true, "YAML": true, "INI": true, "SQL": true,
 }

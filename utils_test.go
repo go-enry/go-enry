@@ -7,7 +7,7 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func (s *UtilsSuite) TestIsVendor(c *C) {
+func (s *TSuite) TestIsVendor(c *C) {
 	c.Assert(IsVendor("foo/bar"), Equals, false)
 	c.Assert(IsVendor("foo/vendor/foo"), Equals, true)
 	c.Assert(IsVendor(".travis.yml"), Equals, true)
@@ -31,18 +31,18 @@ func (s *UtilsSuite) TestIsVendor(c *C) {
 	c.Assert(IsVendor("foo/bar/html5-3.6-respond-1.4.2.js"), Equals, true)
 }
 
-func (s *UtilsSuite) TestIsDocumentation(c *C) {
+func (s *TSuite) TestIsDocumentation(c *C) {
 	c.Assert(IsDocumentation("foo"), Equals, false)
 	c.Assert(IsDocumentation("README"), Equals, true)
 }
 
-func (s *UtilsSuite) TestIsConfiguration(c *C) {
+func (s *TSuite) TestIsConfiguration(c *C) {
 	c.Assert(IsConfiguration("foo"), Equals, false)
 	c.Assert(IsConfiguration("foo.ini"), Equals, true)
 	c.Assert(IsConfiguration("foo.json"), Equals, true)
 }
 
-func (s *UtilsSuite) TestIsBinary(c *C) {
+func (s *TSuite) TestIsBinary(c *C) {
 	c.Assert(IsBinary([]byte("foo")), Equals, false)
 
 	binary := []byte{0}
@@ -58,13 +58,13 @@ const (
 	jsPath   = "some/random/dir/file.js"
 )
 
-func (s *UtilsSuite) BenchmarkVendor(c *C) {
+func (s *TSuite) BenchmarkVendor(c *C) {
 	for i := 0; i < c.N; i++ {
 		_ = IsVendor(htmlPath)
 	}
 }
 
-func (s *UtilsSuite) BenchmarkVendorJS(c *C) {
+func (s *TSuite) BenchmarkVendorJS(c *C) {
 	for i := 0; i < c.N; i++ {
 		_ = IsVendor(jsPath)
 	}
@@ -192,13 +192,13 @@ func isVendorRegexp(s string) bool {
 	return false
 }
 
-func (s *UtilsSuite) BenchmarkVendorRegexp(c *C) {
+func (s *TSuite) BenchmarkVendorRegexp(c *C) {
 	for i := 0; i < c.N; i++ {
 		_ = isVendorRegexp(htmlPath)
 	}
 }
 
-func (s *UtilsSuite) BenchmarkVendorRegexpJS(c *C) {
+func (s *TSuite) BenchmarkVendorRegexpJS(c *C) {
 	for i := 0; i < c.N; i++ {
 		_ = isVendorRegexp(htmlPath)
 	}
