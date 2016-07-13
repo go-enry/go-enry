@@ -18,11 +18,21 @@ func GetLanguageByContent(filename string, content []byte) (lang string, safe bo
 type languageMatcher func([]byte) (string, bool)
 
 var matchers = map[string]languageMatcher{
-	".cl":  clExtLanguage,
-	".cls": clsExtLanguage,
-	".m":   mExtLanguage,
-	".h":   hExtLanguage,
-	".pl":  plExtLanguage,
+	".cl":   clExtLanguage,
+	".inc":  incExtLanguage,
+	".cls":  clsExtLanguage,
+	".m":    mExtLanguage,
+	".ms":   msExtLanguage,
+	".h":    hExtLanguage,
+	".l":    lExtLanguage,
+	".n":    nExtLanguage,
+	".lisp": lispExtLanguage,
+	".lsp":  lispExtLanguage,
+	".pm":   pmExtLanguage,
+	".t":    pmExtLanguage,
+	".pl":   plExtLanguage,
+	".pro":  proExtLanguage,
+	".toc":  tocExtLanguage,
 }
 
 var (
@@ -37,6 +47,14 @@ var (
 	)
 )
 
+func incExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`^<\?(?:php)?`).Match(input) {
+		return "PHP", true
+	}
+
+	return OtherLanguage, true
+}
+
 func hExtLanguage(input []byte) (string, bool) {
 	if objectiveCMatcher.Match(input) {
 		return "Objective-C", true
@@ -45,6 +63,48 @@ func hExtLanguage(input []byte) (string, bool) {
 	}
 
 	return "C", true
+}
+
+func msExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`[.'][a-z][a-z](\s|$)`).Match(input) {
+		return "Groff", true
+	}
+
+	return "MAXScript", true
+}
+
+func nExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`^[.']`).Match(input) {
+		return "Groff", true
+	} else if substring.BytesRegexp(`(module|namespace|using)`).Match(input) {
+		return "Nemerle", true
+	}
+
+	return OtherLanguage, false
+}
+
+func lExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`\(def(un|macro)\s`).Match(input) {
+		return "Common Lisp", true
+	} else if substring.BytesRegexp(`(%[%{}]xs|<.*>)`).Match(input) {
+		return "Lex", true
+	} else if substring.BytesRegexp(`\.[a-z][a-z](\s|$)`).Match(input) {
+		return "Groff", true
+	} else if substring.BytesRegexp(`(de|class|rel|code|data|must)`).Match(input) {
+		return "PicoLisp", true
+	}
+
+	return OtherLanguage, false
+}
+
+func lispExtLanguage(input []byte) (string, bool) {
+	if commonLispMatcher.Match(input) {
+		return "Common Lisp", true
+	} else if substring.BytesRegexp(`\s*\(define `).Match(input) {
+		return "NewLisp", true
+	}
+
+	return OtherLanguage, false
 }
 
 var (
@@ -101,10 +161,10 @@ func clsExtLanguage(input []byte) (string, bool) {
 }
 
 var (
-	mathematicaMatcher = substring.BytesHas(`(*`)
-	matlabMatcher      = substring.BytesRegexp(`\b(function\s*[\[a-zA-Z]+|classdef|figure|end|elseif)\b`)
+	mathematicaMatcher = substring.BytesHas(`\s*\(\*`)
+	matlabMatcher      = substring.BytesRegexp(`\b(function\s*[\[a-zA-Z]+|pcolor|classdef|figure|end|elseif)\b`)
 	objectiveCMatcher  = substring.BytesRegexp(
-		`@(class|end|implementation|interface|property|protocol|selector|synchronised)`)
+		`@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">]`)
 )
 
 func mExtLanguage(input []byte) (string, bool) {
@@ -121,7 +181,8 @@ func mExtLanguage(input []byte) (string, bool) {
 
 var (
 	prologMatcher = substring.BytesRegexp(`^[^#]+:-`)
-	perl6Matcher  = substring.BytesRegexp(`^(use v6|(my )?class|module)`)
+	perlMatcher   = substring.BytesRegexp(`use strict|use\s+v?5\.`)
+	perl6Matcher  = substring.BytesRegexp(`(use v6|(my )?class|module)`)
 )
 
 func plExtLanguage(input []byte) (string, bool) {
@@ -132,4 +193,32 @@ func plExtLanguage(input []byte) (string, bool) {
 	}
 
 	return "Perl", false
+}
+
+func pmExtLanguage(input []byte) (string, bool) {
+	if perlMatcher.Match(input) {
+		return "Perl", true
+	} else if perl6Matcher.Match(input) {
+		return "Perl6", true
+	}
+
+	return "Perl", false
+}
+
+func proExtLanguage(input []byte) (string, bool) {
+	if prologMatcher.Match(input) {
+		return "Prolog", true
+	}
+
+	return OtherLanguage, false
+}
+
+func tocExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp("## |@no-lib-strip@").Match(input) {
+		return "World of Warcraft Addon Data", true
+	} else if substring.BytesRegexp("(contentsline|defcounter|beamer|boolfalse)").Match(input) {
+		return "TeX", true
+	}
+
+	return OtherLanguage, false
 }

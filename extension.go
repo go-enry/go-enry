@@ -2,11 +2,14 @@ package slinguist
 
 import (
 	"path/filepath"
+	"strings"
 )
 
 func GetLanguageByExtension(filename string) (lang string, safe bool) {
+	ext := strings.ToLower(filepath.Ext(filename))
+
 	lang = OtherLanguage
-	langs, ok := LanguagesByExtension[filepath.Ext(filename)]
+	langs, ok := LanguagesByExtension[ext]
 	if !ok {
 		return
 	}
