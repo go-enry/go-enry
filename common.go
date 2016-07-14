@@ -929,6 +929,8 @@ var LanguagesByExtension = map[string][]string{
 }
 
 func init() {
+	LanguagesByExtension[".cgi"] = []string{OtherLanguage}
+	LanguagesByExtension[".fcgi"] = []string{OtherLanguage}
 	ExtensionsByLanguage = reverseStringListMap(LanguagesByExtension)
 }
 

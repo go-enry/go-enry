@@ -23,33 +23,52 @@ var matchers = map[string]languageMatcher{
 	".cls":  clsExtLanguage,
 	".m":    mExtLanguage,
 	".ms":   msExtLanguage,
+	".md":   mdExtLanguage,
+	".fs":   fsExtLanguage,
 	".h":    hExtLanguage,
+	".hh":   hhExtLanguage,
 	".l":    lExtLanguage,
 	".n":    nExtLanguage,
 	".lisp": lispExtLanguage,
 	".lsp":  lispExtLanguage,
 	".pm":   pmExtLanguage,
 	".t":    pmExtLanguage,
+	".rs":   rsExtLanguage,
 	".pl":   plExtLanguage,
 	".pro":  proExtLanguage,
 	".toc":  tocExtLanguage,
+	".sls":  slsExtLanguage,
 }
 
 var (
 	cPlusPlusMatcher = substring.BytesOr(
-		substring.BytesRegexp(`^\s*template\s*<`),
-		substring.BytesRegexp(`^\s*#\s*include <(cstdint|string|vector|map|list|array|bitset|queue|stack|forward_list|unordered_map|unordered_set|(i|o|io)stream)>`),
-		substring.BytesRegexp(`^[ \t]*try`),
-		substring.BytesRegexp(`^[ \t]*(class|(using[ \t]+)?namespace)\s+\w+`),
-		substring.BytesRegexp(`^[ \t]*(private|public|protected):$`),
+		substring.BytesRegexp(`\s*template\s*<`),
+		substring.BytesRegexp(`\s*#\s*include <(cstdint|string|vector|map|list|array|bitset|queue|stack|forward_list|unordered_map|unordered_set|(i|o|io)stream)>`),
+		substring.BytesRegexp(`\n[ \t]*try`),
+		substring.BytesRegexp(`\n[ \t]*(class|(using[ \t]+)?namespace)\s+\w+`),
+		substring.BytesRegexp(`\n[ \t]*(private|public|protected):$`),
 		substring.BytesRegexp(`std::\w+`),
-		substring.BytesRegexp(`^[ \t]*catch\s*`),
+		substring.BytesRegexp(`[ \t]*catch\s*`),
 	)
 )
 
 func incExtLanguage(input []byte) (string, bool) {
 	if substring.BytesRegexp(`^<\?(?:php)?`).Match(input) {
 		return "PHP", true
+	}
+
+	return OtherLanguage, true
+}
+
+func fsExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`\n(: |new-device)`).Match(input) {
+		return "Forth", true
+	} else if substring.BytesRegexp(`\s*(#light|import|let|module|namespace|open|type)`).Match(input) {
+		return "F#", true
+	} else if substring.BytesRegexp(`(#version|precision|uniform|varying|vec[234])`).Match(input) {
+		return "GLSL", true
+	} else if substring.BytesRegexp(`#include|#pragma\s+(rs|version)|__attribute__`).Match(input) {
+		return "Filterscript", true
 	}
 
 	return OtherLanguage, true
@@ -63,6 +82,16 @@ func hExtLanguage(input []byte) (string, bool) {
 	}
 
 	return "C", true
+}
+
+func hhExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`^<\?(?:hh)?`).Match(input) {
+		return "Hack", true
+	} else if cPlusPlusMatcher.Match(input) {
+		return "C++", true
+	}
+
+	return OtherLanguage, false
 }
 
 func msExtLanguage(input []byte) (string, bool) {
@@ -179,6 +208,16 @@ func mExtLanguage(input []byte) (string, bool) {
 	return OtherLanguage, false
 }
 
+func mdExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`\n[-a-z0-9=#!\*\[|]`).Match(input) {
+		return "Markdown", true
+	} else if substring.BytesRegexp(`\n(;;|\(define_)`).Match(input) {
+		return "GCC Machine Description", true
+	}
+
+	return OtherLanguage, false
+}
+
 var (
 	prologMatcher = substring.BytesRegexp(`^[^#]+:-`)
 	perlMatcher   = substring.BytesRegexp(`use strict|use\s+v?5\.`)
@@ -205,6 +244,16 @@ func pmExtLanguage(input []byte) (string, bool) {
 	return "Perl", false
 }
 
+func rsExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`(use |fn |mod |pub |macro_rules|impl|#!?\[)`).Match(input) {
+		return "Rust", true
+	} else if substring.BytesRegexp(`#include|#pragma\s+(rs|version)|__attribute__`).Match(input) {
+		return "RenderScript", true
+	}
+
+	return OtherLanguage, false
+}
+
 func proExtLanguage(input []byte) (string, bool) {
 	if prologMatcher.Match(input) {
 		return "Prolog", true
@@ -214,6 +263,16 @@ func proExtLanguage(input []byte) (string, bool) {
 }
 
 func tocExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp("## |@no-lib-strip@").Match(input) {
+		return "World of Warcraft Addon Data", true
+	} else if substring.BytesRegexp("(contentsline|defcounter|beamer|boolfalse)").Match(input) {
+		return "TeX", true
+	}
+
+	return OtherLanguage, false
+}
+
+func slsExtLanguage(input []byte) (string, bool) {
 	if substring.BytesRegexp("## |@no-lib-strip@").Match(input) {
 		return "World of Warcraft Addon Data", true
 	} else if substring.BytesRegexp("(contentsline|defcounter|beamer|boolfalse)").Match(input) {
