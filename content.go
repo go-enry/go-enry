@@ -18,6 +18,8 @@ func GetLanguageByContent(filename string, content []byte) (lang string, safe bo
 type languageMatcher func([]byte) (string, bool)
 
 var matchers = map[string]languageMatcher{
+	".bf":   bfExtLanguage,
+	".b":    bExtLanguage,
 	".cl":   clExtLanguage,
 	".inc":  incExtLanguage,
 	".cls":  clsExtLanguage,
@@ -32,12 +34,15 @@ var matchers = map[string]languageMatcher{
 	".lisp": lispExtLanguage,
 	".lsp":  lispExtLanguage,
 	".pm":   pmExtLanguage,
-	".t":    pmExtLanguage,
+	".t":    tExtLanguage,
+	".ts":   tsExtLanguage,
+	".tsx":  tsxExtLanguage,
 	".rs":   rsExtLanguage,
 	".pl":   plExtLanguage,
 	".pro":  proExtLanguage,
 	".toc":  tocExtLanguage,
 	".sls":  slsExtLanguage,
+	".sql":  sqlExtLanguage,
 }
 
 var (
@@ -51,6 +56,22 @@ var (
 		substring.BytesRegexp(`[ \t]*catch\s*`),
 	)
 )
+
+func bExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`(include|modules)`).Match(input) {
+		return "Limbo", true
+	}
+
+	return "Brainfuck", false
+}
+
+func bfExtLanguage(input []byte) (string, bool) {
+	if substring.BytesRegexp(`(fprintf|function|return)`).Match(input) {
+		return "HyPhy", true
+	}
+
+	return "Brainfuck", false
+}
 
 func incExtLanguage(input []byte) (string, bool) {
 	if substring.BytesRegexp(`^<\?(?:php)?`).Match(input) {
@@ -190,7 +211,7 @@ func clsExtLanguage(input []byte) (string, bool) {
 }
 
 var (
-	mathematicaMatcher = substring.BytesHas(`\s*\(\*`)
+	mathematicaMatcher = substring.BytesHas(`\n\s*\(\*`)
 	matlabMatcher      = substring.BytesRegexp(`\b(function\s*[\[a-zA-Z]+|pcolor|classdef|figure|end|elseif)\b`)
 	objectiveCMatcher  = substring.BytesRegexp(
 		`@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">]`)
@@ -199,10 +220,18 @@ var (
 func mExtLanguage(input []byte) (string, bool) {
 	if objectiveCMatcher.Match(input) {
 		return "Objective-C", true
-	} else if matlabMatcher.Match(input) {
-		return "Matlab", true
+	} else if substring.BytesHas(`:- module`).Match(input) {
+		return "Mercury", true
+	} else if substring.BytesRegexp(`\n: `).Match(input) {
+		return "MUF", true
+	} else if substring.BytesRegexp(`^\s*;`).Match(input) {
+		return "M", true
 	} else if mathematicaMatcher.Match(input) {
 		return "Mathematica", true
+	} else if matlabMatcher.Match(input) {
+		return "Matlab", true
+	} else if substring.BytesRegexp(`^\w+\s*:\s*module\s*{`).Match(input) {
+		return "Matlab", true
 	}
 
 	return OtherLanguage, false
@@ -244,6 +273,20 @@ func pmExtLanguage(input []byte) (string, bool) {
 	return "Perl", false
 }
 
+func tExtLanguage(input []byte) (string, bool) {
+	if perlMatcher.Match(input) {
+		return "Perl", true
+	} else if perl6Matcher.Match(input) {
+		return "Perl6", true
+	} else if substring.BytesRegexp(`^\s*%|^\s*var\s+\w+\s*:\s*\w+`).Match(input) {
+		return "RenderScript", true
+	} else if substring.BytesRegexp(`^\s*use\s+v6\s*;`).Match(input) {
+		return "RenderScript", true
+	}
+
+	return "Perl", false
+}
+
 func rsExtLanguage(input []byte) (string, bool) {
 	if substring.BytesRegexp(`(use |fn |mod |pub |macro_rules|impl|#!?\[)`).Match(input) {
 		return "Rust", true
@@ -280,4 +323,48 @@ func slsExtLanguage(input []byte) (string, bool) {
 	}
 
 	return OtherLanguage, false
+}
+
+var (
+	pgSQLMatcher = substring.BytesOr(
+		substring.BytesRegexp(`(?i)\\i\b|AS \$\$|LANGUAGE '?plpgsql'?`),
+		substring.BytesRegexp(`(?i)SECURITY (DEFINER|INVOKER)`),
+		substring.BytesRegexp(`BEGIN( WORK| TRANSACTION)?;`),
+	)
+	db2SQLMatcher = substring.BytesOr(
+		substring.BytesRegexp(`(?i)(alter module)|(language sql)|(begin( NOT)+ atomic)`),
+		substring.BytesRegexp(`(?i)signal SQLSTATE '[0-9]+'`),
+	)
+	oracleSQLMatcher = substring.BytesOr(
+		substring.BytesRegexp(`(?i)\$\$PLSQL_|XMLTYPE|sysdate|systimestamp|\.nextval|connect by|AUTHID (DEFINER|CURRENT_USER)`),
+		substring.BytesRegexp(`(?i)constructor\W+function`),
+	)
+)
+
+func sqlExtLanguage(input []byte) (string, bool) {
+	if pgSQLMatcher.Match(input) {
+		return "PLpgSQL", true
+	} else if db2SQLMatcher.Match(input) {
+		return "SQLPL", true
+	} else if oracleSQLMatcher.Match(input) {
+		return "PLSQL", true
+	}
+
+	return "SQL", false
+}
+
+func tsExtLanguage(input []byte) (string, bool) {
+	if substring.BytesHas("</TS>").Match(input) {
+		return "XML", true
+	}
+
+	return "TypeScript", true
+}
+
+func tsxExtLanguage(input []byte) (string, bool) {
+	if substring.BytesHas("</tileset>").Match(input) {
+		return "XML", true
+	}
+
+	return "TypeScript", true
 }

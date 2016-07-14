@@ -929,12 +929,16 @@ var LanguagesByExtension = map[string][]string{
 }
 
 func init() {
-	LanguagesByExtension[".cgi"] = []string{OtherLanguage}
-	LanguagesByExtension[".fcgi"] = []string{OtherLanguage}
+	for _, l := range ignoredExtensions {
+		LanguagesByExtension[l] = []string{OtherLanguage}
+	}
+
 	ExtensionsByLanguage = reverseStringListMap(LanguagesByExtension)
 }
 
 var ExtensionsByLanguage map[string][]string
+
+var ignoredExtensions = []string{".asc", ".cgi", ".fcgi", ".gml", ".vhost"}
 
 func GetLanguageExtensions(language string) []string {
 	return ExtensionsByLanguage[language]

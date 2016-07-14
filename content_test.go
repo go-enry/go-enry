@@ -64,14 +64,20 @@ func (s *TSuite) TestGetLanguageByContentLinguistCorpus(c *C) {
 			if f.Name() == "filenames" {
 				return filepath.SkipDir
 			}
+
+			return nil
+		}
+
+		expected := filepath.Base(filepath.Dir(path))
+		filename := filepath.Base(path)
+		extension := filepath.Ext(path)
+		content, _ := ioutil.ReadFile(path)
+
+		if extension == "" {
 			return nil
 		}
 
 		total++
-		expected := filepath.Base(filepath.Dir(path))
-		filename := filepath.Base(path)
-		content, _ := ioutil.ReadFile(path)
-
 		obtained, safe := GetLanguageByContent(filename, content)
 		if obtained == OtherLanguage {
 			other++
