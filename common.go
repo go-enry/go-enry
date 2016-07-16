@@ -938,7 +938,7 @@ func init() {
 
 var ExtensionsByLanguage map[string][]string
 
-var ignoredExtensions = []string{".asc", ".cgi", ".fcgi", ".gml", ".vhost"}
+var ignoredExtensions = []string{".asc", ".cgi", ".fcgi", ".gml", ".fx", ".vhost"}
 
 func GetLanguageExtensions(language string) []string {
 	return ExtensionsByLanguage[language]
