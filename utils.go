@@ -8,6 +8,11 @@ import (
 	"gopkg.in/toqueteos/substring.v1"
 )
 
+func IsAuxiliaryLanguage(lang string) bool {
+	_, ok := auxiliaryLanguages[lang]
+	return ok
+}
+
 func IsConfiguration(path string) bool {
 	lang, _ := GetLanguageByExtension(path)
 	_, is := configurationLanguages[lang]

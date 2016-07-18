@@ -9,7 +9,7 @@ func GetLanguageByExtension(filename string) (lang string, safe bool) {
 	ext := strings.ToLower(filepath.Ext(filename))
 
 	lang = OtherLanguage
-	langs, ok := LanguagesByExtension[ext]
+	langs, ok := languagesByExtension[ext]
 	if !ok {
 		return
 	}
