@@ -3,7 +3,7 @@ package slinguist
 const OtherLanguage = "Other"
 
 var (
-	extensionsByLanguage map[string][]string
+	ExtensionsByLanguage map[string][]string
 	ignoredExtensions    = map[string]bool{
 		".asc": true, ".cgi": true, ".fcgi": true, ".gml": true, ".fx": true,
 		".vhost": true,
@@ -25,13 +25,13 @@ func init() {
 		languagesByExtension[l] = []string{OtherLanguage}
 	}
 
-	extensionsByLanguage = reverseStringListMap(languagesByExtension)
+	ExtensionsByLanguage = reverseStringListMap(languagesByExtension)
 }
 
 // GetLanguageExtensions returns the different extensions being used by the
 // language.
 func GetLanguageExtensions(language string) []string {
-	return extensionsByLanguage[language]
+	return ExtensionsByLanguage[language]
 }
 
 // GetLanguage return the Language for a given filename and file content.
