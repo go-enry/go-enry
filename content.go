@@ -293,6 +293,12 @@ var matchers = map[string]languageMatcher{
 
 		return "Perl", false
 	},
+	".pp": func(i []byte) (string, bool) {
+		if pascalMatcher.Match(i) {
+			return "Pascal", true
+		}
+		return "Puppet", false
+	},
 	".t": func(i []byte) (string, bool) {
 		if perlMatcher.Match(i) {
 			return "Perl", true
@@ -461,7 +467,7 @@ var (
 	matlabMatcher      = substring.BytesRegexp(`\b(function\s*[\[a-zA-Z]+|pcolor|classdef|figure|end|elseif)\b`)
 	objectiveCMatcher  = substring.BytesRegexp(
 		`@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">]`)
-
+	pascalMatcher = substring.BytesRegexp(`(?ims)^\s*(PROGRAM|UNIT|USES|FUNCTION)[\s\n]+.*?;`)
 	prologMatcher = substring.BytesRegexp(`^[^#]+:-`)
 	perlMatcher   = substring.BytesRegexp(`use strict|use\s+v?5\.`)
 	perl6Matcher  = substring.BytesRegexp(`(use v6|(my )?class|module)`)
