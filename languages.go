@@ -203,7 +203,7 @@ var languagesByExtension = map[string][]string{
 	".mo":                  {"Modelica"},
 	".rhtml":               {"RHTML"},
 	".xib":                 {"XML"},
-	".tf":                  {"HCL"},
+	".tf":                  {"Terraform"},
 	".clixml":              {"XML"},
 	".smt":                 {"SMT"},
 	".applescript":         {"AppleScript"},
