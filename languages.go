@@ -926,4 +926,5 @@ var languagesByExtension = map[string][]string{
 	".fth":                 {"Forth"},
 	".cfm":                 {"ColdFusion"},
 	".as":                  {"ActionScript"},
+	".cf":			{"CFEngine"},
 }
