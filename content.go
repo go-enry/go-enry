@@ -402,13 +402,10 @@ var matchers = map[string]languageMatcher{
 		return OtherLanguage, false
 	},
 	".sls": func(i []byte) (string, bool) {
-		if substring.BytesRegexp("## |@no-lib-strip@").Match(i) {
-			return "World of Warcraft Addon Data", true
-		} else if substring.BytesRegexp("(contentsline|defcounter|beamer|boolfalse)").Match(i) {
-			return "TeX", true
+		if schemeMatcher.Match(i) {
+			return "Scheme", true
 		}
-
-		return OtherLanguage, false
+		return "SaltStack", false
 	},
 	".sql": func(i []byte) (string, bool) {
 		if pgSQLMatcher.Match(i) {
@@ -484,4 +481,5 @@ var (
 		substring.BytesRegexp(`(?i)\$\$PLSQL_|XMLTYPE|sysdate|systimestamp|\.nextval|connect by|AUTHID (DEFINER|CURRENT_USER)`),
 		substring.BytesRegexp(`(?i)constructor\W+function`),
 	)
+	schemeMatcher = substring.BytesRegexp(`(?m)\A(^\s*;;.*$)*\s*\(`)
 )
