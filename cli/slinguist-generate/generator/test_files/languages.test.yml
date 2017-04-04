@@ -1,0 +1,24 @@
+---
+1C Enterprise:
+  type: programming
+  color: "#814CCC"
+  extensions:
+  - ".bsl"
+  - ".os"
+  tm_scope: source.bsl
+  ace_mode: text
+  language_id: 0
+ABAP:
+  type: programming
+  color: "#E8274B"
+  extensions:
+  - ".abap"
+  ace_mode: abap
+  language_id: 1
+ABNF:
+  type: data
+  ace_mode: text
+  extensions:
+  - ".abnf"
+  tm_scope: source.abnf
+  language_id: 429
