@@ -4,18 +4,18 @@ import (
 	"io/ioutil"
 	"log"
 
-	"srcd.works/simple-linguist.v1/cli/slinguist-generate/generator"
+	"srcd.works/simple-linguist.v1/internal/code-generator/generator"
 )
 
 const (
 	languagesYAML     = ".linguist/lib/linguist/languages.yml"
 	langFile          = "languages.go"
-	languagesTmplPath = "cli/slinguist-generate/assets/languages.go.tmpl"
+	languagesTmplPath = "internal/code-generator/assets/languages.go.tmpl"
 	languagesTmpl     = "languages.go.tmpl"
 
 	heuristicsRuby  = ".linguist/lib/linguist/heuristics.rb"
 	contentFile     = "content.go"
-	contentTmplPath = "cli/slinguist-generate/assets/content.go.tmpl"
+	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
 
 	commitPath = ".git/refs/heads/master"

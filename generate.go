@@ -1,3 +1,3 @@
 package slinguist
 
-//go:generate go run cli/slinguist-generate/main.go
+//go:generate go run internal/code-generator/main.go
