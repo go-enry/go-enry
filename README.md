@@ -29,3 +29,8 @@ lang, _ = GetLanguageByContent("bar.m", "<pbjective-c-code>")
 fmt.Println(lang)
 // result: Objective-C
 ```
+
+License
+-------
+
+MIT, see [LICENSE](LICENSE)
