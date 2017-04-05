@@ -9,7 +9,7 @@ Installation
 The recommended way to install simple-linguist
 
 ```
-go get github.com/src-d/simple-linguist
+go get gopkg.in/src-d/simple-linguist.v1/...
 ```
 
 

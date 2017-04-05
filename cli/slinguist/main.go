@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"srcd.works/simple-linguist.v1"
+	"gopkg.in/src-d/simple-linguist.v1"
 )
 
 func main() {
