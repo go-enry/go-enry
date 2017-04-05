@@ -1,5 +1,13 @@
-samples:
-	git clone git@github.com:github/linguist.git .linguist\
+LINGUIST_PATH = .linguist
 
-test: samples
+$(LINGUIST_PATH):
+	git clone git@github.com:github/linguist.git $@
+
+test: $(LINGUIST_PATH)
 	go test -v ./...
+
+code-generate: $(LINGUIST_PATH)
+	go run internal/code-generator/main.go
+
+clean:
+	rm -rf $(LINGUIST_PATH)

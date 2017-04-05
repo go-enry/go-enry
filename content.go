@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH github.com/src-d/simple-linguist/cli/slinguist-generate
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 8b2d15a2d527c363dead3efe5e4dc3cb74fa4613
+// Extracted from github/linguist commit: 3a2a62baad5363a604828706f8df730902a542b0
 
 import (
 	"path/filepath"
