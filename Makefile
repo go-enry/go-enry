@@ -1,7 +1,7 @@
 LINGUIST_PATH = .linguist
 
 $(LINGUIST_PATH):
-	git clone git@github.com:github/linguist.git $@
+	git clone https://github.com/github/linguist.git $@
 
 test: $(LINGUIST_PATH)
 	go test -v ./...
