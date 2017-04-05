@@ -11,8 +11,6 @@ import (
 )
 
 func (s *TSuite) TestGetLanguageByContentLinguistCorpus(c *C) {
-	c.Skip("report")
-
 	var total, failed, ok, other, unsafe int
 
 	w := new(tabwriter.Writer)

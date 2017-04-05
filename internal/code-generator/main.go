@@ -30,6 +30,10 @@ func main() {
 	if err := generator.FromFile(languagesYAML, langFile, languagesTmplPath, languagesTmpl, commit, generator.Languages); err != nil {
 		log.Println(err)
 	}
+
+	if err := generator.FromFile(heuristicsRuby, contentFile, contentTmplPath, contentTmpl, commit, generator.Heuristics); err != nil {
+		log.Println(err)
+	}
 }
 
 func getCommit(path string) (string, error) {
