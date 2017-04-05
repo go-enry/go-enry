@@ -1,0 +1,20 @@
+language: go
+
+go:
+  - 1.8
+  - tip
+
+matrix:
+  allow_failures:
+    - go: tip
+
+install:
+  - rm -rf $GOPATH/src/gopkg.in/src-d
+  - mkdir -p $GOPATH/src/gopkg.in/src-d
+  - ln -s $PWD $GOPATH/src/gopkg.in/src-d/simple-linguist.v1
+  - cd $GOPATH/src/gopkg.in/src-d/simple-linguist.v1
+  - go get -v -t ./...
+
+
+script:
+  - make test
