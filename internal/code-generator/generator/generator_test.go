@@ -13,7 +13,7 @@ const (
 	// FromFile test
 	formatedLangGold    = "test_files/formated_languages.gold"
 	formatedContentGold = "test_files/formated_content.gold"
-	formatedUtilsGold   = "test_files/formated_utils.gold"
+	formatedVendorGold  = "test_files/formated_vendor.gold"
 
 	// Languages test
 	ymlTestFile           = "test_files/languages.test.yml"
@@ -30,11 +30,11 @@ const (
 	commitHeuristicsTest = "fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7"
 
 	// Vendor test
-	vendorTestFile    = "test_files/vendor.test.yml"
-	utilsGold         = "test_files/utils.gold"
-	utilsTestTmplPath = "test_files/utils.test.go.tmpl"
-	utilsTestTmplName = "utils.test.go.tmpl"
-	commitVendorTest  = "fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7"
+	vendorTestFile     = "test_files/vendor.test.yml"
+	vendorGold         = "test_files/vendor.gold"
+	vendorTestTmplPath = "test_files/vendor.test.go.tmpl"
+	vendorTestTmplName = "vendor.test.go.tmpl"
+	commitVendorTest   = "fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7"
 )
 
 func TestFromFile(t *testing.T) {
@@ -44,7 +44,7 @@ func TestFromFile(t *testing.T) {
 	goldContent, err := ioutil.ReadFile(formatedContentGold)
 	assert.NoError(t, err)
 
-	goldUtils, err := ioutil.ReadFile(formatedUtilsGold)
+	goldVendor, err := ioutil.ReadFile(formatedVendorGold)
 	assert.NoError(t, err)
 
 	outPathLang, err := ioutil.TempFile("/tmp", "generator-test-")
@@ -55,7 +55,7 @@ func TestFromFile(t *testing.T) {
 	assert.NoError(t, err)
 	defer os.Remove(outPathContent.Name())
 
-	outPathUtils, err := ioutil.TempFile("/tmp", "generator-test-")
+	outPathVendor, err := ioutil.TempFile("/tmp", "generator-test-")
 	assert.NoError(t, err)
 	defer os.Remove(outPathContent.Name())
 
@@ -92,12 +92,12 @@ func TestFromFile(t *testing.T) {
 		{
 			name:        "TestFromFile_Vendor",
 			fileToParse: vendorTestFile,
-			outPath:     outPathUtils.Name(),
-			tmplPath:    utilsTestTmplPath,
-			tmplName:    utilsTestTmplName,
+			outPath:     outPathVendor.Name(),
+			tmplPath:    vendorTestTmplPath,
+			tmplName:    vendorTestTmplName,
 			commit:      commitVendorTest,
 			generate:    Vendor,
-			wantOut:     goldUtils,
+			wantOut:     goldVendor,
 		},
 	}
 
@@ -181,7 +181,7 @@ func TestHeuristics(t *testing.T) {
 }
 
 func TestVendor(t *testing.T) {
-	gold, err := ioutil.ReadFile(utilsGold)
+	gold, err := ioutil.ReadFile(vendorGold)
 	assert.NoError(t, err)
 
 	input, err := ioutil.ReadFile(vendorTestFile)
@@ -198,8 +198,8 @@ func TestVendor(t *testing.T) {
 		{
 			name:     "TestVendor",
 			input:    input,
-			tmplPath: utilsTestTmplPath,
-			tmplName: utilsTestTmplName,
+			tmplPath: vendorTestTmplPath,
+			tmplName: vendorTestTmplName,
 			commit:   commitVendorTest,
 			wantOut:  gold,
 		},

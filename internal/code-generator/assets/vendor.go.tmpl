@@ -1,0 +1,13 @@
+package slinguist
+
+// CODE GENERATED AUTOMATICALLY WITH github.com/src-d/simple-linguist/cli/slinguist-generate
+// THIS FILE SHOULD NOT BE EDITED BY HAND
+// Extracted from github/linguist commit: {{ getCommit }}
+
+import "gopkg.in/toqueteos/substring.v1"
+
+var vendorMatchers = substring.Or(
+	{{range $regexp := . -}}
+	substring.Regexp(`{{ $regexp }}`),
+	{{end -}}
+)

@@ -18,10 +18,10 @@ const (
 	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
 
-	vendorYAML    = ".linguist/lib/linguist/vendor.yml"
-	utilsFile     = "utils.go"
-	utilsTmplPath = "internal/code-generator/assets/utils.go.tmpl"
-	utilsTmpl     = "utils.go.tmpl"
+	vendorYAML     = ".linguist/lib/linguist/vendor.yml"
+	vendorFile     = "vendor_matchers.go"
+	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
+	vendorTmpl     = "vendor.go.tmpl"
 
 	commitPath = ".git/refs/heads/master"
 )
@@ -40,11 +40,7 @@ func main() {
 		log.Println(err)
 	}
 
-	if err := generator.FromFile(vendorYAML, utilsFile, utilsTmplPath, utilsTmpl, commit, generator.Vendor); err != nil {
-		log.Println(err)
-	}
-
-	if err := generator.FromFile(vendorYAML, utilsFile, utilsTmplPath, utilsTmpl, commit, generator.Vendor); err != nil {
+	if err := generator.FromFile(vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor); err != nil {
 		log.Println(err)
 	}
 }
