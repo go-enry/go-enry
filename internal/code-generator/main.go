@@ -23,6 +23,11 @@ const (
 	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
 	vendorTmpl     = "vendor.go.tmpl"
 
+	documentationYAML     = ".linguist/lib/linguist/documentation.yml"
+	documentationFile     = "documentation_matchers.go"
+	documentationTmplPath = "internal/code-generator/assets/documentation.go.tmpl"
+	documentationTmpl     = "documentation.go.tmpl"
+
 	commitPath = ".git/refs/heads/master"
 )
 
@@ -41,6 +46,10 @@ func main() {
 	}
 
 	if err := generator.FromFile(vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor); err != nil {
+		log.Println(err)
+	}
+
+	if err := generator.FromFile(documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation); err != nil {
 		log.Println(err)
 	}
 }

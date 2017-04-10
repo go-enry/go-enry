@@ -52,23 +52,6 @@ func IsBinary(data []byte) bool {
 	return true
 }
 
-var documentationMatchers = substring.Or(
-	substring.Regexp(`^docs?/`),
-	substring.Regexp(`(^|/)[Dd]ocumentation/`),
-	substring.Regexp(`(^|/)javadoc/`),
-	substring.Regexp(`^man/`),
-	substring.Regexp(`^[Ee]xamples/`),
-	substring.Regexp(`(^|/)CHANGE(S|LOG)?(\.|$)`),
-	substring.Regexp(`(^|/)CONTRIBUTING(\.|$)`),
-	substring.Regexp(`(^|/)COPYING(\.|$)`),
-	substring.Regexp(`(^|/)INSTALL(\.|$)`),
-	substring.Regexp(`(^|/)LICEN[CS]E(\.|$)`),
-	substring.Regexp(`(^|/)[Ll]icen[cs]e(\.|$)`),
-	substring.Regexp(`(^|/)README(\.|$)`),
-	substring.Regexp(`(^|/)[Rr]eadme(\.|$)`),
-	substring.Regexp(`^[Ss]amples/`),
-)
-
 var configurationLanguages = map[string]bool{
 	"XML": true, "JSON": true, "TOML": true, "YAML": true, "INI": true, "SQL": true,
 }
