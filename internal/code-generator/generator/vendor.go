@@ -23,12 +23,12 @@ func Vendor(data []byte, vendorTmplPath, vendorTmplName, commit string) ([]byte,
 	return buf.Bytes(), nil
 }
 
-func executeVendorTemplate(out io.Writer, regexpList []string, vendorTmplPath, languagesTmpl, commit string) error {
+func executeVendorTemplate(out io.Writer, regexpList []string, vendorTmplPath, vendorTmpl, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit": func() string { return commit },
 	}
 
-	t := template.Must(template.New(languagesTmpl).Funcs(fmap).ParseFiles(vendorTmplPath))
+	t := template.Must(template.New(vendorTmpl).Funcs(fmap).ParseFiles(vendorTmplPath))
 	if err := t.Execute(out, regexpList); err != nil {
 		return err
 	}
