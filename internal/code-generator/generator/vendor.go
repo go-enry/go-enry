@@ -8,27 +8,27 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Vendor reads from buf and builds utils.go file from utilsTmplPath.
-func Vendor(data []byte, uitlsTmplPath, utilsTmplName, commit string) ([]byte, error) {
+// Vendor reads from buf and builds vendor_matchers.go file from VendorTmplPath.
+func Vendor(data []byte, vendorTmplPath, vendorTmplName, commit string) ([]byte, error) {
 	var regexpList []string
 	if err := yaml.Unmarshal(data, &regexpList); err != nil {
 		return nil, err
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeVendorTemplate(buf, regexpList, uitlsTmplPath, utilsTmplName, commit); err != nil {
+	if err := executeVendorTemplate(buf, regexpList, vendorTmplPath, vendorTmplName, commit); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-func executeVendorTemplate(out io.Writer, regexpList []string, languagesTmplPath, languagesTmpl, commit string) error {
+func executeVendorTemplate(out io.Writer, regexpList []string, vendorTmplPath, languagesTmpl, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit": func() string { return commit },
 	}
 
-	t := template.Must(template.New(languagesTmpl).Funcs(fmap).ParseFiles(languagesTmplPath))
+	t := template.Must(template.New(languagesTmpl).Funcs(fmap).ParseFiles(vendorTmplPath))
 	if err := t.Execute(out, regexpList); err != nil {
 		return err
 	}
