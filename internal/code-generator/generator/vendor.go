@@ -16,14 +16,14 @@ func Vendor(data []byte, uitlsTmplPath, utilsTmplName, commit string) ([]byte, e
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeUtilsTemplate(buf, regexpList, uitlsTmplPath, utilsTmplName, commit); err != nil {
+	if err := executeVendorTemplate(buf, regexpList, uitlsTmplPath, utilsTmplName, commit); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-func executeUtilsTemplate(out io.Writer, regexpList []string, languagesTmplPath, languagesTmpl, commit string) error {
+func executeVendorTemplate(out io.Writer, regexpList []string, languagesTmplPath, languagesTmpl, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit": func() string { return commit },
 	}
