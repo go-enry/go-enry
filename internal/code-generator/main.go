@@ -28,8 +28,21 @@ const (
 	documentationTmplPath = "internal/code-generator/assets/documentation.go.tmpl"
 	documentationTmpl     = "documentation.go.tmpl"
 
+	typeFile     = "type.go"
+	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
+	typeTmpl     = "type.go.tmpl"
+
 	commitPath = ".git/refs/heads/master"
 )
+
+type generatorArgs struct {
+	fileToParse string
+	outPath     string
+	tmplPath    string
+	tmplName    string
+	commit      string
+	generate    generator.Func
+}
 
 func main() {
 	commit, err := getCommit(commitPath)
@@ -37,20 +50,18 @@ func main() {
 		log.Printf("couldn't find commit: %v", err)
 	}
 
-	if err := generator.FromFile(languagesYAML, langFile, languagesTmplPath, languagesTmpl, commit, generator.Languages); err != nil {
-		log.Println(err)
+	argsList := []*generatorArgs{
+		&generatorArgs{languagesYAML, langFile, languagesTmplPath, languagesTmpl, commit, generator.Languages},
+		&generatorArgs{heuristicsRuby, contentFile, contentTmplPath, contentTmpl, commit, generator.Heuristics},
+		&generatorArgs{vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor},
+		&generatorArgs{documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation},
+		&generatorArgs{languagesYAML, typeFile, typeTmplPath, typeTmpl, commit, generator.Types},
 	}
 
-	if err := generator.FromFile(heuristicsRuby, contentFile, contentTmplPath, contentTmpl, commit, generator.Heuristics); err != nil {
-		log.Println(err)
-	}
-
-	if err := generator.FromFile(vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor); err != nil {
-		log.Println(err)
-	}
-
-	if err := generator.FromFile(documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation); err != nil {
-		log.Println(err)
+	for _, args := range argsList {
+		if err := generator.FromFile(args.fileToParse, args.outPath, args.tmplPath, args.tmplName, args.commit, args.generate); err != nil {
+			log.Println(err)
+		}
 	}
 }
 

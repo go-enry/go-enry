@@ -1,0 +1,46 @@
+---
+Scaml:
+  group: HTML
+  type: markup
+  extensions:
+  - ".scaml"
+  tm_scope: source.scaml
+  ace_mode: text
+  language_id: 342
+Scheme:
+  type: programming
+  color: "#1e4aec"
+  extensions:
+  - ".scm"
+  - ".sld"
+  - ".sls"
+  - ".sps"
+  - ".ss"
+  interpreters:
+  - guile
+  - bigloo
+  - chicken
+  - csi
+  - gosh
+  - r6rs
+  ace_mode: scheme
+  codemirror_mode: scheme
+  codemirror_mime_type: text/x-scheme
+  language_id: 343
+Scilab:
+  type: programming
+  extensions:
+  - ".sci"
+  - ".sce"
+  - ".tst"
+  ace_mode: text
+  language_id: 344
+Self:
+  type: programming
+  color: "#0579aa"
+  extensions:
+  - ".self"
+  tm_scope: none
+  ace_mode: text
+  language_id: 345
+  

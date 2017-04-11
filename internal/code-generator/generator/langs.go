@@ -10,11 +10,11 @@ import (
 )
 
 type languageInfo struct {
-	Type         string   `yaml:"type,omitempty" json:"type,omitempty"`
-	Aliases      []string `yaml:"aliases,omitempty,flow" json:"aliases,omitempty"`
-	Extensions   []string `yaml:"extensions,omitempty,flow" json:"extensions,omitempty"`
-	Interpreters []string `yaml:"interpreters,omitempty,flow" json:"interpreters,omitempty"`
-	Group        string   `yaml:"group,omitempty" json:"group,omitempty"`
+	Type         string   `yaml:"type,omitempty"`
+	Aliases      []string `yaml:"aliases,omitempty,flow"`
+	Extensions   []string `yaml:"extensions,omitempty,flow"`
+	Interpreters []string `yaml:"interpreters,omitempty,flow"`
+	Group        string   `yaml:"group,omitempty"`
 }
 
 // Languages reads from buf and builds languages.go file from languagesTmplPath.
@@ -24,10 +24,7 @@ func Languages(data []byte, languagesTmplPath, languagesTmplName, commit string)
 		return nil, err
 	}
 
-	languagesByExtension, err := buildExtensionLanguageMap(languages)
-	if err != nil {
-		return nil, err
-	}
+	languagesByExtension := buildExtensionLanguageMap(languages)
 
 	buf := &bytes.Buffer{}
 	if err := executeLanguagesTemplate(buf, languagesByExtension, languagesTmplPath, languagesTmplName, commit); err != nil {
@@ -37,7 +34,7 @@ func Languages(data []byte, languagesTmplPath, languagesTmplName, commit string)
 	return buf.Bytes(), nil
 }
 
-func buildExtensionLanguageMap(languages map[string]*languageInfo) (map[string][]string, error) {
+func buildExtensionLanguageMap(languages map[string]*languageInfo) map[string][]string {
 	extensionLangsMap := make(map[string][]string)
 	for lang, info := range languages {
 		for _, extension := range info.Extensions {
@@ -45,7 +42,7 @@ func buildExtensionLanguageMap(languages map[string]*languageInfo) (map[string][
 		}
 	}
 
-	return extensionLangsMap, nil
+	return extensionLangsMap
 }
 
 func executeLanguagesTemplate(out io.Writer, languagesByExtension map[string][]string, languagesTmplPath, languagesTmpl, commit string) error {

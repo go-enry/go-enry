@@ -12,7 +12,7 @@ func (s *TSuite) TestGetLanguageByExtension(c *C) {
 	c.Assert(safe, Equals, true)
 
 	lang, safe = GetLanguageByExtension("foo.go.php")
-	c.Assert(lang, Equals, "Hack")
+	c.Assert(lang, Equals, "PHP")
 	c.Assert(safe, Equals, false)
 }
 
