@@ -8,26 +8,31 @@ import (
 )
 
 const (
+	// languages.go generation
 	languagesYAML     = ".linguist/lib/linguist/languages.yml"
 	langFile          = "languages.go"
 	languagesTmplPath = "internal/code-generator/assets/languages.go.tmpl"
 	languagesTmpl     = "languages.go.tmpl"
 
+	// content.go generation
 	heuristicsRuby  = ".linguist/lib/linguist/heuristics.rb"
 	contentFile     = "content.go"
 	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
 
+	// vendor_matchers.go generation
 	vendorYAML     = ".linguist/lib/linguist/vendor.yml"
 	vendorFile     = "vendor_matchers.go"
 	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
 	vendorTmpl     = "vendor.go.tmpl"
 
+	// documentation_matchers.go generation
 	documentationYAML     = ".linguist/lib/linguist/documentation.yml"
 	documentationFile     = "documentation_matchers.go"
 	documentationTmplPath = "internal/code-generator/assets/documentation.go.tmpl"
 	documentationTmpl     = "documentation.go.tmpl"
 
+	// type.go generation
 	typeFile     = "type.go"
 	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
 	typeTmpl     = "type.go.tmpl"
