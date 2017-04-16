@@ -18,6 +18,11 @@ const (
 	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
 
+	vendorYAML     = ".linguist/lib/linguist/vendor.yml"
+	vendorFile     = "vendor_matchers.go"
+	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
+	vendorTmpl     = "vendor.go.tmpl"
+
 	commitPath = ".git/refs/heads/master"
 )
 
@@ -32,6 +37,10 @@ func main() {
 	}
 
 	if err := generator.FromFile(heuristicsRuby, contentFile, contentTmplPath, contentTmpl, commit, generator.Heuristics); err != nil {
+		log.Println(err)
+	}
+
+	if err := generator.FromFile(vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor); err != nil {
 		log.Println(err)
 	}
 }
