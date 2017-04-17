@@ -17,6 +17,7 @@ const (
 	formatedContentGold       = "test_files/formated_content.gold"
 	formatedVendorGold        = "test_files/formated_vendor.gold"
 	formatedDocumentationGold = "test_files/formated_documentation.gold"
+	formatedTypesGold         = "test_files/formated_type.gold"
 
 	// Languages test
 	ymlTestFile           = "test_files/languages.test.yml"
@@ -41,6 +42,12 @@ const (
 	documentationGold         = "test_files/documentation.gold"
 	documentationTestTmplPath = "test_files/documentation.test.go.tmpl"
 	documentationTestTmplName = "documentation.test.go.tmpl"
+
+	// Types test
+	typesTestFile     = "test_files/type.test.yml"
+	typesGold         = "test_files/type.gold"
+	typesTestTmplPath = "test_files/type.test.go.tmpl"
+	typesTestTmplName = "type.test.go.tmpl"
 )
 
 func TestFromFile(t *testing.T) {
@@ -54,6 +61,9 @@ func TestFromFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	goldDocumentation, err := ioutil.ReadFile(formatedDocumentationGold)
+	assert.NoError(t, err)
+
+	goldTypes, err := ioutil.ReadFile(formatedTypesGold)
 	assert.NoError(t, err)
 
 	outPathLang, err := ioutil.TempFile("/tmp", "generator-test-")
@@ -71,6 +81,10 @@ func TestFromFile(t *testing.T) {
 	outPathDocumentation, err := ioutil.TempFile("/tmp", "generator-test-")
 	assert.NoError(t, err)
 	defer os.Remove(outPathDocumentation.Name())
+
+	outPathTypes, err := ioutil.TempFile("/tmp", "generator-test-")
+	assert.NoError(t, err)
+	defer os.Remove(outPathTypes.Name())
 
 	tests := []struct {
 		name        string
@@ -121,6 +135,16 @@ func TestFromFile(t *testing.T) {
 			commit:      commitTest,
 			generate:    Documentation,
 			wantOut:     goldDocumentation,
+		},
+		{
+			name:        "tyTestFromFile_Types",
+			fileToParse: typesTestFile,
+			outPath:     outPathTypes.Name(),
+			tmplPath:    typesTestTmplPath,
+			tmplName:    typesTestTmplName,
+			commit:      commitTest,
+			generate:    Types,
+			wantOut:     goldTypes,
 		},
 	}
 
@@ -267,6 +291,40 @@ func TestDocumentation(t *testing.T) {
 			out, err := Documentation(tt.input, tt.tmplPath, tt.tmplName, tt.commit)
 			assert.NoError(t, err)
 			assert.EqualValues(t, tt.wantOut, out, fmt.Sprintf("Documentation() = %v, want %v", string(out), string(tt.wantOut)))
+		})
+	}
+}
+
+func TestTypes(t *testing.T) {
+	gold, err := ioutil.ReadFile(typesGold)
+	assert.NoError(t, err)
+
+	input, err := ioutil.ReadFile(typesTestFile)
+	assert.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		input    []byte
+		tmplPath string
+		tmplName string
+		commit   string
+		wantOut  []byte
+	}{
+		{
+			name:     "TestTypes",
+			input:    input,
+			tmplPath: typesTestTmplPath,
+			tmplName: typesTestTmplName,
+			commit:   commitTest,
+			wantOut:  gold,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out, err := Types(tt.input, tt.tmplPath, tt.tmplName, tt.commit)
+			assert.NoError(t, err)
+			assert.EqualValues(t, tt.wantOut, out, fmt.Sprintf("Types() = %v, want %v", string(out), string(tt.wantOut)))
 		})
 	}
 }

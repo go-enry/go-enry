@@ -2,7 +2,6 @@ package generator
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"strings"
 	"text/template"
@@ -10,22 +9,27 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	// ErrExtensionsNotFound is the error returned if data parsed doesn't contain extensions.
-	ErrExtensionsNotFound = errors.New("extensions not found")
-)
+type languageInfo struct {
+	Type         string   `yaml:"type,omitempty"`
+	Aliases      []string `yaml:"aliases,omitempty,flow"`
+	Extensions   []string `yaml:"extensions,omitempty,flow"`
+	Interpreters []string `yaml:"interpreters,omitempty,flow"`
+	Group        string   `yaml:"group,omitempty"`
+}
 
 // Languages reads from buf and builds languages.go file from languagesTmplPath.
 func Languages(data []byte, languagesTmplPath, languagesTmplName, commit string) ([]byte, error) {
-	var yamlSlice yaml.MapSlice
-	if err := yaml.Unmarshal(data, &yamlSlice); err != nil {
+	languages := make(map[string]*languageInfo)
+	if err := yaml.Unmarshal(data, &languages); err != nil {
 		return nil, err
 	}
 
-	languagesByExtension, err := buildExtensionLanguageMap(yamlSlice)
+	orderedKeyList, err := getAlphabeticalOrderedKeys(data)
 	if err != nil {
 		return nil, err
 	}
+
+	languagesByExtension := buildExtensionLanguageMap(languages, orderedKeyList)
 
 	buf := &bytes.Buffer{}
 	if err := executeLanguagesTemplate(buf, languagesByExtension, languagesTmplPath, languagesTmplName, commit); err != nil {
@@ -35,46 +39,30 @@ func Languages(data []byte, languagesTmplPath, languagesTmplName, commit string)
 	return buf.Bytes(), nil
 }
 
-func buildExtensionLanguageMap(yamlSlice yaml.MapSlice) (map[string][]string, error) {
-	extensionLangsMap := make(map[string][]string)
+func getAlphabeticalOrderedKeys(data []byte) ([]string, error) {
+	var yamlSlice yaml.MapSlice
+	if err := yaml.Unmarshal(data, &yamlSlice); err != nil {
+		return nil, err
+	}
+
+	orderedKeyList := make([]string, 0)
 	for _, lang := range yamlSlice {
-		extensions, err := findExtensions(lang.Value.(yaml.MapSlice))
-		if err != nil && err != ErrExtensionsNotFound {
-			return nil, err
-		}
-
-		fillMap(extensionLangsMap, lang.Key.(string), extensions)
+		orderedKeyList = append(orderedKeyList, lang.Key.(string))
 	}
 
-	return extensionLangsMap, nil
+	return orderedKeyList, nil
 }
 
-func findExtensions(items yaml.MapSlice) ([]string, error) {
-	const extField = "extensions"
-	for _, item := range items {
-		if item.Key == extField {
-			extensions := toStringSlice(item.Value.([]interface{}))
-			return extensions, nil
+func buildExtensionLanguageMap(languages map[string]*languageInfo, orderedKeyList []string) map[string][]string {
+	extensionLangsMap := make(map[string][]string)
+	for _, lang := range orderedKeyList {
+		langInfo := languages[lang]
+		for _, extension := range langInfo.Extensions {
+			extensionLangsMap[extension] = append(extensionLangsMap[extension], lang)
 		}
 	}
 
-	return nil, ErrExtensionsNotFound
-}
-
-func toStringSlice(slice []interface{}) []string {
-	extensions := make([]string, 0, len(slice))
-	for _, element := range slice {
-		extension := element.(string)
-		extensions = append(extensions, extension)
-	}
-
-	return extensions
-}
-
-func fillMap(extensionLangs map[string][]string, lang string, extensions []string) {
-	for _, extension := range extensions {
-		extensionLangs[extension] = append(extensionLangs[extension], lang)
-	}
+	return extensionLangsMap
 }
 
 func executeLanguagesTemplate(out io.Writer, languagesByExtension map[string][]string, languagesTmplPath, languagesTmpl, commit string) error {

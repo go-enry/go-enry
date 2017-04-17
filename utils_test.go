@@ -21,13 +21,6 @@ func (s *TSuite) TestIsVendor(c *C) {
 func (s *TSuite) TestIsDocumentation(c *C) {
 	c.Assert(IsDocumentation("foo"), Equals, false)
 	c.Assert(IsDocumentation("README"), Equals, true)
-	c.Assert(IsDocumentation("samples/something"), Equals, true)
-	c.Assert(IsDocumentation("Docs/whatever"), Equals, true)
-	c.Assert(IsDocumentation("/javadoc/*"), Equals, true)
-	c.Assert(IsDocumentation("License"), Equals, true)
-	c.Assert(IsDocumentation("CONTRIBUTING.bar"), Equals, true)
-	c.Assert(IsDocumentation("/CHANGES"), Equals, true)
-	c.Assert(IsDocumentation("INSTALL"), Equals, true)
 }
 
 func (s *TSuite) TestIsConfiguration(c *C) {
