@@ -5,8 +5,8 @@ package slinguist
 // Extracted from github/linguist commit: fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7
 
 var languagesByExtension = map[string][]string{
-	".abap":	{"ABAP"},
-	".abnf":	{"ABNF"},
-	".bsl":	{"1C Enterprise"},
-	".os":	{"1C Enterprise"},
-	}
+	".abap": {"ABAP"},
+	".abnf": {"ABNF"},
+	".bsl":  {"1C Enterprise"},
+	".os":   {"1C Enterprise"},
+}

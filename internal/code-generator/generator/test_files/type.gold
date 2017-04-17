@@ -20,8 +20,8 @@ func GetLanguageType(language string) (langType Type) {
 }
 
 var languagesType = map[string]Type{
-	"Scaml": TypeMarkup,
+	"Scaml":  TypeMarkup,
 	"Scheme": TypeProgramming,
 	"Scilab": TypeProgramming,
-	"Self": TypeProgramming,
-	}
+	"Self":   TypeProgramming,
+}

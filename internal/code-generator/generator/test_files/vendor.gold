@@ -21,4 +21,4 @@ var vendorMatchers = substring.Or(
 	substring.Regexp(`(^|/)ltsugar.m4`),
 	substring.Regexp(`(^|/)ltversion.m4`),
 	substring.Regexp(`(^|/)lt~obsolete.m4`),
-	)
+)

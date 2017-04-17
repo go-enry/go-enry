@@ -22,4 +22,4 @@ var documentationMatchers = substring.Or(
 	substring.Regexp(`(^|/)README(\.|$)`),
 	substring.Regexp(`(^|/)[Rr]eadme(\.|$)`),
 	substring.Regexp(`^[Ss]amples?/`),
-	)
+)

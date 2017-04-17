@@ -20,7 +20,7 @@ func GetLanguageByContent(filename string, content []byte) (lang string, safe bo
 	return GetLanguageByExtension(filename)
 }
 
-type languageMatcher func ([]byte) (string, bool)
+type languageMatcher func([]byte) (string, bool)
 
 var matchers = map[string]languageMatcher{
 	".asc": func(i []byte) (string, bool) {
@@ -31,14 +31,14 @@ var matchers = map[string]languageMatcher{
 		} else if asc_AGSScript_Matcher_0.Match(i) {
 			return "AGS Script", true
 		}
-	
+
 		return OtherLanguage, false
 	},
 	".ms": func(i []byte) (string, bool) {
 		if ms_Groff_Matcher_0.Match(i) {
 			return "Groff", true
 		}
-	
+
 		return "MAXScript", true
 	},
 	".mod": func(i []byte) (string, bool) {
@@ -47,7 +47,7 @@ var matchers = map[string]languageMatcher{
 		} else if mod_ModulaDash2_Matcher_0.Match(i) || mod_ModulaDash2_Matcher_1.Match(i) {
 			return "Modula-2", true
 		}
-	
+
 		return "Linux Kernel Module", false
 	},
 	".pro": func(i []byte) (string, bool) {
@@ -60,22 +60,22 @@ var matchers = map[string]languageMatcher{
 		} else if pro_IDL_Matcher_0.Match(i) {
 			return "IDL", true
 		}
-	
+
 		return OtherLanguage, false
 	},
-	}
+}
 
 var (
-    asc_PublicKey_Matcher_0 = regexp.MustCompile(`(?m)^(----[- ]BEGIN|ssh-(rsa|dss)) `)
-    asc_AsciiDoc_Matcher_0 = regexp.MustCompile(`(?m)^[=-]+(\s|\n)|{{[A-Za-z]`)
-    asc_AGSScript_Matcher_0 = regexp.MustCompile(`(?m)^(\/\/.+|((import|export)\s+)?(function|int|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)\s*[;\(])`)
-    ms_Groff_Matcher_0 = regexp.MustCompile(`(?mi)^[.'][a-z][a-z](\s|$)`)
-    mod_XML_Matcher_0 = regexp.MustCompile(`(?m)<!ENTITY `)
-    mod_ModulaDash2_Matcher_0 = regexp.MustCompile(`(?mi)^\s*MODULE [\w\.]+;`)
-    mod_ModulaDash2_Matcher_1 = regexp.MustCompile(`(?mi)^\s*END [\w\.]+;`)
-    pro_Prolog_Matcher_0 = regexp.MustCompile(`(?m)^[^#]+:-`)
-    pro_INI_Matcher_0 = regexp.MustCompile(`(?m)last_client=`)
-    pro_QMake_Matcher_0 = regexp.MustCompile(`(?m)HEADERS`)
-    pro_QMake_Matcher_1 = regexp.MustCompile(`(?m)SOURCES`)
-    pro_IDL_Matcher_0 = regexp.MustCompile(`(?m)^\s*function[ \w,]+$`)
-    )
+	asc_PublicKey_Matcher_0   = regexp.MustCompile(`(?m)^(----[- ]BEGIN|ssh-(rsa|dss)) `)
+	asc_AsciiDoc_Matcher_0    = regexp.MustCompile(`(?m)^[=-]+(\s|\n)|{{[A-Za-z]`)
+	asc_AGSScript_Matcher_0   = regexp.MustCompile(`(?m)^(\/\/.+|((import|export)\s+)?(function|int|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)\s*[;\(])`)
+	ms_Groff_Matcher_0        = regexp.MustCompile(`(?mi)^[.'][a-z][a-z](\s|$)`)
+	mod_XML_Matcher_0         = regexp.MustCompile(`(?m)<!ENTITY `)
+	mod_ModulaDash2_Matcher_0 = regexp.MustCompile(`(?mi)^\s*MODULE [\w\.]+;`)
+	mod_ModulaDash2_Matcher_1 = regexp.MustCompile(`(?mi)^\s*END [\w\.]+;`)
+	pro_Prolog_Matcher_0      = regexp.MustCompile(`(?m)^[^#]+:-`)
+	pro_INI_Matcher_0         = regexp.MustCompile(`(?m)last_client=`)
+	pro_QMake_Matcher_0       = regexp.MustCompile(`(?m)HEADERS`)
+	pro_QMake_Matcher_1       = regexp.MustCompile(`(?m)SOURCES`)
+	pro_IDL_Matcher_0         = regexp.MustCompile(`(?m)^\s*function[ \w,]+$`)
+)

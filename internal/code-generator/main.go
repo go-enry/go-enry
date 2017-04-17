@@ -37,6 +37,11 @@ const (
 	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
 	typeTmpl     = "type.go.tmpl"
 
+	// interpreters_map.go generation
+	interpretersFile     = "interpreters_map.go"
+	interpretersTmplPath = "internal/code-generator/assets/interpreters.go.tmpl"
+	interpretersTmpl     = "interpreters.go.tmpl"
+
 	commitPath = ".git/refs/heads/master"
 )
 
