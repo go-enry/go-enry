@@ -4,20 +4,22 @@ package slinguist
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
 
+type Type int
+
 const (
-	TypeUnknown = iota
+	TypeUnknown Type = iota
 	TypeData
 	TypeProgramming
 	TypeMarkup
 	TypeProse
 )
 
-func GetLanguageType(language string) (langType int) {
+func GetLanguageType(language string) (langType Type) {
 	langType, _ = languagesType[language]
 	return langType
 }
 
-var languagesType = map[string]int{
+var languagesType = map[string]Type{
 	"1C Enterprise":    TypeProgramming,
 	"ABAP":             TypeProgramming,
 	"ABNF":             TypeData,
