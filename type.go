@@ -5,11 +5,11 @@ package slinguist
 // Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
 
 const (
-	TypeUnknown     = iota
-	TypeData        = iota
-	TypeProgramming = iota
-	TypeMarkup      = iota
-	TypeProse       = iota
+	TypeUnknown = iota
+	TypeData
+	TypeProgramming
+	TypeMarkup
+	TypeProse
 )
 
 func GetLanguageType(language string) (langType int) {

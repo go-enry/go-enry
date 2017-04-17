@@ -6,10 +6,10 @@ package slinguist
 
 const (
 	TypeUnknown     = iota
-	TypeData        = iota
-	TypeProgramming = iota
-	TypeMarkup      = iota
-	TypeProse       = iota
+	TypeData
+	TypeProgramming
+	TypeMarkup
+	TypeProse
 )
 
 func GetLanguageType(language string) (langType int) {
