@@ -41,6 +41,12 @@ const (
 	typesGold         = "test_files/type.gold"
 	typesTestTmplPath = "test_files/type.test.go.tmpl"
 	typesTestTmplName = "type.test.go.tmpl"
+
+	// Interpreters test
+	interpretersTestFile     = "test_files/interpreters.test.yml"
+	interpretersGold         = "test_files/interpreters.gold"
+	interpretersTestTmplPath = "test_files/interpreters.test.go.tmpl"
+	interpretersTestTmplName = "interpreters.test.go.tmpl"
 )
 
 func TestFromFile(t *testing.T) {
@@ -57,6 +63,9 @@ func TestFromFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	goldTypes, err := ioutil.ReadFile(typesGold)
+	assert.NoError(t, err)
+
+	goldInterpreters, err := ioutil.ReadFile(interpretersGold)
 	assert.NoError(t, err)
 
 	outPathLang, err := ioutil.TempFile("/tmp", "generator-test-")
@@ -78,6 +87,10 @@ func TestFromFile(t *testing.T) {
 	outPathTypes, err := ioutil.TempFile("/tmp", "generator-test-")
 	assert.NoError(t, err)
 	defer os.Remove(outPathTypes.Name())
+
+	outPathInterpreters, err := ioutil.TempFile("/tmp", "generator-test-")
+	assert.NoError(t, err)
+	defer os.Remove(outPathInterpreters.Name())
 
 	tests := []struct {
 		name        string
@@ -138,6 +151,16 @@ func TestFromFile(t *testing.T) {
 			commit:      commitTest,
 			generate:    Types,
 			wantOut:     goldTypes,
+		},
+		{
+			name:        "TestFromFile_Interpreters",
+			fileToParse: interpretersTestFile,
+			outPath:     outPathInterpreters.Name(),
+			tmplPath:    interpretersTestTmplPath,
+			tmplName:    interpretersTestTmplName,
+			commit:      commitTest,
+			generate:    Interpreters,
+			wantOut:     goldInterpreters,
 		},
 	}
 

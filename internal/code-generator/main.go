@@ -66,6 +66,7 @@ func main() {
 		&generatorArgs{vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor},
 		&generatorArgs{documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation},
 		&generatorArgs{languagesYAML, typeFile, typeTmplPath, typeTmpl, commit, generator.Types},
+		&generatorArgs{languagesYAML, interpretersFile, interpretersTmplPath, interpretersTmpl, commit, generator.Interpreters},
 	}
 
 	for _, args := range argsList {

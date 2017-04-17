@@ -1,0 +1,16 @@
+package slinguist
+
+// CODE GENERATED AUTOMATICALLY WITH github.com/src-d/simple-linguist/cli/slinguist-generate
+// THIS FILE SHOULD NOT BE EDITED BY HAND
+// Extracted from github/linguist commit: fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7
+
+var languagesByInterpreter = map[string][]string{
+	"bash":    {"Shell"},
+	"nush":    {"Nu"},
+	"python":  {"Python"},
+	"python2": {"Python"},
+	"python3": {"Python"},
+	"rc":      {"Shell"},
+	"sh":      {"Shell"},
+	"zsh":     {"Shell"},
+}
