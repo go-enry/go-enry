@@ -9,10 +9,10 @@ import (
 )
 
 var typeToTypeConst = map[string]string{
-	"data":        "TypeData",
-	"programming": "TypeProgramming",
-	"markup":      "TypeMarkup",
-	"prose":       "TypeProse",
+	"data":        "Data",
+	"programming": "Programming",
+	"markup":      "Markup",
+	"prose":       "Prose",
 }
 
 // Types reads from buf and builds type.go file from typeTmplPath.

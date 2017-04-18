@@ -1,6 +1,6 @@
 package slinguist
 
-// CODE GENERATED AUTOMATICALLY WITH github.com/src-d/simple-linguist/cli/slinguist-generate
+// CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
 

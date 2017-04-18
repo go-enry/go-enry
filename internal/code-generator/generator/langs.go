@@ -12,10 +12,8 @@ import (
 
 type languageInfo struct {
 	Type         string   `yaml:"type,omitempty"`
-	Aliases      []string `yaml:"aliases,omitempty,flow"`
 	Extensions   []string `yaml:"extensions,omitempty,flow"`
 	Interpreters []string `yaml:"interpreters,omitempty,flow"`
-	Group        string   `yaml:"group,omitempty"`
 }
 
 // Languages reads from buf and builds languages.go file from languagesTmplPath.
