@@ -48,7 +48,7 @@ func main() {
 			return nil
 		}
 
-		l := slinguist.GetLanguage(path, content)
+		l := slinguist.GetLanguage(filepath.Base(path), content)
 
 		r, err := filepath.Rel(root, path)
 		if err != nil {
