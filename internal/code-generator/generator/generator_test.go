@@ -13,10 +13,10 @@ const (
 	commitTest = "fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7"
 
 	// Languages test
-	ymlTestFile           = "test_files/languages.test.yml"
-	langGold              = "test_files/languages.gold"
-	languagesTestTmplPath = "test_files/languages.test.go.tmpl"
-	languagesTestTmplName = "languages.test.go.tmpl"
+	extensionsTestFile     = "test_files/extensions.test.yml"
+	extensionsGold         = "test_files/extensions.gold"
+	extensionsTestTmplPath = "test_files/extensions.test.go.tmpl"
+	extensionsTestTmplName = "extensions.test.go.tmpl"
 
 	// Heuristics test
 	heuristicsTestFile  = "test_files/heuristics.test.rb"
@@ -67,12 +67,12 @@ func TestFromFile(t *testing.T) {
 	}{
 		{
 			name:        "TestFromFile_Language",
-			fileToParse: ymlTestFile,
-			tmplPath:    languagesTestTmplPath,
-			tmplName:    languagesTestTmplName,
+			fileToParse: extensionsTestFile,
+			tmplPath:    extensionsTestTmplPath,
+			tmplName:    extensionsTestTmplName,
 			commit:      commitTest,
-			generate:    Languages,
-			wantOut:     langGold,
+			generate:    Extensions,
+			wantOut:     extensionsGold,
 		},
 		{
 			name:        "TestFromFile_Heuristics",
