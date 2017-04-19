@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const shebang = `#!`
+
 var (
 	shebangExecHack = regexp.MustCompile(`exec (\w+).+\$0.+\$@`)
 	pythonVersion   = regexp.MustCompile(`python\d\.\d+`)
@@ -68,7 +70,7 @@ func getFirstLine(data []byte) []byte {
 }
 
 func hasShebang(line []byte) bool {
-	shebang := []byte{'#', '!'}
+	shebang := []byte(shebang)
 	return bytes.HasPrefix(line, shebang)
 }
 
