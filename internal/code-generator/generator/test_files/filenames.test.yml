@@ -1,0 +1,13 @@
+---
+Alpine Abuild:
+  filenames:
+  - APKBUILD
+CMake:
+  filenames:
+  - CMakeLists.txt
+CoffeeScript:
+  filenames:
+  - Cakefile
+Elixir:
+  filenames:
+  - mix.lock
