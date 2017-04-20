@@ -15,44 +15,44 @@ const (
 	// Languages test
 	extensionsTestFile     = "test_files/extensions.test.yml"
 	extensionsGold         = "test_files/extensions.gold"
-	extensionsTestTmplPath = "test_files/extensions.test.go.tmpl"
-	extensionsTestTmplName = "extensions.test.go.tmpl"
+	extensionsTestTmplPath = "../assets/extensions.go.tmpl"
+	extensionsTestTmplName = "extensions.go.tmpl"
 
 	// Heuristics test
 	heuristicsTestFile  = "test_files/heuristics.test.rb"
 	contentGold         = "test_files/content.gold"
-	contentTestTmplPath = "test_files/content.test.go.tmpl"
-	contentTestTmplName = "content.test.go.tmpl"
+	contentTestTmplPath = "../assets/content.go.tmpl"
+	contentTestTmplName = "content.go.tmpl"
 
 	// Vendor test
 	vendorTestFile     = "test_files/vendor.test.yml"
 	vendorGold         = "test_files/vendor.gold"
-	vendorTestTmplPath = "test_files/vendor.test.go.tmpl"
-	vendorTestTmplName = "vendor.test.go.tmpl"
+	vendorTestTmplPath = "../assets/vendor.go.tmpl"
+	vendorTestTmplName = "vendor.go.tmpl"
 
 	// Documentation test
 	documentationTestFile     = "test_files/documentation.test.yml"
 	documentationGold         = "test_files/documentation.gold"
-	documentationTestTmplPath = "test_files/documentation.test.go.tmpl"
-	documentationTestTmplName = "documentation.test.go.tmpl"
+	documentationTestTmplPath = "../assets/documentation.go.tmpl"
+	documentationTestTmplName = "documentation.go.tmpl"
 
 	// Types test
 	typesTestFile     = "test_files/type.test.yml"
 	typesGold         = "test_files/type.gold"
-	typesTestTmplPath = "test_files/type.test.go.tmpl"
-	typesTestTmplName = "type.test.go.tmpl"
+	typesTestTmplPath = "../assets/type.go.tmpl"
+	typesTestTmplName = "type.go.tmpl"
 
 	// Interpreters test
 	interpretersTestFile     = "test_files/interpreters.test.yml"
 	interpretersGold         = "test_files/interpreters.gold"
-	interpretersTestTmplPath = "test_files/interpreters.test.go.tmpl"
-	interpretersTestTmplName = "interpreters.test.go.tmpl"
+	interpretersTestTmplPath = "../assets/interpreters.go.tmpl"
+	interpretersTestTmplName = "interpreters.go.tmpl"
 
 	// Filenames test
 	filenamesTestFile     = "test_files/filenames.test.yml"
 	filenamesGold         = "test_files/filenames.gold"
-	filenamesTestTmplPath = "test_files/filenames.test.go.tmpl"
-	filenamesTestTmplName = "filenames.test.go.tmpl"
+	filenamesTestTmplPath = "../assets/filenames.go.tmpl"
+	filenamesTestTmplName = "filenames.go.tmpl"
 )
 
 func TestFromFile(t *testing.T) {

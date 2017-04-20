@@ -16,7 +16,7 @@ func Documentation(data []byte, documentationTmplPath, documentationTmplName, co
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeVendorTemplate(buf, regexpList, documentationTmplPath, documentationTmplName, commit); err != nil {
+	if err := executeDocumentationTemplate(buf, regexpList, documentationTmplPath, documentationTmplName, commit); err != nil {
 		return nil, err
 	}
 
