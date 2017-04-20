@@ -34,6 +34,53 @@ var matchers = map[string]languageMatcher{
 
 		return OtherLanguage, false
 	},
+	".f": func(i []byte) (string, bool) {
+		if f_Forth_Matcher_0.Match(i) {
+			return "Forth", true
+		} else if f_FilebenchWML_Matcher_0.Match(i) {
+			return "Filebench WML", true
+		} else if f_FORTRAN_Matcher_0.Match(i) {
+			return "FORTRAN", true
+		}
+
+		return OtherLanguage, false
+	},
+	".h": func(i []byte) (string, bool) {
+		if h_ObjectiveDashC_Matcher_0.Match(i) {
+			return "Objective-C", true
+		} else if h_CPlusPlus_Matcher_0.Match(i) || h_CPlusPlus_Matcher_1.Match(i) || h_CPlusPlus_Matcher_2.Match(i) || h_CPlusPlus_Matcher_3.Match(i) || h_CPlusPlus_Matcher_4.Match(i) || h_CPlusPlus_Matcher_5.Match(i) || h_CPlusPlus_Matcher_6.Match(i) {
+			return "C++", true
+		}
+
+		return OtherLanguage, false
+	},
+	".lsp": func(i []byte) (string, bool) {
+		if lsp_CommonLisp_Matcher_0.Match(i) {
+			return "Common Lisp", true
+		} else if lsp_NewLisp_Matcher_0.Match(i) {
+			return "NewLisp", true
+		}
+
+		return OtherLanguage, false
+	},
+	".lisp": func(i []byte) (string, bool) {
+		if lisp_CommonLisp_Matcher_0.Match(i) {
+			return "Common Lisp", true
+		} else if lisp_NewLisp_Matcher_0.Match(i) {
+			return "NewLisp", true
+		}
+
+		return OtherLanguage, false
+	},
+	".md": func(i []byte) (string, bool) {
+		if md_Markdown_Matcher_0.Match(i) || md_Markdown_Matcher_1.Match(i) {
+			return "Markdown", true
+		} else if md_GCCmachinedescription_Matcher_0.Match(i) {
+			return "GCC machine description", true
+		}
+
+		return "Markdown", true
+	},
 	".ms": func(i []byte) (string, bool) {
 		if ms_Groff_Matcher_0.Match(i) {
 			return "Groff", true
@@ -63,19 +110,45 @@ var matchers = map[string]languageMatcher{
 
 		return OtherLanguage, false
 	},
+	".rpy": func(i []byte) (string, bool) {
+		if rpy_Python_Matcher_0.Match(i) {
+			return "Python", true
+		}
+
+		return "Ren'Py", true
+	},
 }
 
 var (
-	asc_PublicKey_Matcher_0   = regexp.MustCompile(`(?m)^(----[- ]BEGIN|ssh-(rsa|dss)) `)
-	asc_AsciiDoc_Matcher_0    = regexp.MustCompile(`(?m)^[=-]+(\s|\n)|{{[A-Za-z]`)
-	asc_AGSScript_Matcher_0   = regexp.MustCompile(`(?m)^(\/\/.+|((import|export)\s+)?(function|int|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)\s*[;\(])`)
-	ms_Groff_Matcher_0        = regexp.MustCompile(`(?mi)^[.'][a-z][a-z](\s|$)`)
-	mod_XML_Matcher_0         = regexp.MustCompile(`(?m)<!ENTITY `)
-	mod_ModulaDash2_Matcher_0 = regexp.MustCompile(`(?mi)^\s*MODULE [\w\.]+;`)
-	mod_ModulaDash2_Matcher_1 = regexp.MustCompile(`(?mi)^\s*END [\w\.]+;`)
-	pro_Prolog_Matcher_0      = regexp.MustCompile(`(?m)^[^#]+:-`)
-	pro_INI_Matcher_0         = regexp.MustCompile(`(?m)last_client=`)
-	pro_QMake_Matcher_0       = regexp.MustCompile(`(?m)HEADERS`)
-	pro_QMake_Matcher_1       = regexp.MustCompile(`(?m)SOURCES`)
-	pro_IDL_Matcher_0         = regexp.MustCompile(`(?m)^\s*function[ \w,]+$`)
+	asc_PublicKey_Matcher_0            = regexp.MustCompile(`(?m)^(----[- ]BEGIN|ssh-(rsa|dss)) `)
+	asc_AsciiDoc_Matcher_0             = regexp.MustCompile(`(?m)^[=-]+(\s|\n)|{{[A-Za-z]`)
+	asc_AGSScript_Matcher_0            = regexp.MustCompile(`(?m)^(\/\/.+|((import|export)\s+)?(function|int|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)\s*[;\(])`)
+	f_Forth_Matcher_0                  = regexp.MustCompile(`(?m)^: `)
+	f_FilebenchWML_Matcher_0           = regexp.MustCompile(`(?m)flowop`)
+	f_FORTRAN_Matcher_0                = regexp.MustCompile(`(?mi)^([c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`)
+	h_ObjectiveDashC_Matcher_0         = regexp.MustCompile(`(?m)^\s*(@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">])`)
+	h_CPlusPlus_Matcher_0              = regexp.MustCompile(`(?m)^\s*#\s*include <(cstdint|string|vector|map|list|array|bitset|queue|stack|forward_list|unordered_map|unordered_set|(i|o|io)stream)>`)
+	h_CPlusPlus_Matcher_1              = regexp.MustCompile(`(?m)^\s*template\s*<`)
+	h_CPlusPlus_Matcher_2              = regexp.MustCompile(`(?m)^[ \t]*try`)
+	h_CPlusPlus_Matcher_3              = regexp.MustCompile(`(?m)^[ \t]*catch\s*\(`)
+	h_CPlusPlus_Matcher_4              = regexp.MustCompile(`(?m)^[ \t]*(class|(using[ \t]+)?namespace)\s+\w+`)
+	h_CPlusPlus_Matcher_5              = regexp.MustCompile(`(?m)^[ \t]*(private|public|protected):$`)
+	h_CPlusPlus_Matcher_6              = regexp.MustCompile(`(?m)std::\w+`)
+	lsp_CommonLisp_Matcher_0           = regexp.MustCompile(`(?mi)^\s*\((defun|in-package|defpackage) `)
+	lsp_NewLisp_Matcher_0              = regexp.MustCompile(`(?m)^\s*\(define `)
+	lisp_CommonLisp_Matcher_0          = regexp.MustCompile(`(?mi)^\s*\((defun|in-package|defpackage) `)
+	lisp_NewLisp_Matcher_0             = regexp.MustCompile(`(?m)^\s*\(define `)
+	md_Markdown_Matcher_0              = regexp.MustCompile(`(?mi)(^[-a-z0-9=#!\*\[|>])|<\/`)
+	md_Markdown_Matcher_1              = regexp.MustCompile(`(?m)^$`)
+	md_GCCmachinedescription_Matcher_0 = regexp.MustCompile(`(?m)^(;;|\(define_)`)
+	ms_Groff_Matcher_0                 = regexp.MustCompile(`(?mi)^[.'][a-z][a-z](\s|$)`)
+	mod_XML_Matcher_0                  = regexp.MustCompile(`(?m)<!ENTITY `)
+	mod_ModulaDash2_Matcher_0          = regexp.MustCompile(`(?mi)^\s*MODULE [\w\.]+;`)
+	mod_ModulaDash2_Matcher_1          = regexp.MustCompile(`(?mi)^\s*END [\w\.]+;`)
+	pro_Prolog_Matcher_0               = regexp.MustCompile(`(?m)^[^#]+:-`)
+	pro_INI_Matcher_0                  = regexp.MustCompile(`(?m)last_client=`)
+	pro_QMake_Matcher_0                = regexp.MustCompile(`(?m)HEADERS`)
+	pro_QMake_Matcher_1                = regexp.MustCompile(`(?m)SOURCES`)
+	pro_IDL_Matcher_0                  = regexp.MustCompile(`(?m)^\s*function[ \w,]+$`)
+	rpy_Python_Matcher_0               = regexp.MustCompile(`(?ms)(^(import|from|class|def)\s)`)
 )
