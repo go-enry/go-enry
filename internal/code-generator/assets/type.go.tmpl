@@ -7,6 +7,7 @@ package slinguist
 type Type int
 
 const (
+	// Language's type. Either data, programming, markup, prose, or unknown.
 	Unknown Type = iota
 	Data
 	Programming
@@ -14,6 +15,7 @@ const (
 	Prose
 )
 
+// GetLanguageType returns the given language's type.
 func GetLanguageType(language string) (langType Type) {
 	langType, _ = languagesType[language]
 	return langType
