@@ -37,10 +37,10 @@ const (
 	documentationTestTmplName = "documentation.go.tmpl"
 
 	// Types test
-	typesTestFile     = "test_files/type.test.yml"
-	typesGold         = "test_files/type.gold"
-	typesTestTmplPath = "../assets/type.go.tmpl"
-	typesTestTmplName = "type.go.tmpl"
+	typesTestFile     = "test_files/types.test.yml"
+	typesGold         = "test_files/types.gold"
+	typesTestTmplPath = "../assets/types.go.tmpl"
+	typesTestTmplName = "types.go.tmpl"
 
 	// Interpreters test
 	interpretersTestFile     = "test_files/interpreters.test.yml"
