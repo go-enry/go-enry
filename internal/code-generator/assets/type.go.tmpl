@@ -17,7 +17,11 @@ const (
 
 // GetLanguageType returns the given language's type.
 func GetLanguageType(language string) (langType Type) {
-	langType, _ = languagesType[language]
+	langType, ok := languagesType[language]
+	if !ok {
+		langType = Unknown
+	}
+
 	return langType
 }
 

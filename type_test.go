@@ -29,4 +29,7 @@ func (s *TSuite) TestGetLanguageType(c *C) {
 
 	langType = GetLanguageType("Textile")
 	c.Assert(langType, Equals, Prose)
+
+	langType = GetLanguageType("Whatever")
+	c.Assert(langType, Equals, Unknown)
 }
