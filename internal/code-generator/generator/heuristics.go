@@ -299,7 +299,7 @@ func getHeuristics(line string) []*heuristic {
 		}
 
 		if reg != "" {
-			reg = convToValidRegexp(reg)
+			reg = convertToValidRegexp(reg)
 			heuristics = append(heuristics, &heuristic{Regexp: reg})
 		}
 	}
@@ -327,7 +327,7 @@ func replaceRegexpVariables(reg string) string {
 	return repl
 }
 
-func convToValidRegexp(reg string) string {
+func convertToValidRegexp(reg string) string {
 	// example: `/^(\s*)(<Project|<Import|<Property|<?xml|xmlns)/i``
 	// Ruby modifier "m" matches multiple lines, recognizing newlines as normal characters, Go use flag "s" for that.
 	const (

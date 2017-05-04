@@ -4,8 +4,8 @@ package slinguist
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: {{ getCommit }}
 
-var languagesByInterpreter = map[string][]string{
-	{{range $interpreter, $languages := . -}}
-	"{{ $interpreter }}":	{ {{- $languages | formatStringSlice -}} },
+var languagesByFilename = map[string]string{
+	{{range $filename, $language := . -}}
+	"{{ $filename }}":	{{- printf "%q" $language -}},
 	{{end -}}
 }

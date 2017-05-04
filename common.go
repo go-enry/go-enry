@@ -36,6 +36,10 @@ func GetLanguageExtensions(language string) []string {
 
 // GetLanguage return the Language for a given filename and file content.
 func GetLanguage(filename string, content []byte) string {
+	if lang, safe := GetLanguageByFilename(filename); safe {
+		return lang
+	}
+
 	if lang, safe := GetLanguageByShebang(content); safe {
 		return lang
 	}

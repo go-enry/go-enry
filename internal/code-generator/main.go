@@ -8,11 +8,13 @@ import (
 )
 
 const (
-	// languages.go generation
-	languagesYAML     = ".linguist/lib/linguist/languages.yml"
-	langFile          = "languages.go"
-	languagesTmplPath = "internal/code-generator/assets/languages.go.tmpl"
-	languagesTmpl     = "languages.go.tmpl"
+	// languages info file
+	languagesYAML = ".linguist/lib/linguist/languages.yml"
+
+	// extensions_map.go generation
+	extensionsFile     = "extensions_map.go"
+	extensionsTmplPath = "internal/code-generator/assets/extensions.go.tmpl"
+	extensionsTmpl     = "extensions.go.tmpl"
 
 	// content.go generation
 	heuristicsRuby  = ".linguist/lib/linguist/heuristics.rb"
@@ -42,6 +44,11 @@ const (
 	interpretersTmplPath = "internal/code-generator/assets/interpreters.go.tmpl"
 	interpretersTmpl     = "interpreters.go.tmpl"
 
+	// filenames_map.go generation
+	filenamesFile     = "filenames_map.go"
+	filenamesTmplPath = "internal/code-generator/assets/filenames.go.tmpl"
+	filenamesTmpl     = "filenames.go.tmpl"
+
 	commitPath = ".git/refs/heads/master"
 )
 
@@ -61,12 +68,13 @@ func main() {
 	}
 
 	argsList := []*generatorArgs{
-		&generatorArgs{languagesYAML, langFile, languagesTmplPath, languagesTmpl, commit, generator.Languages},
+		&generatorArgs{languagesYAML, extensionsFile, extensionsTmplPath, extensionsTmpl, commit, generator.Extensions},
 		&generatorArgs{heuristicsRuby, contentFile, contentTmplPath, contentTmpl, commit, generator.Heuristics},
 		&generatorArgs{vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor},
 		&generatorArgs{documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation},
 		&generatorArgs{languagesYAML, typeFile, typeTmplPath, typeTmpl, commit, generator.Types},
 		&generatorArgs{languagesYAML, interpretersFile, interpretersTmplPath, interpretersTmpl, commit, generator.Interpreters},
+		&generatorArgs{languagesYAML, filenamesFile, filenamesTmplPath, filenamesTmpl, commit, generator.Filenames},
 	}
 
 	for _, args := range argsList {
