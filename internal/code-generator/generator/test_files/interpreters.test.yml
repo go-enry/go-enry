@@ -1,0 +1,15 @@
+---
+Nu:
+  interpreters:
+  - nush
+Shell:
+  interpreters:
+  - bash
+  - rc
+  - sh
+  - zsh
+Python:
+  interpreters:
+  - python
+  - python2
+  - python3

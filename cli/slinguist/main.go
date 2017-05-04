@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -12,18 +13,20 @@ import (
 )
 
 func main() {
+	flag.Usage = usage
 	flag.Parse()
 	root, err := filepath.Abs(flag.Arg(0))
-	ifError(err)
-
-	if root == "" {
-		usage()
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	errors := false
 	o := make(map[string][]string, 0)
 	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
-			return err
+			errors = true
+			log.Println(err)
+			return filepath.SkipDir
 		}
 
 		if slinguist.IsVendor(f.Name()) || slinguist.IsDotFile(f.Name()) {
@@ -38,22 +41,36 @@ func main() {
 			return nil
 		}
 
-		l, safe := slinguist.GetLanguageByExtension(path)
-		if !safe {
-			content, _ := ioutil.ReadFile(path)
-			l, safe = slinguist.GetLanguageByContent(path, content)
-
+		content, err := ioutil.ReadFile(path)
+		if err != nil {
+			errors = true
+			log.Println(err)
+			return nil
 		}
 
-		r, _ := filepath.Rel(root, path)
+		l := slinguist.GetLanguage(path, content)
+
+		r, err := filepath.Rel(root, path)
+		if err != nil {
+			errors = true
+			log.Println(err)
+			return nil
+		}
+
 		o[l] = append(o[l], r)
 		return nil
 	})
 
-	ifError(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	js, _ := json.MarshalIndent(o, "", "  ")
 	fmt.Printf("%s\n", js)
+
+	if errors {
+		os.Exit(2)
+	}
 }
 
 func usage() {
@@ -63,12 +80,4 @@ func usage() {
 	)
 
 	flag.PrintDefaults()
-	os.Exit(2)
-}
-
-func ifError(err error) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
-		os.Exit(2)
-	}
 }

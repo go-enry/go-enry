@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"io"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -11,10 +12,8 @@ import (
 
 type languageInfo struct {
 	Type         string   `yaml:"type,omitempty"`
-	Aliases      []string `yaml:"aliases,omitempty,flow"`
 	Extensions   []string `yaml:"extensions,omitempty,flow"`
 	Interpreters []string `yaml:"interpreters,omitempty,flow"`
-	Group        string   `yaml:"group,omitempty"`
 }
 
 // Languages reads from buf and builds languages.go file from languagesTmplPath.
@@ -24,11 +23,7 @@ func Languages(data []byte, languagesTmplPath, languagesTmplName, commit string)
 		return nil, err
 	}
 
-	orderedKeyList, err := getAlphabeticalOrderedKeys(data)
-	if err != nil {
-		return nil, err
-	}
-
+	orderedKeyList := getAlphabeticalOrderedKeys(languages)
 	languagesByExtension := buildExtensionLanguageMap(languages, orderedKeyList)
 
 	buf := &bytes.Buffer{}
@@ -39,18 +34,14 @@ func Languages(data []byte, languagesTmplPath, languagesTmplName, commit string)
 	return buf.Bytes(), nil
 }
 
-func getAlphabeticalOrderedKeys(data []byte) ([]string, error) {
-	var yamlSlice yaml.MapSlice
-	if err := yaml.Unmarshal(data, &yamlSlice); err != nil {
-		return nil, err
+func getAlphabeticalOrderedKeys(languages map[string]*languageInfo) []string {
+	keyList := make([]string, 0)
+	for lang := range languages {
+		keyList = append(keyList, lang)
 	}
 
-	orderedKeyList := make([]string, 0)
-	for _, lang := range yamlSlice {
-		orderedKeyList = append(orderedKeyList, lang.Key.(string))
-	}
-
-	return orderedKeyList, nil
+	sort.Strings(keyList)
+	return keyList
 }
 
 func buildExtensionLanguageMap(languages map[string]*languageInfo, orderedKeyList []string) map[string][]string {

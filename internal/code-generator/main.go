@@ -37,6 +37,11 @@ const (
 	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
 	typeTmpl     = "type.go.tmpl"
 
+	// interpreters_map.go generation
+	interpretersFile     = "interpreters_map.go"
+	interpretersTmplPath = "internal/code-generator/assets/interpreters.go.tmpl"
+	interpretersTmpl     = "interpreters.go.tmpl"
+
 	commitPath = ".git/refs/heads/master"
 )
 
@@ -61,6 +66,7 @@ func main() {
 		&generatorArgs{vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor},
 		&generatorArgs{documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation},
 		&generatorArgs{languagesYAML, typeFile, typeTmplPath, typeTmpl, commit, generator.Types},
+		&generatorArgs{languagesYAML, interpretersFile, interpretersTmplPath, interpretersTmpl, commit, generator.Interpreters},
 	}
 
 	for _, args := range argsList {
