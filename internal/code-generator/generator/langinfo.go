@@ -4,6 +4,7 @@ import "sort"
 
 type languageInfo struct {
 	Type         string   `yaml:"type,omitempty"`
+	Aliases      []string `yaml:"aliases,omitempty"`
 	Extensions   []string `yaml:"extensions,omitempty,flow"`
 	Interpreters []string `yaml:"interpreters,omitempty,flow"`
 	Filenames    []string `yaml:"filenames,omitempty,flow"`
