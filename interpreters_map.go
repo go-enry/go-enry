@@ -36,6 +36,7 @@ var languagesByInterpreter = map[string][]string{
 	"io":          {"Io"},
 	"ioke":        {"Ioke"},
 	"jconsole":    {"J"},
+	"jolie":       {"Jolie"},
 	"jruby":       {"Ruby"},
 	"julia":       {"Julia"},
 	"lisp":        {"Common Lisp"},
