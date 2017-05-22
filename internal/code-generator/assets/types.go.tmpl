@@ -4,8 +4,8 @@ package slinguist
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: {{ getCommit }}
 
-var languagesByExtension = map[string][]string{
-	{{range $extension, $languages := . -}}
-	"{{ $extension }}":	{ {{- $languages | formatStringSlice -}} },
+var languagesType = map[string]Type{
+	{{range $language, $type := . -}}
+	"{{ $language }}": {{ $type -}},
 	{{end -}}
 }

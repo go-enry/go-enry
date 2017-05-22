@@ -35,9 +35,9 @@ const (
 	documentationTmpl     = "documentation.go.tmpl"
 
 	// type.go generation
-	typeFile     = "type.go"
-	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
-	typeTmpl     = "type.go.tmpl"
+	typeFile     = "types_map.go"
+	typeTmplPath = "internal/code-generator/assets/types.go.tmpl"
+	typeTmpl     = "types.go.tmpl"
 
 	// interpreters_map.go generation
 	interpretersFile     = "interpreters_map.go"
@@ -48,6 +48,11 @@ const (
 	filenamesFile     = "filenames_map.go"
 	filenamesTmplPath = "internal/code-generator/assets/filenames.go.tmpl"
 	filenamesTmpl     = "filenames.go.tmpl"
+
+	// aliases_map.go generation
+	aliasesFile     = "aliases_map.go"
+	aliasesTmplPath = "internal/code-generator/assets/aliases.go.tmpl"
+	aliasesTmpl     = "aliases.go.tmpl"
 
 	commitPath = ".git/refs/heads/master"
 )
@@ -75,6 +80,7 @@ func main() {
 		&generatorArgs{languagesYAML, typeFile, typeTmplPath, typeTmpl, commit, generator.Types},
 		&generatorArgs{languagesYAML, interpretersFile, interpretersTmplPath, interpretersTmpl, commit, generator.Interpreters},
 		&generatorArgs{languagesYAML, filenamesFile, filenamesTmplPath, filenamesTmpl, commit, generator.Filenames},
+		&generatorArgs{languagesYAML, aliasesFile, aliasesTmplPath, aliasesTmpl, commit, generator.Aliases},
 	}
 
 	for _, args := range argsList {

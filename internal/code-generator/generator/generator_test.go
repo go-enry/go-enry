@@ -37,10 +37,10 @@ const (
 	documentationTestTmplName = "documentation.go.tmpl"
 
 	// Types test
-	typesTestFile     = "test_files/type.test.yml"
-	typesGold         = "test_files/type.gold"
-	typesTestTmplPath = "../assets/type.go.tmpl"
-	typesTestTmplName = "type.go.tmpl"
+	typesTestFile     = "test_files/types.test.yml"
+	typesGold         = "test_files/types.gold"
+	typesTestTmplPath = "../assets/types.go.tmpl"
+	typesTestTmplName = "types.go.tmpl"
 
 	// Interpreters test
 	interpretersTestFile     = "test_files/interpreters.test.yml"
@@ -53,6 +53,12 @@ const (
 	filenamesGold         = "test_files/filenames.gold"
 	filenamesTestTmplPath = "../assets/filenames.go.tmpl"
 	filenamesTestTmplName = "filenames.go.tmpl"
+
+	// Aliases test
+	aliasesTestFile     = "test_files/aliases.test.yml"
+	aliasesGold         = "test_files/aliases.gold"
+	aliasesTestTmplPath = "../assets/aliases.go.tmpl"
+	aliasesTestTmplName = "aliases.go.tmpl"
 )
 
 func TestFromFile(t *testing.T) {
@@ -127,6 +133,15 @@ func TestFromFile(t *testing.T) {
 			commit:      commitTest,
 			generate:    Filenames,
 			wantOut:     filenamesGold,
+		},
+		{
+			name:        "TestFromFile_Aliases",
+			fileToParse: aliasesTestFile,
+			tmplPath:    aliasesTestTmplPath,
+			tmplName:    aliasesTestTmplName,
+			commit:      commitTest,
+			generate:    Aliases,
+			wantOut:     aliasesGold,
 		},
 	}
 

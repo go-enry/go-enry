@@ -1,0 +1,42 @@
+---
+ASP:
+  aliases:
+  - aspx
+  - aspx-vb
+AutoIt:
+  aliases:
+  - au3
+  - AutoIt3
+  - AutoItScript
+Batchfile:
+  aliases:
+  - bat
+  - batch
+  - dosbatch
+  - winbatch
+C++:
+  aliases:
+  - cpp
+Go:
+  aliases:
+  - golang
+Gradle:
+  type: data
+HTML+Django:
+  aliases:
+  - django
+  - html+django/jinja
+  - html+jinja
+  - htmldjango
+  - njk
+  - nunjucks
+Makefile:
+  aliases:
+  - bsdmake
+  - make
+  - mf
+Objective-C:
+  aliases:
+  - obj-c
+  - objc
+  - objectivec
