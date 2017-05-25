@@ -10,10 +10,9 @@ import (
 func GetLanguageByModeline(content []byte) (lang string, safe bool) {
 	headFoot := getHeaderAndFooter(content)
 	for _, getLang := range modelinesFunc {
-		lang = getLang(headFoot)
-		safe = lang != OtherLanguage
+		lang, safe = getLang(headFoot)
 		if safe {
-			return
+			break
 		}
 	}
 
@@ -23,7 +22,7 @@ func GetLanguageByModeline(content []byte) (lang string, safe bool) {
 func getHeaderAndFooter(content []byte) []byte {
 	const (
 		searchScope = 5
-		eol         = `\n`
+		eol         = "\n"
 	)
 
 	if bytes.Count(content, []byte(eol)) < 2*searchScope {
@@ -37,7 +36,7 @@ func getHeaderAndFooter(content []byte) []byte {
 	return bytes.Join(headerAndFooter, []byte(eol))
 }
 
-var modelinesFunc = []func(content []byte) string{
+var modelinesFunc = []func(content []byte) (string, bool){
 	GetLanguageByEmacsModeline,
 	GetLanguageByVimModeline,
 }
@@ -50,11 +49,11 @@ var (
 )
 
 // GetLanguageByEmacsModeline detecs if the content has a emacs modeline and try to get a
-// language basing on alias. If couldn't retrieve a valid language, it returns OtherLanguage.
-func GetLanguageByEmacsModeline(content []byte) (lang string) {
+// language basing on alias. If couldn't retrieve a valid language, it returns OtherLanguage and false.
+func GetLanguageByEmacsModeline(content []byte) (string, bool) {
 	matched := reEmacsModeline.FindAllSubmatch(content, -1)
 	if matched == nil {
-		return OtherLanguage
+		return OtherLanguage, false
 	}
 
 	// only take the last matched line, discard previous lines
@@ -67,23 +66,22 @@ func GetLanguageByEmacsModeline(content []byte) (lang string) {
 		alias = string(lastLineMatched)
 	}
 
-	lang = GetLanguageByAlias(alias)
-	return
+	return GetLanguageByAlias(alias)
 }
 
 // GetLanguageByVimModeline detecs if the content has a vim modeline and try to get a
-// language basing on alias. If couldn't retrieve a valid language, it returns OtherLanguage.
-func GetLanguageByVimModeline(content []byte) (lang string) {
+// language basing on alias. If couldn't retrieve a valid language, it returns OtherLanguage and false.
+func GetLanguageByVimModeline(content []byte) (string, bool) {
 	matched := reVimModeline.FindAllSubmatch(content, -1)
 	if matched == nil {
-		return OtherLanguage
+		return OtherLanguage, false
 	}
 
 	// only take the last matched line, discard previous lines
 	lastLineMatched := matched[len(matched)-1][1]
 	matchedAlias := reVimLang.FindAllSubmatch(lastLineMatched, -1)
 	if matchedAlias == nil {
-		return OtherLanguage
+		return OtherLanguage, false
 	}
 
 	alias := string(matchedAlias[0][1])
@@ -100,6 +98,5 @@ func GetLanguageByVimModeline(content []byte) (lang string) {
 		}
 	}
 
-	lang = GetLanguageByAlias(alias)
-	return
+	return GetLanguageByAlias(alias)
 }

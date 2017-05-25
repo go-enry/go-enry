@@ -16,6 +16,8 @@ import (
 	"gopkg.in/src-d/simple-linguist.v1/internal/tokenizer"
 )
 
+const samplesSubDir = "filenames"
+
 type samplesFrequencies struct {
 	LanguageTotal  int                       `json:"language_total,omitempty"`
 	Languages      map[string]int            `json:"languages,omitempty"`
@@ -37,11 +39,7 @@ func Frequencies(samplesDir, frequenciesTmplPath, frequenciesTmplName, commit, o
 		return err
 	}
 
-	if err := formatedWrite(outPath, buf.Bytes()); err != nil {
-		return err
-	}
-
-	return nil
+	return formatedWrite(outPath, buf.Bytes())
 }
 
 func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
@@ -98,8 +96,6 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 }
 
 func getSamples(samplesDir string, langDir os.FileInfo) ([]string, error) {
-	const subDir = "filenames"
-
 	samples := []string{}
 	path := filepath.Join(samplesDir, langDir.Name())
 	entries, err := ioutil.ReadDir(path)
@@ -112,7 +108,7 @@ func getSamples(samplesDir string, langDir os.FileInfo) ([]string, error) {
 			samples = append(samples, filepath.Join(path, entry.Name()))
 		}
 
-		if entry.IsDir() && entry.Name() == subDir {
+		if entry.IsDir() && entry.Name() == samplesSubDir {
 			subSamples, err := getSubSamples(samplesDir, langDir.Name(), entry)
 			if err != nil {
 				return nil, err

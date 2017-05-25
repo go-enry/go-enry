@@ -52,7 +52,11 @@ func GetLanguage(filename string, content []byte) string {
 		return lang
 	}
 
-	lang, _ := GetLanguageByContent(filename, content)
+	if lang, safe := GetLanguageByContent(filename, content); safe {
+		return lang
+	}
+
+	lang := GetLanguageByClassifier(content, nil, nil)
 	return lang
 }
 
