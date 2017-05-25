@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
+// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 // languagesByAlias keeps alias for different languages and use the name of the languages as a alias too. All the
 // keys (alias or not) are written in lower case and the whitespaces has been replaced by underscores.
@@ -577,6 +577,7 @@ var languagesByAlias = map[string]string{
 	"textile":               "Textile",
 	"thrift":                "Thrift",
 	"ti_program":            "TI Program",
+	"tl":                    "Type Language",
 	"tla":                   "TLA",
 	"toml":                  "TOML",
 	"ts":                    "TypeScript",
@@ -584,6 +585,7 @@ var languagesByAlias = map[string]string{
 	"turtle":                "Turtle",
 	"twig":                  "Twig",
 	"txl":                   "TXL",
+	"type_language":         "Type Language",
 	"typescript":            "TypeScript",
 	"udiff":                 "Diff",
 	"unified_parallel_c":    "Unified Parallel C",

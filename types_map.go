@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
+// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 var languagesType = map[string]Type{
 	"1C Enterprise":    Programming,
@@ -408,6 +408,7 @@ var languagesType = map[string]Type{
 	"Turing":                       Programming,
 	"Turtle":                       Data,
 	"Twig":                         Markup,
+	"Type Language":                Data,
 	"TypeScript":                   Programming,
 	"Unified Parallel C":           Programming,
 	"Unity3D Asset":                Data,

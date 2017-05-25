@@ -21,6 +21,14 @@ func FromFile(fileToParse, outPath, tmplPath, tmplName, commit string, generate 
 		return err
 	}
 
+	if err := formatedWrite(outPath, source); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func formatedWrite(outPath string, source []byte) error {
 	formatedSource, err := format.Source(source)
 	if err != nil {
 		return err
