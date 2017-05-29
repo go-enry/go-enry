@@ -4,8 +4,8 @@ package slinguist
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: {{ getCommit }}
 
-// languagesByAlias keeps alias for different languages and use the name of the languages as a alias too. All the
-// keys (alias or not) are written in lower case and the whitespaces has been replaced by underscores.
+// languagesByAlias keeps alias for different languages and use the name of the languages as an alias too.
+// All the keys (alias or not) are written in lower case and the whitespaces has been replaced by underscores.
 var languagesByAlias = map[string]string{
 	{{range $alias, $language := . -}}
 	"{{ $alias }}":	{{ printf "%q" $language -}},

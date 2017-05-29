@@ -11,7 +11,7 @@ import (
 	"text/template"
 )
 
-// Heuristics reads from buf and builds content.go file from contentTmplPath.
+// Heuristics reads from buf and builds source file from contentTmplPath.
 func Heuristics(heuristics []byte, contentTmplPath, contentTmplName, commit string) ([]byte, error) {
 	disambiguators, err := getDisambiguators(heuristics)
 	if err != nil {

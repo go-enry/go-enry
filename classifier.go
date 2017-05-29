@@ -6,9 +6,7 @@ import (
 	"gopkg.in/src-d/simple-linguist.v1/internal/tokenizer"
 )
 
-// GetLanguageByClassifier takes in a content and a list of candidates, and apply the classifier's Classify method to
-// get the most probably language. If classifier is null then DefaultClassfier will be used.
-func GetLanguageByClassifier(content []byte, candidates []string, classifier Classifier) string {
+func getLanguageByClassifier(content []byte, candidates []string, classifier Classifier) string {
 	if classifier == nil {
 		classifier = DefaultClassifier
 	}

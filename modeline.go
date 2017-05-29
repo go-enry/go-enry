@@ -5,9 +5,7 @@ import (
 	"regexp"
 )
 
-// GetLanguageByModeline returns the language of the given content looking for the modeline,
-// and safe to indicate the sureness of returned language.
-func GetLanguageByModeline(content []byte) (lang string, safe bool) {
+func getLanguageByModeline(content []byte) (lang string, safe bool) {
 	headFoot := getHeaderAndFooter(content)
 	for _, getLang := range modelinesFunc {
 		lang, safe = getLang(headFoot)

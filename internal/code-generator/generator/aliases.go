@@ -3,14 +3,13 @@ package generator
 import (
 	"bytes"
 	"io"
-	"text/template"
-
 	"strings"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Aliases reads from buf and builds aliases_map.go file from aliasesTmplPath.
+// Aliases reads from buf and builds source file from aliasesTmplPath.
 func Aliases(data []byte, aliasesTmplPath, aliasesTmplName, commit string) ([]byte, error) {
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {

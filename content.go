@@ -5,25 +5,12 @@ package slinguist
 // Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 import (
-	"path/filepath"
 	"regexp"
-	"strings"
 )
-
-func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	ext := strings.ToLower(filepath.Ext(filename))
-	if fnMatcher, ok := matchers[ext]; ok {
-		lang, safe = fnMatcher(content)
-	} else {
-		lang = OtherLanguage
-	}
-
-	return
-}
 
 type languageMatcher func([]byte) (string, bool)
 
-var matchers = map[string]languageMatcher{
+var contentMatchers = map[string]languageMatcher{
 	".asc": func(i []byte) (string, bool) {
 		if asc_PublicKey_Matcher_0.Match(i) {
 			return "Public Key", true

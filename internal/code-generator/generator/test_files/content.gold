@@ -2,28 +2,15 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7
+// Extracted from github/linguist commit: 0123456789abcdef0123456789abcdef01234567
 
 import (
-	"path/filepath"
 	"regexp"
-	"strings"
 )
-
-func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	ext := strings.ToLower(filepath.Ext(filename))
-	if fnMatcher, ok := matchers[ext]; ok {
-		lang, safe = fnMatcher(content)
-	} else {
-		lang = OtherLanguage
-	}
-
-	return
-}
 
 type languageMatcher func([]byte) (string, bool)
 
-var matchers = map[string]languageMatcher{
+var contentMatchers = map[string]languageMatcher{
 	".asc": func(i []byte) (string, bool) {
 		if asc_PublicKey_Matcher_0.Match(i) {
 			return "Public Key", true

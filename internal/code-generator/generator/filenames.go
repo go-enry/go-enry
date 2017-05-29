@@ -8,7 +8,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Filenames reads from buf and builds filenames_map.go file from filenamesTmplPath.
+// Filenames reads from buf and builds source file from filenamesTmplPath.
 func Filenames(data []byte, filenamesTmplPath, filenamesTmplName, commit string) ([]byte, error) {
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {

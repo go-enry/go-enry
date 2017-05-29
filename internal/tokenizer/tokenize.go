@@ -5,7 +5,13 @@ import (
 	"regexp"
 )
 
+const byteLimit = 100000
+
 func Tokenize(content []byte) []string {
+	if len(content) > byteLimit {
+		content = content[:byteLimit]
+	}
+
 	tokens := make([][]byte, 0, 50)
 	for _, extract := range extractTokens {
 		var extractedTokens [][]byte

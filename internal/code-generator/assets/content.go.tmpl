@@ -5,25 +5,12 @@ package slinguist
 // Extracted from github/linguist commit: {{ getCommit }}
 
 import (
-	"path/filepath"
 	"regexp"
-	"strings"
 )
-
-func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	ext := strings.ToLower(filepath.Ext(filename))
-	if fnMatcher, ok := matchers[ext]; ok {
-		lang, safe = fnMatcher(content)
-	} else {
-		lang = OtherLanguage
-	}
-
-	return
-}
 
 type languageMatcher func ([]byte) (string, bool)
 
-var matchers = map[string]languageMatcher{
+var contentMatchers = map[string]languageMatcher{
 	{{ range $index, $disambiguator := . -}}
 	{{ printf "%q" $disambiguator.Extension }}: func(i []byte) (string, bool) {
 		{{ range $i, $language := $disambiguator.Languages -}}

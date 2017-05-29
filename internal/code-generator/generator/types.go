@@ -15,7 +15,7 @@ var typeToTypeConst = map[string]string{
 	"prose":       "Prose",
 }
 
-// Types reads from buf and builds type.go file from typeTmplPath.
+// Types reads from buf and builds source file from typeTmplPath.
 func Types(data []byte, typeTmplPath, typeTmplName, commit string) ([]byte, error) {
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {

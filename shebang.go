@@ -14,9 +14,7 @@ var (
 	pythonVersion   = regexp.MustCompile(`python\d\.\d+`)
 )
 
-// GetLanguageByShebang returns the language of the given content looking for the shebang line,
-// and safe to indicate the sureness of returned language.
-func GetLanguageByShebang(content []byte) (lang string, safe bool) {
+func getLanguageByShebang(content []byte) (lang string, safe bool) {
 	interpreter := getInterpreter(content)
 	lang = OtherLanguage
 	if langs, ok := languagesByInterpreter[interpreter]; ok {
