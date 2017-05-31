@@ -2,447 +2,447 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
+// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
 
 import (
 	"regexp"
 )
 
-type languageMatcher func([]byte) (string, bool)
+type languageMatcher func([]byte) []string
 
 var contentMatchers = map[string]languageMatcher{
-	".asc": func(i []byte) (string, bool) {
+	".asc": func(i []byte) []string {
 		if asc_PublicKey_Matcher_0.Match(i) {
-			return "Public Key", true
+			return []string{"Public Key"}
 		} else if asc_AsciiDoc_Matcher_0.Match(i) {
-			return "AsciiDoc", true
+			return []string{"AsciiDoc"}
 		} else if asc_AGSScript_Matcher_0.Match(i) {
-			return "AGS Script", true
+			return []string{"AGS Script"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".bb": func(i []byte) (string, bool) {
+	".bb": func(i []byte) []string {
 		if bb_BlitzBasic_Matcher_0.Match(i) || bb_BlitzBasic_Matcher_1.Match(i) {
-			return "BlitzBasic", true
+			return []string{"BlitzBasic"}
 		} else if bb_BitBake_Matcher_0.Match(i) {
-			return "BitBake", true
+			return []string{"BitBake"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".builds": func(i []byte) (string, bool) {
+	".builds": func(i []byte) []string {
 		if builds_XML_Matcher_0.Match(i) {
-			return "XML", true
+			return []string{"XML"}
 		}
 
-		return "Text", true
+		return []string{"Text"}
 	},
-	".ch": func(i []byte) (string, bool) {
+	".ch": func(i []byte) []string {
 		if ch_xBase_Matcher_0.Match(i) {
-			return "xBase", true
+			return []string{"xBase"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".cl": func(i []byte) (string, bool) {
+	".cl": func(i []byte) []string {
 		if cl_CommonLisp_Matcher_0.Match(i) {
-			return "Common Lisp", true
+			return []string{"Common Lisp"}
 		} else if cl_Cool_Matcher_0.Match(i) {
-			return "Cool", true
+			return []string{"Cool"}
 		} else if cl_OpenCL_Matcher_0.Match(i) {
-			return "OpenCL", true
+			return []string{"OpenCL"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".cls": func(i []byte) (string, bool) {
+	".cls": func(i []byte) []string {
 		if cls_TeX_Matcher_0.Match(i) {
-			return "TeX", true
+			return []string{"TeX"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".cs": func(i []byte) (string, bool) {
+	".cs": func(i []byte) []string {
 		if cs_Smalltalk_Matcher_0.Match(i) {
-			return "Smalltalk", true
+			return []string{"Smalltalk"}
 		} else if cs_CSharp_Matcher_0.Match(i) || cs_CSharp_Matcher_1.Match(i) {
-			return "C#", true
+			return []string{"C#"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".d": func(i []byte) (string, bool) {
+	".d": func(i []byte) []string {
 		if d_D_Matcher_0.Match(i) {
-			return "D", true
+			return []string{"D"}
 		} else if d_DTrace_Matcher_0.Match(i) {
-			return "DTrace", true
+			return []string{"DTrace"}
 		} else if d_Makefile_Matcher_0.Match(i) {
-			return "Makefile", true
+			return []string{"Makefile"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".ecl": func(i []byte) (string, bool) {
+	".ecl": func(i []byte) []string {
 		if ecl_ECLiPSe_Matcher_0.Match(i) {
-			return "ECLiPSe", true
+			return []string{"ECLiPSe"}
 		} else if ecl_ECL_Matcher_0.Match(i) {
-			return "ECL", true
+			return []string{"ECL"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".es": func(i []byte) (string, bool) {
+	".es": func(i []byte) []string {
 		if es_Erlang_Matcher_0.Match(i) {
-			return "Erlang", true
+			return []string{"Erlang"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".f": func(i []byte) (string, bool) {
+	".f": func(i []byte) []string {
 		if f_Forth_Matcher_0.Match(i) {
-			return "Forth", true
+			return []string{"Forth"}
 		} else if f_FilebenchWML_Matcher_0.Match(i) {
-			return "Filebench WML", true
+			return []string{"Filebench WML"}
 		} else if f_Fortran_Matcher_0.Match(i) {
-			return "Fortran", true
+			return []string{"Fortran"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".for": func(i []byte) (string, bool) {
+	".for": func(i []byte) []string {
 		if for_Forth_Matcher_0.Match(i) {
-			return "Forth", true
+			return []string{"Forth"}
 		} else if for_Fortran_Matcher_0.Match(i) {
-			return "Fortran", true
+			return []string{"Fortran"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".fr": func(i []byte) (string, bool) {
+	".fr": func(i []byte) []string {
 		if fr_Forth_Matcher_0.Match(i) {
-			return "Forth", true
+			return []string{"Forth"}
 		} else if fr_Frege_Matcher_0.Match(i) {
-			return "Frege", true
+			return []string{"Frege"}
 		}
 
-		return "Text", true
+		return []string{"Text"}
 	},
-	".fs": func(i []byte) (string, bool) {
+	".fs": func(i []byte) []string {
 		if fs_Forth_Matcher_0.Match(i) {
-			return "Forth", true
+			return []string{"Forth"}
 		} else if fs_FSharp_Matcher_0.Match(i) {
-			return "F#", true
+			return []string{"F#"}
 		} else if fs_GLSL_Matcher_0.Match(i) {
-			return "GLSL", true
+			return []string{"GLSL"}
 		} else if fs_Filterscript_Matcher_0.Match(i) {
-			return "Filterscript", true
+			return []string{"Filterscript"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".gs": func(i []byte) (string, bool) {
+	".gs": func(i []byte) []string {
 		if gs_Gosu_Matcher_0.Match(i) {
-			return "Gosu", true
+			return []string{"Gosu"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".h": func(i []byte) (string, bool) {
+	".h": func(i []byte) []string {
 		if h_ObjectiveDashC_Matcher_0.Match(i) {
-			return "Objective-C", true
+			return []string{"Objective-C"}
 		} else if h_CPlusPlus_Matcher_0.Match(i) || h_CPlusPlus_Matcher_1.Match(i) || h_CPlusPlus_Matcher_2.Match(i) || h_CPlusPlus_Matcher_3.Match(i) || h_CPlusPlus_Matcher_4.Match(i) || h_CPlusPlus_Matcher_5.Match(i) || h_CPlusPlus_Matcher_6.Match(i) {
-			return "C++", true
+			return []string{"C++"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".inc": func(i []byte) (string, bool) {
+	".inc": func(i []byte) []string {
 		if inc_PHP_Matcher_0.Match(i) {
-			return "PHP", true
+			return []string{"PHP"}
 		} else if inc_POVDashRaySDL_Matcher_0.Match(i) {
-			return "POV-Ray SDL", true
+			return []string{"POV-Ray SDL"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".l": func(i []byte) (string, bool) {
+	".l": func(i []byte) []string {
 		if l_CommonLisp_Matcher_0.Match(i) {
-			return "Common Lisp", true
+			return []string{"Common Lisp"}
 		} else if l_Lex_Matcher_0.Match(i) {
-			return "Lex", true
+			return []string{"Lex"}
 		} else if l_Roff_Matcher_0.Match(i) {
-			return "Roff", true
+			return []string{"Roff"}
 		} else if l_PicoLisp_Matcher_0.Match(i) {
-			return "PicoLisp", true
+			return []string{"PicoLisp"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".ls": func(i []byte) (string, bool) {
+	".ls": func(i []byte) []string {
 		if ls_LoomScript_Matcher_0.Match(i) {
-			return "LoomScript", true
+			return []string{"LoomScript"}
 		}
 
-		return "LiveScript", true
+		return []string{"LiveScript"}
 	},
-	".lsp": func(i []byte) (string, bool) {
+	".lsp": func(i []byte) []string {
 		if lsp_CommonLisp_Matcher_0.Match(i) {
-			return "Common Lisp", true
+			return []string{"Common Lisp"}
 		} else if lsp_NewLisp_Matcher_0.Match(i) {
-			return "NewLisp", true
+			return []string{"NewLisp"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".lisp": func(i []byte) (string, bool) {
+	".lisp": func(i []byte) []string {
 		if lisp_CommonLisp_Matcher_0.Match(i) {
-			return "Common Lisp", true
+			return []string{"Common Lisp"}
 		} else if lisp_NewLisp_Matcher_0.Match(i) {
-			return "NewLisp", true
+			return []string{"NewLisp"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".m": func(i []byte) (string, bool) {
+	".m": func(i []byte) []string {
 		if m_ObjectiveDashC_Matcher_0.Match(i) {
-			return "Objective-C", true
+			return []string{"Objective-C"}
 		} else if m_Mercury_Matcher_0.Match(i) {
-			return "Mercury", true
+			return []string{"Mercury"}
 		} else if m_MUF_Matcher_0.Match(i) {
-			return "MUF", true
+			return []string{"MUF"}
 		} else if m_M_Matcher_0.Match(i) {
-			return "M", true
+			return []string{"M"}
 		} else if m_Mathematica_Matcher_0.Match(i) {
-			return "Mathematica", true
+			return []string{"Mathematica"}
 		} else if m_Matlab_Matcher_0.Match(i) {
-			return "Matlab", true
+			return []string{"Matlab"}
 		} else if m_Limbo_Matcher_0.Match(i) {
-			return "Limbo", true
+			return []string{"Limbo"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".md": func(i []byte) (string, bool) {
+	".md": func(i []byte) []string {
 		if md_Markdown_Matcher_0.Match(i) || md_Markdown_Matcher_1.Match(i) {
-			return "Markdown", true
+			return []string{"Markdown"}
 		} else if md_GCCMachineDescription_Matcher_0.Match(i) {
-			return "GCC Machine Description", true
+			return []string{"GCC Machine Description"}
 		}
 
-		return "Markdown", true
+		return []string{"Markdown"}
 	},
-	".ml": func(i []byte) (string, bool) {
+	".ml": func(i []byte) []string {
 		if ml_OCaml_Matcher_0.Match(i) {
-			return "OCaml", true
+			return []string{"OCaml"}
 		} else if ml_StandardML_Matcher_0.Match(i) {
-			return "Standard ML", true
+			return []string{"Standard ML"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".mod": func(i []byte) (string, bool) {
+	".mod": func(i []byte) []string {
 		if mod_XML_Matcher_0.Match(i) {
-			return "XML", true
+			return []string{"XML"}
 		} else if mod_ModulaDash2_Matcher_0.Match(i) || mod_ModulaDash2_Matcher_1.Match(i) {
-			return "Modula-2", true
+			return []string{"Modula-2"}
 		}
 
-		return "Linux Kernel Module", false
+		return []string{"Linux Kernel Module", "AMPL"}
 	},
-	".ms": func(i []byte) (string, bool) {
+	".ms": func(i []byte) []string {
 		if ms_Roff_Matcher_0.Match(i) {
-			return "Roff", true
+			return []string{"Roff"}
 		}
 
-		return "MAXScript", true
+		return []string{"MAXScript"}
 	},
-	".n": func(i []byte) (string, bool) {
+	".n": func(i []byte) []string {
 		if n_Roff_Matcher_0.Match(i) {
-			return "Roff", true
+			return []string{"Roff"}
 		} else if n_Nemerle_Matcher_0.Match(i) {
-			return "Nemerle", true
+			return []string{"Nemerle"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".ncl": func(i []byte) (string, bool) {
+	".ncl": func(i []byte) []string {
 		if ncl_Text_Matcher_0.Match(i) {
-			return "Text", true
+			return []string{"Text"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".nl": func(i []byte) (string, bool) {
+	".nl": func(i []byte) []string {
 		if nl_NL_Matcher_0.Match(i) {
-			return "NL", true
+			return []string{"NL"}
 		}
 
-		return "NewLisp", true
+		return []string{"NewLisp"}
 	},
-	".php": func(i []byte) (string, bool) {
+	".php": func(i []byte) []string {
 		if php_Hack_Matcher_0.Match(i) {
-			return "Hack", true
+			return []string{"Hack"}
 		} else if php_PHP_Matcher_0.Match(i) {
-			return "PHP", true
+			return []string{"PHP"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".pl": func(i []byte) (string, bool) {
+	".pl": func(i []byte) []string {
 		if pl_Prolog_Matcher_0.Match(i) {
-			return "Prolog", true
+			return []string{"Prolog"}
 		} else if pl_Perl_Matcher_0.Match(i) {
-			return "Perl", true
+			return []string{"Perl"}
 		} else if pl_Perl6_Matcher_0.Match(i) {
-			return "Perl6", true
+			return []string{"Perl6"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".pm": func(i []byte) (string, bool) {
+	".pm": func(i []byte) []string {
 		if pm_Perl6_Matcher_0.Match(i) {
-			return "Perl6", true
+			return []string{"Perl6"}
 		} else if pm_Perl_Matcher_0.Match(i) {
-			return "Perl", true
+			return []string{"Perl"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".pod": func(i []byte) (string, bool) {
+	".pod": func(i []byte) []string {
 		if pod_Pod_Matcher_0.Match(i) {
-			return "Pod", true
+			return []string{"Pod"}
 		}
 
-		return "Perl", true
+		return []string{"Perl"}
 	},
-	".pro": func(i []byte) (string, bool) {
+	".pro": func(i []byte) []string {
 		if pro_Prolog_Matcher_0.Match(i) {
-			return "Prolog", true
+			return []string{"Prolog"}
 		} else if pro_INI_Matcher_0.Match(i) {
-			return "INI", true
+			return []string{"INI"}
 		} else if pro_QMake_Matcher_0.Match(i) && pro_QMake_Matcher_1.Match(i) {
-			return "QMake", true
+			return []string{"QMake"}
 		} else if pro_IDL_Matcher_0.Match(i) {
-			return "IDL", true
+			return []string{"IDL"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".props": func(i []byte) (string, bool) {
+	".props": func(i []byte) []string {
 		if props_XML_Matcher_0.Match(i) {
-			return "XML", true
+			return []string{"XML"}
 		} else if props_INI_Matcher_0.Match(i) {
-			return "INI", true
+			return []string{"INI"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".r": func(i []byte) (string, bool) {
+	".r": func(i []byte) []string {
 		if r_Rebol_Matcher_0.Match(i) {
-			return "Rebol", true
+			return []string{"Rebol"}
 		} else if r_R_Matcher_0.Match(i) {
-			return "R", true
+			return []string{"R"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".rno": func(i []byte) (string, bool) {
+	".rno": func(i []byte) []string {
 		if rno_RUNOFF_Matcher_0.Match(i) {
-			return "RUNOFF", true
+			return []string{"RUNOFF"}
 		} else if rno_Roff_Matcher_0.Match(i) {
-			return "Roff", true
+			return []string{"Roff"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".rpy": func(i []byte) (string, bool) {
+	".rpy": func(i []byte) []string {
 		if rpy_Python_Matcher_0.Match(i) {
-			return "Python", true
+			return []string{"Python"}
 		}
 
-		return "Ren'Py", true
+		return []string{"Ren'Py"}
 	},
-	".rs": func(i []byte) (string, bool) {
+	".rs": func(i []byte) []string {
 		if rs_Rust_Matcher_0.Match(i) {
-			return "Rust", true
+			return []string{"Rust"}
 		} else if rs_RenderScript_Matcher_0.Match(i) {
-			return "RenderScript", true
+			return []string{"RenderScript"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".sc": func(i []byte) (string, bool) {
+	".sc": func(i []byte) []string {
 		if sc_SuperCollider_Matcher_0.Match(i) || sc_SuperCollider_Matcher_1.Match(i) || sc_SuperCollider_Matcher_2.Match(i) {
-			return "SuperCollider", true
+			return []string{"SuperCollider"}
 		} else if sc_Scala_Matcher_0.Match(i) || sc_Scala_Matcher_1.Match(i) || sc_Scala_Matcher_2.Match(i) {
-			return "Scala", true
+			return []string{"Scala"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".sql": func(i []byte) (string, bool) {
+	".sql": func(i []byte) []string {
 		if sql_PLpgSQL_Matcher_0.Match(i) || sql_PLpgSQL_Matcher_1.Match(i) || sql_PLpgSQL_Matcher_2.Match(i) {
-			return "PLpgSQL", true
+			return []string{"PLpgSQL"}
 		} else if sql_SQLPL_Matcher_0.Match(i) || sql_SQLPL_Matcher_1.Match(i) {
-			return "SQLPL", true
+			return []string{"SQLPL"}
 		} else if sql_PLSQL_Matcher_0.Match(i) || sql_PLSQL_Matcher_1.Match(i) {
-			return "PLSQL", true
+			return []string{"PLSQL"}
 		} else if sql_SQL_Matcher_0.Match(i) {
-			return "SQL", true
+			return []string{"SQL"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".srt": func(i []byte) (string, bool) {
+	".srt": func(i []byte) []string {
 		if srt_SubRipText_Matcher_0.Match(i) {
-			return "SubRip Text", true
+			return []string{"SubRip Text"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".t": func(i []byte) (string, bool) {
+	".t": func(i []byte) []string {
 		if t_Turing_Matcher_0.Match(i) {
-			return "Turing", true
+			return []string{"Turing"}
 		} else if t_Perl6_Matcher_0.Match(i) {
-			return "Perl6", true
+			return []string{"Perl6"}
 		} else if t_Perl_Matcher_0.Match(i) {
-			return "Perl", true
+			return []string{"Perl"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".toc": func(i []byte) (string, bool) {
+	".toc": func(i []byte) []string {
 		if toc_WorldofWarcraftAddonData_Matcher_0.Match(i) {
-			return "World of Warcraft Addon Data", true
+			return []string{"World of Warcraft Addon Data"}
 		} else if toc_TeX_Matcher_0.Match(i) {
-			return "TeX", true
+			return []string{"TeX"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".ts": func(i []byte) (string, bool) {
+	".ts": func(i []byte) []string {
 		if ts_XML_Matcher_0.Match(i) {
-			return "XML", true
+			return []string{"XML"}
 		}
 
-		return "TypeScript", true
+		return []string{"TypeScript"}
 	},
-	".tst": func(i []byte) (string, bool) {
+	".tst": func(i []byte) []string {
 		if tst_GAP_Matcher_0.Match(i) {
-			return "GAP", true
+			return []string{"GAP"}
 		}
 
-		return "Scilab", true
+		return []string{"Scilab"}
 	},
-	".tsx": func(i []byte) (string, bool) {
+	".tsx": func(i []byte) []string {
 		if tsx_TypeScript_Matcher_0.Match(i) {
-			return "TypeScript", true
+			return []string{"TypeScript"}
 		} else if tsx_XML_Matcher_0.Match(i) {
-			return "XML", true
+			return []string{"XML"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
 }
 

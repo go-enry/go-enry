@@ -2,8 +2,8 @@ package generator
 
 import (
 	"bytes"
-	"html/template"
 	"io"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )

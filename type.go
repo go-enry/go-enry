@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
+// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
 
 var languagesType = map[string]Type{
 	"1C Enterprise":    Programming,
@@ -427,6 +427,7 @@ var languagesType = map[string]Type{
 	"Wavefront Material":           Data,
 	"Wavefront Object":             Data,
 	"Web Ontology Language":        Markup,
+	"WebAssembly":                  Programming,
 	"WebIDL":                       Programming,
 	"World of Warcraft Addon Data": Data,
 	"X10":              Programming,

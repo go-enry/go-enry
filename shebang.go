@@ -14,15 +14,11 @@ var (
 	pythonVersion   = regexp.MustCompile(`python\d\.\d+`)
 )
 
-func getLanguageByShebang(content []byte) (lang string, safe bool) {
+// GetLanguagesByShebang returns a slice of possible languages for the given content, filename will be ignored.
+// It accomplish the signature to be a Strategy type.
+func GetLanguagesByShebang(filename string, content []byte) (languages []string) {
 	interpreter := getInterpreter(content)
-	lang = OtherLanguage
-	if langs, ok := languagesByInterpreter[interpreter]; ok {
-		lang = langs[0]
-		safe = len(langs) == 1
-	}
-
-	return
+	return languagesByInterpreter[interpreter]
 }
 
 func getInterpreter(data []byte) (interpreter string) {

@@ -34,7 +34,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguage() {
 
 	for _, test := range tests {
 		language := GetLanguage(test.filename, test.content)
-		assert.Equal(s.T(), language, test.expected, fmt.Sprintf("%v: %v, expected: %v", test.name, language, test.expected))
+		assert.Equal(s.T(), test.expected, language, fmt.Sprintf("%v: %v, expected: %v", test.name, language, test.expected))
 	}
 }
 
@@ -91,8 +91,8 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByModelineLinguist() {
 		assert.NoError(s.T(), err)
 
 		lang, safe := GetLanguageByModeline(content)
-		assert.Equal(s.T(), lang, test.expectedLang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), safe, test.expectedSafe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
+		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
 	}
 }
 
@@ -116,8 +116,8 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByModeline() {
 
 	for _, test := range tests {
 		lang, safe := GetLanguageByModeline(test.content)
-		assert.Equal(s.T(), lang, test.expectedLang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), safe, test.expectedSafe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
+		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
 	}
 }
 
@@ -140,8 +140,8 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByFilename() {
 
 	for _, test := range tests {
 		lang, safe := GetLanguageByFilename(test.filename)
-		assert.Equal(s.T(), lang, test.expectedLang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), safe, test.expectedSafe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
+		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
 	}
 }
 
@@ -181,8 +181,8 @@ println("The shell script says ",vm.arglist.concat(" "));`
 
 	for _, test := range tests {
 		lang, safe := GetLanguageByShebang(test.content)
-		assert.Equal(s.T(), lang, test.expectedLang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), safe, test.expectedSafe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
+		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
 	}
 }
 
@@ -200,8 +200,8 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByExtension() {
 
 	for _, test := range tests {
 		lang, safe := GetLanguageByExtension(test.filename)
-		assert.Equal(s.T(), lang, test.expectedLang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), safe, test.expectedSafe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
+		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
 	}
 }
 
@@ -263,15 +263,15 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByClassifier() {
 	test := []struct {
 		name       string
 		filename   string
-		candidates []string
+		candidates map[string]float64
 		expected   string
 	}{
-		{name: "TestGetLanguageByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "C"},
+		{name: "TestGetLanguageByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: map[string]float64{"python": 1.00, "ruby": 1.00, "c": 1.00, "c++": 1.00}, expected: "C"},
 		{name: "TestGetLanguageByClassifier_2", filename: filepath.Join(samples, "C/blob.c"), candidates: nil, expected: "C"},
 		{name: "TestGetLanguageByClassifier_3", filename: filepath.Join(samples, "C/main.c"), candidates: nil, expected: "C"},
-		{name: "TestGetLanguageByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
-		{name: "TestGetLanguageByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
-		{name: "TestGetLanguageByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
+		{name: "TestGetLanguageByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: map[string]float64{"python": 1.00, "ruby": 1.00, "c++": 1.00}, expected: "C++"},
+		{name: "TestGetLanguageByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: map[string]float64{"ruby": 1.00}, expected: "Ruby"},
+		{name: "TestGetLanguageByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: map[string]float64{"python": 1.00, "ruby": 1.00, "c": 1.00, "c++": 1.00}, expected: "Python"},
 		{name: "TestGetLanguageByClassifier_7", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: nil, expected: "Python"},
 	}
 
@@ -280,7 +280,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByClassifier() {
 		assert.NoError(s.T(), err)
 
 		lang := GetLanguageByClassifier(content, test.candidates, nil)
-		assert.Equal(s.T(), lang, test.expected, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expected))
+		assert.Equal(s.T(), test.expected, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expected))
 	}
 }
 
@@ -297,7 +297,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageExtensions() {
 
 	for _, test := range tests {
 		extensions := GetLanguageExtensions(test.language)
-		assert.EqualValues(s.T(), extensions, test.expected, fmt.Sprintf("%v: extensions = %v, expected: %v", test.name, extensions, test.expected))
+		assert.EqualValues(s.T(), test.expected, extensions, fmt.Sprintf("%v: extensions = %v, expected: %v", test.name, extensions, test.expected))
 	}
 }
 
@@ -320,7 +320,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageType() {
 
 	for _, test := range tests {
 		langType := GetLanguageType(test.language)
-		assert.Equal(s.T(), langType, test.expected, fmt.Sprintf("%v: langType = %v, expected: %v", test.name, langType, test.expected))
+		assert.Equal(s.T(), test.expected, langType, fmt.Sprintf("%v: langType = %v, expected: %v", test.name, langType, test.expected))
 	}
 }
 
@@ -345,7 +345,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByAlias() {
 
 	for _, test := range tests {
 		lang, ok := GetLanguageByAlias(test.alias)
-		assert.Equal(s.T(), lang, test.expectedLang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), ok, test.expectedOk, fmt.Sprintf("%v: ok = %v, expected: %v", test.name, ok, test.expectedOk))
+		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
+		assert.Equal(s.T(), test.expectedOk, ok, fmt.Sprintf("%v: ok = %v, expected: %v", test.name, ok, test.expectedOk))
 	}
 }

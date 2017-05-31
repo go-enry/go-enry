@@ -4,9 +4,9 @@ package slinguist
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: 0123456789abcdef0123456789abcdef01234567
 
-var languagesByFilename = map[string]string{
-	"APKBUILD":       "Alpine Abuild",
-	"CMakeLists.txt": "CMake",
-	"Cakefile":       "CoffeeScript",
-	"mix.lock":       "Elixir",
+var languagesByFilename = map[string][]string{
+	"APKBUILD":       {"Alpine Abuild"},
+	"CMakeLists.txt": {"CMake"},
+	"Cakefile":       {"CoffeeScript"},
+	"mix.lock":       {"Elixir"},
 }

@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
+// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
 
 var languagesByExtension = map[string][]string{
 	".1":                   {"Roff"},
@@ -926,6 +926,8 @@ var languagesByExtension = map[string][]string{
 	".vw":                  {"PLSQL"},
 	".vxml":                {"XML"},
 	".w":                   {"CWeb"},
+	".wast":                {"WebAssembly"},
+	".wat":                 {"WebAssembly"},
 	".watchr":              {"Ruby"},
 	".webidl":              {"WebIDL"},
 	".weechatlog":          {"IRC log"},
@@ -1419,6 +1421,7 @@ var extensionsByLanguage = map[string][]string{
 	"Wavefront Material":           {".mtl"},
 	"Wavefront Object":             {".obj"},
 	"Web Ontology Language":        {".owl"},
+	"WebAssembly":                  {".wast", ".wat"},
 	"WebIDL":                       {".webidl"},
 	"World of Warcraft Addon Data": {".toc"},
 	"X10":              {".x10"},

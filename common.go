@@ -1,6 +1,7 @@
 package slinguist
 
 import (
+	"math"
 	"path/filepath"
 	"strings"
 )
@@ -8,100 +9,142 @@ import (
 // OtherLanguage is used as a zero value when a function can not return a specific language.
 const OtherLanguage = "Other"
 
+// Strategy type fix the signature for the functions that can be used as a strategy.
+type Strategy func(filename string, content []byte) (languages []string)
+
+var strategies = []Strategy{
+	GetLanguagesByModeline,
+	GetLanguagesByFilename,
+	GetLanguagesByShebang,
+	GetLanguagesByExtension,
+	GetLanguagesByContent,
+}
+
 // GetLanguage applies a sequence of strategies based on the given filename and content
 // to find out the most probably language to return.
 func GetLanguage(filename string, content []byte) string {
-	if lang, safe := GetLanguageByModeline(content); safe {
-		return lang
+	candidates := map[string]float64{}
+	for _, strategy := range strategies {
+		languages := strategy(filename, content)
+		if len(languages) == 1 {
+			return languages[0]
+		}
+
+		if len(languages) > 0 {
+			for _, language := range languages {
+				candidates[language]++
+			}
+		}
 	}
 
-	if lang, safe := GetLanguageByFilename(filename); safe {
-		return lang
+	if len(candidates) == 0 {
+		return OtherLanguage
 	}
 
-	if lang, safe := GetLanguageByShebang(content); safe {
-		return lang
-	}
-
-	if lang, safe := GetLanguageByExtension(filename); safe {
-		return lang
-	}
-
-	if lang, safe := GetLanguageByContent(filename, content); safe {
-		return lang
-	}
-
-	lang := GetLanguageByClassifier(content, nil, nil)
+	lang := GetLanguageByClassifier(content, candidates, nil)
 	return lang
 }
 
 // GetLanguageByModeline returns the language of the given content looking for the modeline,
 // and safe to indicate the sureness of returned language.
 func GetLanguageByModeline(content []byte) (lang string, safe bool) {
-	return getLanguageByModeline(content)
+	return getLangAndSafe("", content, GetLanguagesByModeline)
 }
 
 // GetLanguageByFilename returns a language based on the given filename, and safe to indicate
 // the sureness of returned language.
 func GetLanguageByFilename(filename string) (lang string, safe bool) {
-	return getLanguageByFilename(filename)
+	return getLangAndSafe(filename, nil, GetLanguagesByFilename)
 }
 
-func getLanguageByFilename(filename string) (lang string, safe bool) {
-	lang, safe = languagesByFilename[filename]
-	if lang == "" {
-		lang = OtherLanguage
-	}
-
-	return
+// GetLanguagesByFilename returns a slice of possible languages for the given filename, content will be ignored.
+// It accomplish the signature to be a Strategy type.
+func GetLanguagesByFilename(filename string, content []byte) []string {
+	return languagesByFilename[filename]
 }
 
 // GetLanguageByShebang returns the language of the given content looking for the shebang line,
 // and safe to indicate the sureness of returned language.
 func GetLanguageByShebang(content []byte) (lang string, safe bool) {
-	return getLanguageByShebang(content)
+	return getLangAndSafe("", content, GetLanguagesByShebang)
 }
 
 // GetLanguageByExtension returns a language based on the given filename, and safe to indicate
 // the sureness of returned language.
 func GetLanguageByExtension(filename string) (lang string, safe bool) {
-	return getLanguageByExtension(filename)
+	return getLangAndSafe(filename, nil, GetLanguagesByExtension)
 }
 
-func getLanguageByExtension(filename string) (lang string, safe bool) {
+// GetLanguagesByExtension returns a slice of possible languages for the given filename, content will be ignored.
+// It accomplish the signature to be a Strategy type.
+func GetLanguagesByExtension(filename string, content []byte) []string {
 	ext := strings.ToLower(filepath.Ext(filename))
-	lang = OtherLanguage
-	langs, ok := languagesByExtension[ext]
-	if !ok {
-		return
-	}
-
-	lang = langs[0]
-	safe = len(langs) == 1
-	return
+	return languagesByExtension[ext]
 }
 
 // GetLanguageByContent returns a language based on the filename and heuristics applies to the content,
 // and safe to indicate the sureness of returned language.
 func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	return getLanguageByContent(filename, content)
+	return getLangAndSafe(filename, content, GetLanguagesByContent)
 }
 
-func getLanguageByContent(filename string, content []byte) (lang string, safe bool) {
+// GetLanguagesByContent returns a slice of possible languages for the given content, filename will be ignored.
+// It accomplish the signature to be a Strategy type.
+func GetLanguagesByContent(filename string, content []byte) []string {
 	ext := strings.ToLower(filepath.Ext(filename))
-	if fnMatcher, ok := contentMatchers[ext]; ok {
-		lang, safe = fnMatcher(content)
-	} else {
-		lang = OtherLanguage
+	fnMatcher, ok := contentMatchers[ext]
+	if !ok {
+		return nil
 	}
 
+	return fnMatcher(content)
+}
+
+func getLangAndSafe(filename string, content []byte, getLanguageByStrategy Strategy) (lang string, safe bool) {
+	languages := getLanguageByStrategy(filename, content)
+	if len(languages) == 0 {
+		lang = OtherLanguage
+		return
+	}
+
+	lang = languages[0]
+	safe = len(languages) == 1
 	return
 }
 
 // GetLanguageByClassifier takes in a content and a list of candidates, and apply the classifier's Classify method to
-// get the most probably language. If classifier is null then DefaultClassfier will be used.
-func GetLanguageByClassifier(content []byte, candidates []string, classifier Classifier) string {
-	return getLanguageByClassifier(content, candidates, classifier)
+// get the most probably language. If classifier is null then DefaultClassfier will be used. If there aren't candidates
+// OtherLanguage is returned.
+func GetLanguageByClassifier(content []byte, candidates map[string]float64, classifier Classifier) string {
+	scores := GetLanguagesByClassifier(content, candidates, classifier)
+	if len(scores) == 0 {
+		return OtherLanguage
+	}
+
+	return getLangugeHigherScore(scores)
+}
+
+func getLangugeHigherScore(scores map[string]float64) string {
+	var language string
+	higher := -math.MaxFloat64
+	for lang, score := range scores {
+		if higher < score {
+			language = lang
+			higher = score
+		}
+	}
+
+	return language
+}
+
+// GetLanguagesByClassifier returns a map of possible languages as keys and a score as value based on content and candidates. The values can be ordered
+// with the highest value as the most probably language. If classifier is null then DefaultClassfier will be used.
+func GetLanguagesByClassifier(content []byte, candidates map[string]float64, classifier Classifier) map[string]float64 {
+	if classifier == nil {
+		classifier = DefaultClassifier
+	}
+
+	return classifier.Classify(content, candidates)
 }
 
 // GetLanguageExtensions returns the different extensions being used by the language.

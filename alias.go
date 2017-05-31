@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
+// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
 
 // languagesByAlias keeps alias for different languages and use the name of the languages as an alias too.
 // All the keys (alias or not) are written in lower case and the whitespaces has been replaced by underscores.
@@ -608,9 +608,12 @@ var languagesByAlias = map[string]string{
 	"visual_basic":          "Visual Basic",
 	"volt":                  "Volt",
 	"vue":                   "Vue",
+	"wasm":                  "WebAssembly",
+	"wast":                  "WebAssembly",
 	"wavefront_material":    "Wavefront Material",
 	"wavefront_object":      "Wavefront Object",
 	"web_ontology_language": "Web Ontology Language",
+	"webassembly":           "WebAssembly",
 	"webidl":                "WebIDL",
 	"winbatch":              "Batchfile",
 	"wisp":                  "wisp",

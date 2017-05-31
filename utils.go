@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"path/filepath"
 	"strings"
-
-	"gopkg.in/toqueteos/substring.v1"
 )
 
 var (
@@ -46,16 +44,12 @@ func IsDotFile(path string) bool {
 
 // IsVendor returns whether or not path is a vendor path.
 func IsVendor(path string) bool {
-	return findIndex(path, vendorMatchers) >= 0
+	return vendorMatchers.Match(path)
 }
 
 // IsDocumentation returns whether or not path is a documentation path.
 func IsDocumentation(path string) bool {
-	return findIndex(path, documentationMatchers) >= 0
-}
-
-func findIndex(path string, matchers substring.StringsMatcher) int {
-	return matchers.MatchIndex(path)
+	return documentationMatchers.Match(path)
 }
 
 const sniffLen = 8000
