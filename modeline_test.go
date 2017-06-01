@@ -9,6 +9,7 @@ import (
 
 const (
 	modelinesDir = ".linguist/test/fixtures/Data/Modelines"
+	samplesDir   = ".linguist/samples"
 )
 
 func (s *TSuite) TestGetLanguageByModeline(c *C) {
@@ -18,42 +19,43 @@ func (s *TSuite) TestGetLanguageByModeline(c *C) {
 		expectedSafe bool
 	}{
 		// Emacs
-		{filename: "example_smalltalk.md", expectedLang: "Smalltalk", expectedSafe: true},
-		{filename: "fundamentalEmacs.c", expectedLang: "Text", expectedSafe: true},
-		{filename: "iamphp.inc", expectedLang: "PHP", expectedSafe: true},
-		{filename: "seeplusplusEmacs1", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs2", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs3", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs4", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs5", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs6", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs7", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs9", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs10", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs11", expectedLang: "C++", expectedSafe: true},
-		{filename: "seeplusplusEmacs12", expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "example_smalltalk.md"), expectedLang: "Smalltalk", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "fundamentalEmacs.c"), expectedLang: "Text", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "iamphp.inc"), expectedLang: "PHP", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs1"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs2"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs3"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs4"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs5"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs6"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs7"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs9"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs10"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs11"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplusEmacs12"), expectedLang: "C++", expectedSafe: true},
 
 		// Vim
-		{filename: "seeplusplus", expectedLang: "C++", expectedSafe: true},
-		{filename: "iamjs.pl", expectedLang: "JavaScript", expectedSafe: true},
-		{filename: "iamjs2.pl", expectedLang: "JavaScript", expectedSafe: true},
-		{filename: "not_perl.pl", expectedLang: "Prolog", expectedSafe: true},
-		{filename: "ruby", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby2", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby3", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby4", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby5", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby6", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby7", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby8", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby9", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby10", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby11", expectedLang: "Ruby", expectedSafe: true},
-		{filename: "ruby12", expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "seeplusplus"), expectedLang: "C++", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "iamjs.pl"), expectedLang: "JavaScript", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "iamjs2.pl"), expectedLang: "JavaScript", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "not_perl.pl"), expectedLang: "Prolog", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby2"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby3"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby4"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby5"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby6"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby7"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby8"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby9"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby10"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby11"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(modelinesDir, "ruby12"), expectedLang: "Ruby", expectedSafe: true},
+		{filename: filepath.Join(samplesDir, "C/main.c"), expectedLang: OtherLanguage, expectedSafe: false},
 	}
 
 	for _, test := range linguistTests {
-		content, err := ioutil.ReadFile(filepath.Join(modelinesDir, test.filename))
+		content, err := ioutil.ReadFile(test.filename)
 		c.Assert(err, Equals, nil)
 
 		lang, safe := GetLanguageByModeline(content)
@@ -62,8 +64,9 @@ func (s *TSuite) TestGetLanguageByModeline(c *C) {
 	}
 
 	const (
-		wrongVim = `# vim: set syntax=ruby ft  =python filetype=perl :`
-		rightVim = `/* vim: set syntax=python ft   =python filetype=python */`
+		wrongVim  = `# vim: set syntax=ruby ft  =python filetype=perl :`
+		rightVim  = `/* vim: set syntax=python ft   =python filetype=python */`
+		noLangVim = `/* vim: set shiftwidth=4 softtabstop=0 cindent cinoptions={1s: */`
 	)
 
 	tests := []struct {
@@ -73,6 +76,7 @@ func (s *TSuite) TestGetLanguageByModeline(c *C) {
 	}{
 		{content: []byte(wrongVim), expectedLang: OtherLanguage, expectedSafe: false},
 		{content: []byte(rightVim), expectedLang: "Python", expectedSafe: true},
+		{content: []byte(noLangVim), expectedLang: OtherLanguage, expectedSafe: false},
 	}
 
 	for _, test := range tests {

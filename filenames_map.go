@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
+// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 var languagesByFilename = map[string]string{
 	".Rprofile":          "R",
@@ -22,6 +22,7 @@ var languagesByFilename = map[string]string{
 	".factor-rc":         "Factor",
 	".gclient":           "Python",
 	".gnus":              "Emacs Lisp",
+	".irbrc":             "Ruby",
 	".jshintrc":          "JSON",
 	".nvimrc":            "Vim script",
 	".php_cs":            "PHP",
@@ -85,6 +86,7 @@ var languagesByFilename = map[string]string{
 	"README.me":          "Text",
 	"README.mysql":       "Text",
 	"ROOT":               "Isabelle ROOT",
+	"Rakefile":           "Ruby",
 	"Rexfile":            "Perl6",
 	"SConscript":         "Python",
 	"SConstruct":         "Python",

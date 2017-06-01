@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
+// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 var languagesType = map[string]Type{
 	"1C Enterprise":    Programming,
@@ -59,6 +59,7 @@ var languagesType = map[string]Type{
 	"CSON":                     Data,
 	"CSS":                      Markup,
 	"CSV":                      Data,
+	"CWeb":                     Programming,
 	"Cap'n Proto":              Programming,
 	"CartoCSS":                 Programming,
 	"Ceylon":                   Programming,
@@ -70,6 +71,7 @@ var languagesType = map[string]Type{
 	"Clean":                    Programming,
 	"Click":                    Programming,
 	"Clojure":                  Programming,
+	"Closure Templates":        Markup,
 	"CoffeeScript":             Programming,
 	"ColdFusion":               Programming,
 	"ColdFusion CFC":           Programming,
@@ -193,6 +195,7 @@ var languagesType = map[string]Type{
 	"JavaScript":               Programming,
 	"Jison":                    Programming,
 	"Jison Lex":                Programming,
+	"Jolie":                    Programming,
 	"Julia":                    Programming,
 	"Jupyter Notebook":         Markup,
 	"KRL":                      Programming,
@@ -297,6 +300,7 @@ var languagesType = map[string]Type{
 	"Parrot Assembly":                Programming,
 	"Parrot Internal Representation": Programming,
 	"Pascal":                       Programming,
+	"Pep8":                         Programming,
 	"Perl":                         Programming,
 	"Perl6":                        Programming,
 	"Pic":                          Markup,
@@ -368,6 +372,7 @@ var languagesType = map[string]Type{
 	"Scheme":                       Programming,
 	"Scilab":                       Programming,
 	"Self":                         Programming,
+	"ShaderLab":                    Programming,
 	"Shell":                        Programming,
 	"ShellSession":                 Programming,
 	"Shen":                         Programming,
@@ -403,6 +408,7 @@ var languagesType = map[string]Type{
 	"Turing":                       Programming,
 	"Turtle":                       Data,
 	"Twig":                         Markup,
+	"Type Language":                Data,
 	"TypeScript":                   Programming,
 	"Unified Parallel C":           Programming,
 	"Unity3D Asset":                Data,

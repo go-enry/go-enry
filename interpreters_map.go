@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
+// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 var languagesByInterpreter = map[string][]string{
 	"Rscript":     {"R"},
@@ -36,6 +36,7 @@ var languagesByInterpreter = map[string][]string{
 	"io":          {"Io"},
 	"ioke":        {"Ioke"},
 	"jconsole":    {"J"},
+	"jolie":       {"Jolie"},
 	"jruby":       {"Ruby"},
 	"julia":       {"Julia"},
 	"lisp":        {"Common Lisp"},

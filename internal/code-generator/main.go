@@ -54,7 +54,13 @@ const (
 	aliasesTmplPath = "internal/code-generator/assets/aliases.go.tmpl"
 	aliasesTmpl     = "aliases.go.tmpl"
 
-	commitPath = ".git/refs/heads/master"
+	// frequencies.go generation
+	samplesDir          = ".linguist/samples"
+	frequenciesFile     = "frequencies.go"
+	frequenciesTmplPath = "internal/code-generator/assets/frequencies.go.tmpl"
+	frequenciesTmpl     = "frequencies.go.tmpl"
+
+	commitPath = ".linguist/.git/refs/heads/master"
 )
 
 type generatorArgs struct {
@@ -87,6 +93,10 @@ func main() {
 		if err := generator.FromFile(args.fileToParse, args.outPath, args.tmplPath, args.tmplName, args.commit, args.generate); err != nil {
 			log.Println(err)
 		}
+	}
+
+	if err := generator.Frequencies(samplesDir, frequenciesTmplPath, frequenciesTmpl, commit, frequenciesFile); err != nil {
+		log.Println(err)
 	}
 }
 

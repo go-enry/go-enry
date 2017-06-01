@@ -2,7 +2,7 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: dae33dc2b20cddc85d1300435c3be7118a7115a9
+// Extracted from github/linguist commit: 60f864a138650dd17fafc94814be9ee2d3aaef8c
 
 import (
 	"path/filepath"
@@ -117,8 +117,8 @@ var matchers = map[string]languageMatcher{
 			return "Forth", true
 		} else if f_FilebenchWML_Matcher_0.Match(i) {
 			return "Filebench WML", true
-		} else if f_FORTRAN_Matcher_0.Match(i) {
-			return "FORTRAN", true
+		} else if f_Fortran_Matcher_0.Match(i) {
+			return "Fortran", true
 		}
 
 		return OtherLanguage, false
@@ -126,8 +126,8 @@ var matchers = map[string]languageMatcher{
 	".for": func(i []byte) (string, bool) {
 		if for_Forth_Matcher_0.Match(i) {
 			return "Forth", true
-		} else if for_FORTRAN_Matcher_0.Match(i) {
-			return "FORTRAN", true
+		} else if for_Fortran_Matcher_0.Match(i) {
+			return "Fortran", true
 		}
 
 		return OtherLanguage, false
@@ -184,8 +184,8 @@ var matchers = map[string]languageMatcher{
 			return "Common Lisp", true
 		} else if l_Lex_Matcher_0.Match(i) {
 			return "Lex", true
-		} else if l_Groff_Matcher_0.Match(i) {
-			return "Groff", true
+		} else if l_Roff_Matcher_0.Match(i) {
+			return "Roff", true
 		} else if l_PicoLisp_Matcher_0.Match(i) {
 			return "PicoLisp", true
 		}
@@ -239,8 +239,8 @@ var matchers = map[string]languageMatcher{
 	".md": func(i []byte) (string, bool) {
 		if md_Markdown_Matcher_0.Match(i) || md_Markdown_Matcher_1.Match(i) {
 			return "Markdown", true
-		} else if md_GCCmachinedescription_Matcher_0.Match(i) {
-			return "GCC machine description", true
+		} else if md_GCCMachineDescription_Matcher_0.Match(i) {
+			return "GCC Machine Description", true
 		}
 
 		return "Markdown", true
@@ -264,15 +264,15 @@ var matchers = map[string]languageMatcher{
 		return "Linux Kernel Module", false
 	},
 	".ms": func(i []byte) (string, bool) {
-		if ms_Groff_Matcher_0.Match(i) {
-			return "Groff", true
+		if ms_Roff_Matcher_0.Match(i) {
+			return "Roff", true
 		}
 
 		return "MAXScript", true
 	},
 	".n": func(i []byte) (string, bool) {
-		if n_Groff_Matcher_0.Match(i) {
-			return "Groff", true
+		if n_Roff_Matcher_0.Match(i) {
+			return "Roff", true
 		} else if n_Nemerle_Matcher_0.Match(i) {
 			return "Nemerle", true
 		}
@@ -314,19 +314,10 @@ var matchers = map[string]languageMatcher{
 		return OtherLanguage, false
 	},
 	".pm": func(i []byte) (string, bool) {
-		if pm_Perl_Matcher_0.Match(i) {
-			return "Perl", true
-		} else if pm_Perl6_Matcher_0.Match(i) {
+		if pm_Perl6_Matcher_0.Match(i) {
 			return "Perl6", true
-		}
-
-		return OtherLanguage, false
-	},
-	".t": func(i []byte) (string, bool) {
-		if t_Perl_Matcher_0.Match(i) {
+		} else if pm_Perl_Matcher_0.Match(i) {
 			return "Perl", true
-		} else if t_Perl6_Matcher_0.Match(i) {
-			return "Perl6", true
 		}
 
 		return OtherLanguage, false
@@ -372,8 +363,8 @@ var matchers = map[string]languageMatcher{
 	".rno": func(i []byte) (string, bool) {
 		if rno_RUNOFF_Matcher_0.Match(i) {
 			return "RUNOFF", true
-		} else if rno_Groff_Matcher_0.Match(i) {
-			return "Groff", true
+		} else if rno_Roff_Matcher_0.Match(i) {
+			return "Roff", true
 		}
 
 		return OtherLanguage, false
@@ -419,6 +410,17 @@ var matchers = map[string]languageMatcher{
 	".srt": func(i []byte) (string, bool) {
 		if srt_SubRipText_Matcher_0.Match(i) {
 			return "SubRip Text", true
+		}
+
+		return OtherLanguage, false
+	},
+	".t": func(i []byte) (string, bool) {
+		if t_Turing_Matcher_0.Match(i) {
+			return "Turing", true
+		} else if t_Perl6_Matcher_0.Match(i) {
+			return "Perl6", true
+		} else if t_Perl_Matcher_0.Match(i) {
+			return "Perl", true
 		}
 
 		return OtherLanguage, false
@@ -481,9 +483,9 @@ var (
 	es_Erlang_Matcher_0                    = regexp.MustCompile(`(?m)^\s*(?:%%|main\s*\(.*?\)\s*->)`)
 	f_Forth_Matcher_0                      = regexp.MustCompile(`(?m)^: `)
 	f_FilebenchWML_Matcher_0               = regexp.MustCompile(`(?m)flowop`)
-	f_FORTRAN_Matcher_0                    = regexp.MustCompile(`(?mi)^([c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`)
+	f_Fortran_Matcher_0                    = regexp.MustCompile(`(?mi)^([c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`)
 	for_Forth_Matcher_0                    = regexp.MustCompile(`(?m)^: `)
-	for_FORTRAN_Matcher_0                  = regexp.MustCompile(`(?mi)^([c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`)
+	for_Fortran_Matcher_0                  = regexp.MustCompile(`(?mi)^([c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`)
 	fr_Forth_Matcher_0                     = regexp.MustCompile(`(?m)^(: |also |new-device|previous )`)
 	fr_Frege_Matcher_0                     = regexp.MustCompile(`(?m)^\s*(import|module|package|data|type) `)
 	fs_Forth_Matcher_0                     = regexp.MustCompile(`(?m)^(: |new-device)`)
@@ -503,7 +505,7 @@ var (
 	inc_POVDashRaySDL_Matcher_0            = regexp.MustCompile(`(?m)^\s*#(declare|local|macro|while)\s`)
 	l_CommonLisp_Matcher_0                 = regexp.MustCompile(`(?m)\(def(un|macro)\s`)
 	l_Lex_Matcher_0                        = regexp.MustCompile(`(?m)^(%[%{}]xs|<.*>)`)
-	l_Groff_Matcher_0                      = regexp.MustCompile(`(?mi)^\.[a-z][a-z](\s|$)`)
+	l_Roff_Matcher_0                       = regexp.MustCompile(`(?mi)^\.[a-z][a-z](\s|$)`)
 	l_PicoLisp_Matcher_0                   = regexp.MustCompile(`(?m)^\((de|class|rel|code|data|must)\s`)
 	ls_LoomScript_Matcher_0                = regexp.MustCompile(`(?m)^\s*package\s*[\w\.\/\*\s]*\s*{`)
 	lsp_CommonLisp_Matcher_0               = regexp.MustCompile(`(?mi)^\s*\((defun|in-package|defpackage) `)
@@ -519,14 +521,14 @@ var (
 	m_Limbo_Matcher_0                      = regexp.MustCompile(`(?m)^\w+\s*:\s*module\s*{`)
 	md_Markdown_Matcher_0                  = regexp.MustCompile(`(?mi)(^[-a-z0-9=#!\*\[|>])|<\/`)
 	md_Markdown_Matcher_1                  = regexp.MustCompile(`(?m)^$`)
-	md_GCCmachinedescription_Matcher_0     = regexp.MustCompile(`(?m)^(;;|\(define_)`)
+	md_GCCMachineDescription_Matcher_0     = regexp.MustCompile(`(?m)^(;;|\(define_)`)
 	ml_OCaml_Matcher_0                     = regexp.MustCompile(`(?m)(^\s*module)|let rec |match\s+(\S+\s)+with`)
 	ml_StandardML_Matcher_0                = regexp.MustCompile(`(?m)=> |case\s+(\S+\s)+of`)
 	mod_XML_Matcher_0                      = regexp.MustCompile(`(?m)<!ENTITY `)
 	mod_ModulaDash2_Matcher_0              = regexp.MustCompile(`(?mi)^\s*MODULE [\w\.]+;`)
 	mod_ModulaDash2_Matcher_1              = regexp.MustCompile(`(?mi)^\s*END [\w\.]+;`)
-	ms_Groff_Matcher_0                     = regexp.MustCompile(`(?mi)^[.'][a-z][a-z](\s|$)`)
-	n_Groff_Matcher_0                      = regexp.MustCompile(`(?m)^[.']`)
+	ms_Roff_Matcher_0                      = regexp.MustCompile(`(?mi)^[.'][a-z][a-z](\s|$)`)
+	n_Roff_Matcher_0                       = regexp.MustCompile(`(?m)^[.']`)
 	n_Nemerle_Matcher_0                    = regexp.MustCompile(`(?m)^(module|namespace|using)\s`)
 	ncl_Text_Matcher_0                     = regexp.MustCompile(`(?m)THE_TITLE`)
 	nl_NL_Matcher_0                        = regexp.MustCompile(`(?m)^(b|g)[0-9]+ `)
@@ -535,10 +537,8 @@ var (
 	pl_Prolog_Matcher_0                    = regexp.MustCompile(`(?m)^[^#]*:-`)
 	pl_Perl_Matcher_0                      = regexp.MustCompile(`(?m)use strict|use\s+v?5\.`)
 	pl_Perl6_Matcher_0                     = regexp.MustCompile(`(?m)^(use v6|(my )?class|module)`)
-	pm_Perl_Matcher_0                      = regexp.MustCompile(`(?m)use strict|use\s+v?5\.`)
-	pm_Perl6_Matcher_0                     = regexp.MustCompile(`(?m)^(use v6|(my )?class|module)`)
-	t_Perl_Matcher_0                       = regexp.MustCompile(`(?m)use strict|use\s+v?5\.`)
-	t_Perl6_Matcher_0                      = regexp.MustCompile(`(?m)^(use v6|(my )?class|module)`)
+	pm_Perl6_Matcher_0                     = regexp.MustCompile(`(?m)^\s*(?:use\s+v6\s*;|(?:\bmy\s+)?class|module)\b`)
+	pm_Perl_Matcher_0                      = regexp.MustCompile(`(?m)\buse\s+(?:strict\b|v?5\.)`)
 	pod_Pod_Matcher_0                      = regexp.MustCompile(`(?m)^=\w+\b`)
 	pro_Prolog_Matcher_0                   = regexp.MustCompile(`(?m)^[^#]+:-`)
 	pro_INI_Matcher_0                      = regexp.MustCompile(`(?m)last_client=`)
@@ -550,7 +550,7 @@ var (
 	r_Rebol_Matcher_0                      = regexp.MustCompile(`(?mi)\bRebol\b`)
 	r_R_Matcher_0                          = regexp.MustCompile(`(?m)<-|^\s*#`)
 	rno_RUNOFF_Matcher_0                   = regexp.MustCompile(`(?mi)^\.!|^\.end lit(?:eral)?\b`)
-	rno_Groff_Matcher_0                    = regexp.MustCompile(`(?m)^\.\\" `)
+	rno_Roff_Matcher_0                     = regexp.MustCompile(`(?m)^\.\\" `)
 	rpy_Python_Matcher_0                   = regexp.MustCompile(`(?ms)(^(import|from|class|def)\s)`)
 	rs_Rust_Matcher_0                      = regexp.MustCompile(`(?m)^(use |fn |mod |pub |macro_rules|impl|#!?\[)`)
 	rs_RenderScript_Matcher_0              = regexp.MustCompile(`(?m)#include|#pragma\s+(rs|version)|__attribute__`)
@@ -569,6 +569,9 @@ var (
 	sql_PLSQL_Matcher_1                    = regexp.MustCompile(`(?mi)constructor\W+function`)
 	sql_SQL_Matcher_0                      = regexp.MustCompile(`(?mi)! /begin|boolean|package|exception`)
 	srt_SubRipText_Matcher_0               = regexp.MustCompile(`(?m)^(\d{2}:\d{2}:\d{2},\d{3})\s*(-->)\s*(\d{2}:\d{2}:\d{2},\d{3})$`)
+	t_Turing_Matcher_0                     = regexp.MustCompile(`(?m)^\s*%[ \t]+|^\s*var\s+\w+\s*:=\s*\w+`)
+	t_Perl6_Matcher_0                      = regexp.MustCompile(`(?m)^\s*(?:use\s+v6\s*;|\bmodule\b|\b(?:my\s+)?class\b)`)
+	t_Perl_Matcher_0                       = regexp.MustCompile(`(?m)\buse\s+(?:strict\b|v?5\.)`)
 	toc_WorldofWarcraftAddonData_Matcher_0 = regexp.MustCompile(`(?m)^## |@no-lib-strip@`)
 	toc_TeX_Matcher_0                      = regexp.MustCompile(`(?m)^\\(contentsline|defcounter|beamer|boolfalse)`)
 	ts_XML_Matcher_0                       = regexp.MustCompile(`(?m)<TS`)

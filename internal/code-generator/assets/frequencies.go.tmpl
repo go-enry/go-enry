@@ -1,0 +1,24 @@
+package slinguist
+
+// CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
+// THIS FILE SHOULD NOT BE EDITED BY HAND
+// Extracted from github/linguist commit: {{ getCommit }}
+
+var DefaultClassifier Classifier = &classifier{
+	languagesLogProbabilities: map[string]float64{
+	{{ $freqs := . -}}
+	{{range $index, $language := orderKeys .Languages -}}
+		"{{ $language }}":	{{ languageLogProbability $language -}},
+	{{end -}}
+	},
+	tokensLogProbabilities: map[string]map[string]float64{
+	{{range $index, $language := orderMapMapKeys .Tokens -}}
+		"{{ $language }}": map[string]float64{	
+		{{range $i, $token := index $freqs.Tokens $language | orderKeys -}}
+			{{ quote $token }}: {{ tokenLogProbability $language $token }},
+		{{end -}}
+		},
+	{{end -}}
+	},
+	tokensTotal: {{ toFloat64 .TokensTotal -}},
+}

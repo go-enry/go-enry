@@ -4,15 +4,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 const (
+	lingustURL = "https://github.com/github/linguist.git"
+	commitTree = "60f864a138650dd17fafc94814be9ee2d3aaef8c"
 	commitTest = "fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7"
 
-	// Languages test
+	// Extensions test
 	extensionsTestFile     = "test_files/extensions.test.yml"
 	extensionsGold         = "test_files/extensions.gold"
 	extensionsTestTmplPath = "../assets/extensions.go.tmpl"
@@ -59,9 +64,48 @@ const (
 	aliasesGold         = "test_files/aliases.gold"
 	aliasesTestTmplPath = "../assets/aliases.go.tmpl"
 	aliasesTestTmplName = "aliases.go.tmpl"
+
+	// Frequencies test
+	frequenciesTestDir      = "/samples"
+	frequenciesGold         = "test_files/frequencies.gold"
+	frequenciesTestTmplPath = "../assets/frequencies.go.tmpl"
+	frequenciesTestTmplName = "frequencies.go.tmpl"
 )
 
-func TestFromFile(t *testing.T) {
+type GeneratorTestSuite struct {
+	suite.Suite
+	tmpLinguist string
+}
+
+func (g *GeneratorTestSuite) SetupSuite() {
+	tmpLinguist, err := ioutil.TempDir("", "linguist-")
+	assert.NoError(g.T(), err)
+	g.tmpLinguist = tmpLinguist
+
+	cmd := exec.Command("git", "clone", lingustURL, tmpLinguist)
+	err = cmd.Run()
+	assert.NoError(g.T(), err)
+
+	cwd, err := os.Getwd()
+	assert.NoError(g.T(), err)
+
+	err = os.Chdir(tmpLinguist)
+	assert.NoError(g.T(), err)
+
+	cmd = exec.Command("git", "checkout", commitTree)
+	err = cmd.Run()
+	assert.NoError(g.T(), err)
+
+	err = os.Chdir(cwd)
+	assert.NoError(g.T(), err)
+}
+
+func (g *GeneratorTestSuite) TearDownSuite() {
+	err := os.RemoveAll(g.tmpLinguist)
+	assert.NoError(g.T(), err)
+}
+
+func (g *GeneratorTestSuite) TestFromFile() {
 	tests := []struct {
 		name        string
 		fileToParse string
@@ -145,20 +189,57 @@ func TestFromFile(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gold, err := ioutil.ReadFile(tt.wantOut)
-			assert.NoError(t, err)
+	for _, test := range tests {
+		gold, err := ioutil.ReadFile(test.wantOut)
+		assert.NoError(g.T(), err)
 
-			outPath, err := ioutil.TempFile("/tmp", "generator-test-")
-			assert.NoError(t, err)
-			defer os.Remove(outPath.Name())
+		outPath, err := ioutil.TempFile("/tmp", "generator-test-")
+		assert.NoError(g.T(), err)
+		defer os.Remove(outPath.Name())
 
-			err = FromFile(tt.fileToParse, outPath.Name(), tt.tmplPath, tt.tmplName, tt.commit, tt.generate)
-			assert.NoError(t, err)
-			out, err := ioutil.ReadFile(outPath.Name())
-			assert.NoError(t, err)
-			assert.EqualValues(t, gold, out, fmt.Sprintf("FromFile() = %v, want %v", string(out), string(tt.wantOut)))
-		})
+		err = FromFile(test.fileToParse, outPath.Name(), test.tmplPath, test.tmplName, test.commit, test.generate)
+		assert.NoError(g.T(), err)
+		out, err := ioutil.ReadFile(outPath.Name())
+		assert.NoError(g.T(), err)
+		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("FromFile() = %v, want %v", string(out), string(test.wantOut)))
 	}
+}
+
+func (g *GeneratorTestSuite) TestFrequencies() {
+	tests := []struct {
+		name       string
+		samplesDir string
+		tmplPath   string
+		tmplName   string
+		commit     string
+		wantOut    string
+	}{
+		{
+			name:       "Frequencies_1",
+			samplesDir: filepath.Join(g.tmpLinguist, frequenciesTestDir),
+			tmplPath:   frequenciesTestTmplPath,
+			tmplName:   frequenciesTestTmplName,
+			commit:     commitTree,
+			wantOut:    frequenciesGold,
+		},
+	}
+
+	for _, test := range tests {
+		gold, err := ioutil.ReadFile(test.wantOut)
+		assert.NoError(g.T(), err)
+
+		outPath, err := ioutil.TempFile("/tmp", "frequencies-test-")
+		assert.NoError(g.T(), err)
+		defer os.Remove(outPath.Name())
+
+		err = Frequencies(test.samplesDir, test.tmplPath, test.tmplName, test.commit, outPath.Name())
+		assert.NoError(g.T(), err)
+		out, err := ioutil.ReadFile(outPath.Name())
+		assert.NoError(g.T(), err)
+		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("Frequencies() = %v, want %v", string(out), string(test.wantOut)))
+	}
+}
+
+func TestGeneratorTestSuite(t *testing.T) {
+	suite.Run(t, new(GeneratorTestSuite))
 }
