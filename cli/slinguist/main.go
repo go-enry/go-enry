@@ -21,7 +21,7 @@ func main() {
 	}
 
 	errors := false
-	o := make(map[string][]string, 0)
+	out := make(map[string][]string, 0)
 	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			errors = true
@@ -29,7 +29,23 @@ func main() {
 			return filepath.SkipDir
 		}
 
-		if slinguist.IsVendor(f.Name()) || slinguist.IsDotFile(f.Name()) {
+		relativePath, err := filepath.Rel(root, path)
+		if err != nil {
+			errors = true
+			log.Println(err)
+			return nil
+		}
+
+		if relativePath == "." {
+			return nil
+		}
+
+		if f.IsDir() {
+			relativePath = relativePath + "/"
+		}
+
+		if slinguist.IsVendor(relativePath) || slinguist.IsDotFile(relativePath) ||
+			slinguist.IsDocumentation(relativePath) || slinguist.IsConfiguration(relativePath) {
 			if f.IsDir() {
 				return filepath.SkipDir
 			}
@@ -48,16 +64,12 @@ func main() {
 			return nil
 		}
 
-		l := slinguist.GetLanguage(filepath.Base(path), content)
-
-		r, err := filepath.Rel(root, path)
-		if err != nil {
-			errors = true
-			log.Println(err)
+		language := slinguist.GetLanguage(filepath.Base(path), content)
+		if language == slinguist.OtherLanguage {
 			return nil
 		}
 
-		o[l] = append(o[l], r)
+		out[language] = append(out[language], relativePath)
 		return nil
 	})
 
@@ -65,8 +77,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	js, _ := json.MarshalIndent(o, "", "  ")
-	fmt.Printf("%s\n", js)
+	data, _ := json.MarshalIndent(out, "", "  ")
+	fmt.Printf("%s\n", data)
 
 	if errors {
 		os.Exit(2)
