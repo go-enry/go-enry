@@ -1,10 +1,10 @@
-package enry
+package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
 
-var languagesByExtension = map[string][]string{
+var LanguagesByExtension = map[string][]string{
 	".1":                   {"Roff"},
 	".1in":                 {"Roff"},
 	".1m":                  {"Roff"},
@@ -1003,7 +1003,7 @@ var languagesByExtension = map[string][]string{
 	".zsh":                 {"Shell"},
 }
 
-var extensionsByLanguage = map[string][]string{
+var ExtensionsByLanguage = map[string][]string{
 	"1C Enterprise": {".bsl", ".os"},
 	"ABAP":          {".abap"},
 	"ABNF":          {".abnf"},

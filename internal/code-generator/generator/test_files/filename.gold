@@ -1,10 +1,10 @@
-package enry
+package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
 
-var languagesByFilename = map[string][]string{
+var LanguagesByFilename = map[string][]string{
 	".Rprofile":          {"R"},
 	".XCompose":          {"XCompose"},
 	".abbrev_defs":       {"Emacs Lisp"},

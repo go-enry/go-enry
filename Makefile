@@ -7,6 +7,7 @@ test: $(LINGUIST_PATH)
 	go test -v ./...
 
 code-generate: $(LINGUIST_PATH)
+	mkdir -p data
 	go run internal/code-generator/main.go
 
 clean:

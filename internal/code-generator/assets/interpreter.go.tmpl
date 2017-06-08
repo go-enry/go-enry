@@ -1,10 +1,10 @@
-package enry
+package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: {{ getCommit }}
 
-var languagesByInterpreter = map[string][]string{
+var LanguagesByInterpreter = map[string][]string{
 	{{range $interpreter, $languages := . -}}
 	"{{ $interpreter }}":	{ {{- $languages | formatStringSlice -}} },
 	{{end -}}
