@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"gopkg.in/src-d/simple-linguist.v1/internal/code-generator/generator"
+	"gopkg.in/src-d/enry.v1/internal/code-generator/generator"
 )
 
 const (

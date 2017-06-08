@@ -3,7 +3,7 @@ package slinguist
 import (
 	"math"
 
-	"gopkg.in/src-d/simple-linguist.v1/internal/tokenizer"
+	"gopkg.in/src-d/enry.v1/internal/tokenizer"
 )
 
 // Classifier is the interface that contains the method Classify which is in charge to assign scores to the possibles candidates.

@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"text/template"
 
-	"gopkg.in/src-d/simple-linguist.v1/internal/tokenizer"
+	"gopkg.in/src-d/enry.v1/internal/tokenizer"
 )
 
 const samplesSubDir = "filenames"
