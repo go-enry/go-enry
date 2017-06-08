@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/src-d/simple-linguist.v1"
+	"gopkg.in/src-d/enry.v1"
 )
 
 func main() {

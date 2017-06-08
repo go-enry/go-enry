@@ -11,8 +11,8 @@ matrix:
 install:
   - rm -rf $GOPATH/src/gopkg.in/src-d
   - mkdir -p $GOPATH/src/gopkg.in/src-d
-  - ln -s $PWD $GOPATH/src/gopkg.in/src-d/simple-linguist.v1
-  - cd $GOPATH/src/gopkg.in/src-d/simple-linguist.v1
+  - ln -s $PWD $GOPATH/src/gopkg.in/src-d/enry.v1
+  - cd $GOPATH/src/gopkg.in/src-d/enry.v1
   - go get -v -t ./...
 
 
