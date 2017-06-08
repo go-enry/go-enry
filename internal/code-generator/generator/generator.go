@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 )
 
-// Func is the function's type that generate the files from templates.
+// Func is the function's type that generate source file from a data to be parsed and a template.
 type Func func(dataToParse []byte, templatePath string, template string, commit string) ([]byte, error)
 
 // FromFile read data to parse from a file named fileToParse and write the generated source code to a file named outPath. The generated

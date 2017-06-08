@@ -2,42 +2,83 @@ package slinguist
 
 import (
 	"bytes"
+	"fmt"
+	"testing"
 
-	. "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
 
-func (s *TSuite) TestIsVendor(c *C) {
-	c.Assert(IsVendor("foo/bar"), Equals, false)
-	c.Assert(IsVendor("foo/vendor/foo"), Equals, true)
-	c.Assert(IsVendor(".sublime-project"), Equals, true)
-	c.Assert(IsVendor("leaflet.draw-src.js"), Equals, true)
-	c.Assert(IsVendor("foo/bar/MochiKit.js"), Equals, true)
-	c.Assert(IsVendor("foo/bar/dojo.js"), Equals, true)
-	c.Assert(IsVendor("foo/env/whatever"), Equals, true)
-	c.Assert(IsVendor("foo/.imageset/bar"), Equals, true)
-	c.Assert(IsVendor("Vagrantfile"), Equals, true)
+func (s *SimpleLinguistTestSuite) TestIsVendor() {
+	tests := []struct {
+		name     string
+		path     string
+		expected bool
+	}{
+		{name: "TestIsVendor_1", path: "foo/bar", expected: false},
+		{name: "TestIsVendor_2", path: "foo/vendor/foo", expected: true},
+		{name: "TestIsVendor_3", path: ".sublime-project", expected: true},
+		{name: "TestIsVendor_4", path: "leaflet.draw-src.js", expected: true},
+		{name: "TestIsVendor_5", path: "foo/bar/MochiKit.js", expected: true},
+		{name: "TestIsVendor_6", path: "foo/bar/dojo.js", expected: true},
+		{name: "TestIsVendor_7", path: "foo/env/whatever", expected: true},
+		{name: "TestIsVendor_8", path: "foo/.imageset/bar", expected: true},
+		{name: "TestIsVendor_9", path: "Vagrantfile", expected: true},
+	}
+
+	for _, test := range tests {
+		is := IsVendor(test.path)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
 }
 
-func (s *TSuite) TestIsDocumentation(c *C) {
-	c.Assert(IsDocumentation("foo"), Equals, false)
-	c.Assert(IsDocumentation("README"), Equals, true)
+func (s *SimpleLinguistTestSuite) TestIsDocumentation() {
+	tests := []struct {
+		name     string
+		path     string
+		expected bool
+	}{
+		{name: "TestIsDocumentation_1", path: "foo", expected: false},
+		{name: "TestIsDocumentation_2", path: "README", expected: true},
+	}
+
+	for _, test := range tests {
+		is := IsDocumentation(test.path)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
 }
 
-func (s *TSuite) TestIsConfiguration(c *C) {
-	c.Assert(IsConfiguration("foo"), Equals, false)
-	c.Assert(IsConfiguration("foo.ini"), Equals, true)
-	c.Assert(IsConfiguration("foo.json"), Equals, true)
+func (s *SimpleLinguistTestSuite) TestIsConfiguration() {
+	tests := []struct {
+		name     string
+		path     string
+		expected bool
+	}{
+		{name: "TestIsConfiguration_1", path: "foo", expected: false},
+		{name: "TestIsConfiguration_2", path: "foo.ini", expected: true},
+		{name: "TestIsConfiguration_3", path: "foo.json", expected: true},
+	}
+
+	for _, test := range tests {
+		is := IsConfiguration(test.path)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
 }
 
-func (s *TSuite) TestIsBinary(c *C) {
-	c.Assert(IsBinary([]byte("foo")), Equals, false)
+func (s *SimpleLinguistTestSuite) TestIsBinary() {
+	tests := []struct {
+		name     string
+		data     []byte
+		expected bool
+	}{
+		{name: "TestIsBinary_1", data: []byte("foo"), expected: false},
+		{name: "TestIsBinary_2", data: []byte{0}, expected: true},
+		{name: "TestIsBinary_3", data: bytes.Repeat([]byte{'o'}, 8000), expected: false},
+	}
 
-	binary := []byte{0}
-	c.Assert(IsBinary(binary), Equals, true)
-
-	binary = bytes.Repeat([]byte{'o'}, 8000)
-	binary = append(binary, byte(0))
-	c.Assert(IsBinary(binary), Equals, false)
+	for _, test := range tests {
+		is := IsBinary(test.data)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
 }
 
 const (
@@ -45,14 +86,14 @@ const (
 	jsPath   = "some/random/dir/file.js"
 )
 
-func (s *TSuite) BenchmarkVendor(c *C) {
-	for i := 0; i < c.N; i++ {
+func BenchmarkVendor(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		_ = IsVendor(htmlPath)
 	}
 }
 
-func (s *TSuite) BenchmarkVendorJS(c *C) {
-	for i := 0; i < c.N; i++ {
+func BenchmarkVendorJS(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		_ = IsVendor(jsPath)
 	}
 }

@@ -11,7 +11,7 @@ import (
 	"text/template"
 )
 
-// Heuristics reads from buf and builds content.go file from contentTmplPath.
+// Heuristics reads from buf and builds source file from contentTmplPath.
 func Heuristics(heuristics []byte, contentTmplPath, contentTmplName, commit string) ([]byte, error) {
 	disambiguators, err := getDisambiguators(heuristics)
 	if err != nil {
@@ -24,6 +24,8 @@ func Heuristics(heuristics []byte, contentTmplPath, contentTmplName, commit stri
 	}
 
 	return buf.Bytes(), nil
+	// fmt.Println(string(buf.Bytes()))
+	// return nil, nil
 }
 
 const unknownLanguage = "OtherLanguage"
@@ -417,9 +419,15 @@ func executeContentTemplate(out io.Writer, disambiguators []*disambiguator, cont
 	fmap := template.FuncMap{
 		"getCommit":        func() string { return commit },
 		"getAllHeuristics": getAllHeuristics,
-		"returnLanguage":   returnLanguage,
-		"safeLanguage":     safeLanguage,
-		"avoidLanguage":    avoidLanguage,
+		"returnStringSlice": func(slice []string) string {
+			if len(slice) == 0 {
+				return "nil"
+			}
+
+			return `[]string{` + strings.Join(slice, `, `) + `}`
+		},
+		"returnLanguages": returnLanguages,
+		"avoidLanguage":   avoidLanguage,
 	}
 
 	t := template.Must(template.New(contentTmpl).Funcs(fmap).ParseFiles(contentTmplPath))
@@ -458,18 +466,7 @@ func containsInvalidRegexp(reg string) bool {
 	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `\1`)
 }
 
-func returnLanguage(langsHeuristics []*languageHeuristics) string {
-	lang, _ := returnLangAndSafe(langsHeuristics)
-	return lang
-}
-
-func safeLanguage(langsHeuristics []*languageHeuristics) bool {
-	_, safe := returnLangAndSafe(langsHeuristics)
-	return safe
-}
-
-func returnLangAndSafe(langsHeuristics []*languageHeuristics) (string, bool) {
-	// at the moment, only returns one string although might be exists several language to return as a []string.
+func returnLanguages(langsHeuristics []*languageHeuristics) []string {
 	langs := make([]string, 0)
 	for _, langHeu := range langsHeuristics {
 		if len(langHeu.Heuristics) == 0 {
@@ -477,12 +474,5 @@ func returnLangAndSafe(langsHeuristics []*languageHeuristics) (string, bool) {
 		}
 	}
 
-	lang := unknownLanguage
-	safe := false
-	if len(langs) != 0 {
-		lang = langs[0]
-		safe = len(langs) == 1
-	}
-
-	return lang, safe
+	return langs
 }

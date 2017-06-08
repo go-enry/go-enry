@@ -2,121 +2,108 @@ package slinguist
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/simple-linguist.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7
+// Extracted from github/linguist commit: 0123456789abcdef0123456789abcdef01234567
 
 import (
-	"path/filepath"
 	"regexp"
-	"strings"
 )
 
-func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	ext := strings.ToLower(filepath.Ext(filename))
-	if fnMatcher, ok := matchers[ext]; ok {
-		lang, safe = fnMatcher(content)
-	} else {
-		lang = OtherLanguage
-	}
+type languageMatcher func([]byte) []string
 
-	return
-}
-
-type languageMatcher func([]byte) (string, bool)
-
-var matchers = map[string]languageMatcher{
-	".asc": func(i []byte) (string, bool) {
+var contentMatchers = map[string]languageMatcher{
+	".asc": func(i []byte) []string {
 		if asc_PublicKey_Matcher_0.Match(i) {
-			return "Public Key", true
+			return []string{"Public Key"}
 		} else if asc_AsciiDoc_Matcher_0.Match(i) {
-			return "AsciiDoc", true
+			return []string{"AsciiDoc"}
 		} else if asc_AGSScript_Matcher_0.Match(i) {
-			return "AGS Script", true
+			return []string{"AGS Script"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".f": func(i []byte) (string, bool) {
+	".f": func(i []byte) []string {
 		if f_Forth_Matcher_0.Match(i) {
-			return "Forth", true
+			return []string{"Forth"}
 		} else if f_FilebenchWML_Matcher_0.Match(i) {
-			return "Filebench WML", true
+			return []string{"Filebench WML"}
 		} else if f_FORTRAN_Matcher_0.Match(i) {
-			return "FORTRAN", true
+			return []string{"FORTRAN"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".h": func(i []byte) (string, bool) {
+	".h": func(i []byte) []string {
 		if h_ObjectiveDashC_Matcher_0.Match(i) {
-			return "Objective-C", true
+			return []string{"Objective-C"}
 		} else if h_CPlusPlus_Matcher_0.Match(i) || h_CPlusPlus_Matcher_1.Match(i) || h_CPlusPlus_Matcher_2.Match(i) || h_CPlusPlus_Matcher_3.Match(i) || h_CPlusPlus_Matcher_4.Match(i) || h_CPlusPlus_Matcher_5.Match(i) || h_CPlusPlus_Matcher_6.Match(i) {
-			return "C++", true
+			return []string{"C++"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".lsp": func(i []byte) (string, bool) {
+	".lsp": func(i []byte) []string {
 		if lsp_CommonLisp_Matcher_0.Match(i) {
-			return "Common Lisp", true
+			return []string{"Common Lisp"}
 		} else if lsp_NewLisp_Matcher_0.Match(i) {
-			return "NewLisp", true
+			return []string{"NewLisp"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".lisp": func(i []byte) (string, bool) {
+	".lisp": func(i []byte) []string {
 		if lisp_CommonLisp_Matcher_0.Match(i) {
-			return "Common Lisp", true
+			return []string{"Common Lisp"}
 		} else if lisp_NewLisp_Matcher_0.Match(i) {
-			return "NewLisp", true
+			return []string{"NewLisp"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".md": func(i []byte) (string, bool) {
+	".md": func(i []byte) []string {
 		if md_Markdown_Matcher_0.Match(i) || md_Markdown_Matcher_1.Match(i) {
-			return "Markdown", true
+			return []string{"Markdown"}
 		} else if md_GCCmachinedescription_Matcher_0.Match(i) {
-			return "GCC machine description", true
+			return []string{"GCC machine description"}
 		}
 
-		return "Markdown", true
+		return []string{"Markdown"}
 	},
-	".ms": func(i []byte) (string, bool) {
+	".ms": func(i []byte) []string {
 		if ms_Groff_Matcher_0.Match(i) {
-			return "Groff", true
+			return []string{"Groff"}
 		}
 
-		return "MAXScript", true
+		return []string{"MAXScript"}
 	},
-	".mod": func(i []byte) (string, bool) {
+	".mod": func(i []byte) []string {
 		if mod_XML_Matcher_0.Match(i) {
-			return "XML", true
+			return []string{"XML"}
 		} else if mod_ModulaDash2_Matcher_0.Match(i) || mod_ModulaDash2_Matcher_1.Match(i) {
-			return "Modula-2", true
+			return []string{"Modula-2"}
 		}
 
-		return "Linux Kernel Module", false
+		return []string{"Linux Kernel Module", "AMPL"}
 	},
-	".pro": func(i []byte) (string, bool) {
+	".pro": func(i []byte) []string {
 		if pro_Prolog_Matcher_0.Match(i) {
-			return "Prolog", true
+			return []string{"Prolog"}
 		} else if pro_INI_Matcher_0.Match(i) {
-			return "INI", true
+			return []string{"INI"}
 		} else if pro_QMake_Matcher_0.Match(i) && pro_QMake_Matcher_1.Match(i) {
-			return "QMake", true
+			return []string{"QMake"}
 		} else if pro_IDL_Matcher_0.Match(i) {
-			return "IDL", true
+			return []string{"IDL"}
 		}
 
-		return OtherLanguage, false
+		return nil
 	},
-	".rpy": func(i []byte) (string, bool) {
+	".rpy": func(i []byte) []string {
 		if rpy_Python_Matcher_0.Match(i) {
-			return "Python", true
+			return []string{"Python"}
 		}
 
-		return "Ren'Py", true
+		return []string{"Ren'Py"}
 	},
 }
 

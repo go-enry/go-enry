@@ -3,12 +3,13 @@ package generator
 import (
 	"bytes"
 	"io"
+	"strings"
 	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Filenames reads from buf and builds filenames_map.go file from filenamesTmplPath.
+// Filenames reads from buf and builds source file from filenamesTmplPath.
 func Filenames(data []byte, filenamesTmplPath, filenamesTmplName, commit string) ([]byte, error) {
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {
@@ -25,20 +26,21 @@ func Filenames(data []byte, filenamesTmplPath, filenamesTmplName, commit string)
 	return buf.Bytes(), nil
 }
 
-func buildFilenameLanguageMap(languages map[string]*languageInfo) map[string]string {
-	filenameLangMap := make(map[string]string)
+func buildFilenameLanguageMap(languages map[string]*languageInfo) map[string][]string {
+	filenameLangMap := make(map[string][]string)
 	for lang, langInfo := range languages {
 		for _, filename := range langInfo.Filenames {
-			filenameLangMap[filename] = lang
+			filenameLangMap[filename] = append(filenameLangMap[filename], lang)
 		}
 	}
 
 	return filenameLangMap
 }
 
-func executeFilenamesTemplate(out io.Writer, languagesByFilename map[string]string, filenamesTmplPath, filenamesTmpl, commit string) error {
+func executeFilenamesTemplate(out io.Writer, languagesByFilename map[string][]string, filenamesTmplPath, filenamesTmpl, commit string) error {
 	fmap := template.FuncMap{
-		"getCommit": func() string { return commit },
+		"getCommit":         func() string { return commit },
+		"formatStringSlice": func(slice []string) string { return `"` + strings.Join(slice, `","`) + `"` },
 	}
 
 	t := template.Must(template.New(filenamesTmpl).Funcs(fmap).ParseFiles(filenamesTmplPath))

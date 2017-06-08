@@ -2,13 +2,13 @@ package generator
 
 import (
 	"bytes"
-	"html/template"
 	"io"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Vendor reads from buf and builds vendor_matchers.go file from vendorTmplPath.
+// Vendor reads from buf and builds source file from vendorTmplPath.
 func Vendor(data []byte, vendorTmplPath, vendorTmplName, commit string) ([]byte, error) {
 	var regexpList []string
 	if err := yaml.Unmarshal(data, &regexpList); err != nil {

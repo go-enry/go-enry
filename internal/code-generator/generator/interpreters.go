@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Interpreters reads from buf and builds interpreters_map.go file from interpretersTmplPath.
+// Interpreters reads from buf and builds source file from interpretersTmplPath.
 func Interpreters(data []byte, interpretersTmplPath, interpretersTmplName, commit string) ([]byte, error) {
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {

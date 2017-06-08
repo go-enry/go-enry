@@ -15,7 +15,7 @@ import (
 const (
 	lingustURL = "https://github.com/github/linguist.git"
 	commitTree = "60f864a138650dd17fafc94814be9ee2d3aaef8c"
-	commitTest = "fe8b44ab8a225b1ffa75b983b916ea22fee5b6f7"
+	commitTest = "0123456789abcdef0123456789abcdef01234567"
 
 	// Extensions test
 	extensionsTestFile     = "test_files/extensions.test.yml"
@@ -77,6 +77,10 @@ type GeneratorTestSuite struct {
 	tmpLinguist string
 }
 
+func TestGeneratorTestSuite(t *testing.T) {
+	suite.Run(t, new(GeneratorTestSuite))
+}
+
 func (g *GeneratorTestSuite) SetupSuite() {
 	tmpLinguist, err := ioutil.TempDir("", "linguist-")
 	assert.NoError(g.T(), err)
@@ -116,7 +120,7 @@ func (g *GeneratorTestSuite) TestFromFile() {
 		wantOut     string
 	}{
 		{
-			name:        "TestFromFile_Language",
+			name:        "TestFromFile_Extensions",
 			fileToParse: extensionsTestFile,
 			tmplPath:    extensionsTestTmplPath,
 			tmplName:    extensionsTestTmplName,
@@ -201,7 +205,7 @@ func (g *GeneratorTestSuite) TestFromFile() {
 		assert.NoError(g.T(), err)
 		out, err := ioutil.ReadFile(outPath.Name())
 		assert.NoError(g.T(), err)
-		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("FromFile() = %v, want %v", string(out), string(test.wantOut)))
+		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("%v: %v, expected: %v", test.name, string(out), string(test.wantOut)))
 	}
 }
 
@@ -236,10 +240,6 @@ func (g *GeneratorTestSuite) TestFrequencies() {
 		assert.NoError(g.T(), err)
 		out, err := ioutil.ReadFile(outPath.Name())
 		assert.NoError(g.T(), err)
-		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("Frequencies() = %v, want %v", string(out), string(test.wantOut)))
+		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("%v: %v, expected: %v", test.name, string(out), string(test.wantOut)))
 	}
-}
-
-func TestGeneratorTestSuite(t *testing.T) {
-	suite.Run(t, new(GeneratorTestSuite))
 }

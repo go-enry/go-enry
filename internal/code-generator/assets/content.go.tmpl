@@ -5,27 +5,14 @@ package slinguist
 // Extracted from github/linguist commit: {{ getCommit }}
 
 import (
-	"path/filepath"
 	"regexp"
-	"strings"
 )
 
-func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	ext := strings.ToLower(filepath.Ext(filename))
-	if fnMatcher, ok := matchers[ext]; ok {
-		lang, safe = fnMatcher(content)
-	} else {
-		lang = OtherLanguage
-	}
+type languageMatcher func ([]byte) []string
 
-	return
-}
-
-type languageMatcher func ([]byte) (string, bool)
-
-var matchers = map[string]languageMatcher{
+var contentMatchers = map[string]languageMatcher{
 	{{ range $index, $disambiguator := . -}}
-	{{ printf "%q" $disambiguator.Extension }}: func(i []byte) (string, bool) {
+	{{ printf "%q" $disambiguator.Extension }}: func(i []byte) []string {
 		{{ range $i, $language := $disambiguator.Languages -}}
 
 		{{- if not (avoidLanguage $language) }}
@@ -33,14 +20,14 @@ var matchers = map[string]languageMatcher{
 		{{- if gt $i 0 }} else {{ end -}} 
 		if {{- range $j, $heuristic := $language.Heuristics }} {{ $heuristic.Name }}.Match(i) 
 		{{- if lt $j (len $language.LogicRelations) }} {{index $language.LogicRelations $j}} {{- end -}} {{ end }} {
-			return {{ printf "%q" $language.Language }}, true
+			return []string{ {{- printf "%q" $language.Language -}} }
 		}
 		
 		{{- end -}}
 		{{- end -}}
 		{{- end}}
 	
-		return {{ returnLanguage $disambiguator.Languages }}, {{ safeLanguage $disambiguator.Languages }}
+		return {{ returnLanguages $disambiguator.Languages | returnStringSlice }}
 	},
 	{{ end -}}
 }

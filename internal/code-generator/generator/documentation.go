@@ -2,13 +2,13 @@ package generator
 
 import (
 	"bytes"
-	"html/template"
 	"io"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Documentation reads from buf and builds documentation_matchers.go file from documentationTmplPath.
+// Documentation reads from buf and builds source file from documentationTmplPath.
 func Documentation(data []byte, documentationTmplPath, documentationTmplName, commit string) ([]byte, error) {
 	var regexpList []string
 	if err := yaml.Unmarshal(data, &regexpList); err != nil {

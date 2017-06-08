@@ -5,7 +5,13 @@ package slinguist
 // Extracted from github/linguist commit: {{ getCommit }}
 
 var languagesByExtension = map[string][]string{
-	{{range $extension, $languages := . -}}
+	{{range $extension, $languages := .LanguagesByExtension -}}
 	"{{ $extension }}":	{ {{- $languages | formatStringSlice -}} },
+	{{end -}}
+}
+
+var extensionsByLanguage = map[string][]string{
+	{{range $language, $extensions := .ExtensionsByLanguage -}}
+	"{{ $language }}":	{ {{- $extensions | formatStringSlice -}} },
 	{{end -}}
 }

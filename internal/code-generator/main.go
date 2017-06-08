@@ -11,8 +11,8 @@ const (
 	// languages info file
 	languagesYAML = ".linguist/lib/linguist/languages.yml"
 
-	// extensions_map.go generation
-	extensionsFile     = "extensions_map.go"
+	// extension.go generation
+	extensionsFile     = "extension.go"
 	extensionsTmplPath = "internal/code-generator/assets/extensions.go.tmpl"
 	extensionsTmpl     = "extensions.go.tmpl"
 
@@ -22,35 +22,35 @@ const (
 	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
 
-	// vendor_matchers.go generation
+	// vendor.go generation
 	vendorYAML     = ".linguist/lib/linguist/vendor.yml"
-	vendorFile     = "vendor_matchers.go"
+	vendorFile     = "vendor.go"
 	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
 	vendorTmpl     = "vendor.go.tmpl"
 
-	// documentation_matchers.go generation
+	// documentation.go generation
 	documentationYAML     = ".linguist/lib/linguist/documentation.yml"
-	documentationFile     = "documentation_matchers.go"
+	documentationFile     = "documentation.go"
 	documentationTmplPath = "internal/code-generator/assets/documentation.go.tmpl"
 	documentationTmpl     = "documentation.go.tmpl"
 
 	// type.go generation
-	typeFile     = "types_map.go"
+	typeFile     = "type.go"
 	typeTmplPath = "internal/code-generator/assets/types.go.tmpl"
 	typeTmpl     = "types.go.tmpl"
 
-	// interpreters_map.go generation
-	interpretersFile     = "interpreters_map.go"
+	// interpreter.go generation
+	interpretersFile     = "interpreter.go"
 	interpretersTmplPath = "internal/code-generator/assets/interpreters.go.tmpl"
 	interpretersTmpl     = "interpreters.go.tmpl"
 
-	// filenames_map.go generation
-	filenamesFile     = "filenames_map.go"
+	// filename.go generation
+	filenamesFile     = "filename.go"
 	filenamesTmplPath = "internal/code-generator/assets/filenames.go.tmpl"
 	filenamesTmpl     = "filenames.go.tmpl"
 
-	// aliases_map.go generation
-	aliasesFile     = "aliases_map.go"
+	// alias.go generation
+	aliasesFile     = "alias.go"
 	aliasesTmplPath = "internal/code-generator/assets/aliases.go.tmpl"
 	aliasesTmpl     = "aliases.go.tmpl"
 

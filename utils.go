@@ -4,15 +4,32 @@ import (
 	"bytes"
 	"path/filepath"
 	"strings"
-
-	"gopkg.in/toqueteos/substring.v1"
 )
 
+var (
+	auxiliaryLanguages = map[string]bool{
+		"Other": true, "XML": true, "YAML": true, "TOML": true, "INI": true,
+		"JSON": true, "TeX": true, "Public Key": true, "AsciiDoc": true,
+		"AGS Script": true, "VimL": true, "Diff": true, "CMake": true, "fish": true,
+		"Awk": true, "Graphviz (DOT)": true, "Markdown": true, "desktop": true,
+		"XSLT": true, "SQL": true, "RMarkdown": true, "IRC log": true,
+		"reStructuredText": true, "Twig": true, "CSS": true, "Batchfile": true,
+		"Text": true, "HTML+ERB": true, "HTML": true, "Gettext Catalog": true,
+		"Smarty": true, "Raw token data": true,
+	}
+
+	configurationLanguages = map[string]bool{
+		"XML": true, "JSON": true, "TOML": true, "YAML": true, "INI": true, "SQL": true,
+	}
+)
+
+// IsAuxiliaryLanguage returns whether or not lang is an auxiliary language.
 func IsAuxiliaryLanguage(lang string) bool {
 	_, ok := auxiliaryLanguages[lang]
 	return ok
 }
 
+// IsConfiguration returns whether or not path is using a configuration language.
 func IsConfiguration(path string) bool {
 	lang, _ := GetLanguageByExtension(path)
 	_, is := configurationLanguages[lang]
@@ -20,26 +37,25 @@ func IsConfiguration(path string) bool {
 	return is
 }
 
+// IsDotFile returns whether or not path has dot as a prefix.
 func IsDotFile(path string) bool {
 	return strings.HasPrefix(filepath.Base(path), ".")
 }
 
+// IsVendor returns whether or not path is a vendor path.
 func IsVendor(path string) bool {
-	return findIndex(path, vendorMatchers) >= 0
+	return vendorMatchers.Match(path)
 }
 
+// IsDocumentation returns whether or not path is a documentation path.
 func IsDocumentation(path string) bool {
-	return findIndex(path, documentationMatchers) >= 0
-}
-
-func findIndex(path string, matchers substring.StringsMatcher) int {
-	return matchers.MatchIndex(path)
+	return documentationMatchers.Match(path)
 }
 
 const sniffLen = 8000
 
-//IsBinary detects if data is a binary value based on:
-//http://git.kernel.org/cgit/git/git.git/tree/xdiff-interface.c?id=HEAD#n198
+// IsBinary detects if data is a binary value based on:
+// http://git.kernel.org/cgit/git/git.git/tree/xdiff-interface.c?id=HEAD#n198
 func IsBinary(data []byte) bool {
 	if len(data) > sniffLen {
 		data = data[:sniffLen]
@@ -50,8 +66,4 @@ func IsBinary(data []byte) bool {
 	}
 
 	return true
-}
-
-var configurationLanguages = map[string]bool{
-	"XML": true, "JSON": true, "TOML": true, "YAML": true, "INI": true, "SQL": true,
 }
