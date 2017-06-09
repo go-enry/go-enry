@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"text/tabwriter"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -205,59 +204,6 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByExtension() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByContentLinguistCorpus() {
-	var total, failed, ok, other, unsafe int
-
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-
-	filepath.Walk(".linguist/samples", func(path string, f os.FileInfo, err error) error {
-		if f.IsDir() {
-			if f.Name() == "filenames" {
-				return filepath.SkipDir
-			}
-
-			return nil
-		}
-
-		expected := filepath.Base(filepath.Dir(path))
-		filename := filepath.Base(path)
-		extension := filepath.Ext(path)
-		content, _ := ioutil.ReadFile(path)
-
-		if extension == "" {
-			return nil
-		}
-
-		total++
-		obtained, safe := GetLanguageByContent(filename, content)
-		if obtained == OtherLanguage {
-			other++
-		}
-
-		var status string
-		if expected == obtained {
-			status = "ok"
-			ok++
-		} else {
-			status = "failed"
-			failed++
-			if !safe {
-				unsafe++
-			}
-		}
-
-		fmt.Fprintf(w, "%s\t%s\t%s\t%v\t%s\n", filename, expected, obtained, safe, status)
-
-		return nil
-	})
-
-	fmt.Fprintln(w)
-	w.Flush()
-
-	fmt.Printf("total files: %d, ok: %d, failed: %d, unsafe: %d, other: %d\n", total, ok, failed, unsafe, other)
-}
-
 func (s *SimpleLinguistTestSuite) TestGetLanguageByClassifier() {
 	const samples = `.linguist/samples/`
 	test := []struct {
@@ -348,4 +294,56 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByAlias() {
 		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
 		assert.Equal(s.T(), test.expectedOk, ok, fmt.Sprintf("%v: ok = %v, expected: %v", test.name, ok, test.expectedOk))
 	}
+}
+
+func (s *SimpleLinguistTestSuite) TestLinguistCorpus() {
+	const (
+		samplesDir   = ".linguist/samples"
+		filenamesDir = "filenames"
+	)
+
+	var cornerCases = map[string]bool{
+		"hello.ms": true,
+	}
+
+	var total, failed, ok, other int
+	var expected string
+	filepath.Walk(samplesDir, func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() {
+			if f.Name() != filenamesDir {
+				expected = f.Name()
+			}
+
+			return nil
+		}
+
+		filename := filepath.Base(path)
+		content, _ := ioutil.ReadFile(path)
+
+		total++
+		obtained := GetLanguage(filename, content)
+		if obtained == OtherLanguage {
+			other++
+		}
+
+		var status string
+		if expected == obtained {
+			status = "ok"
+			ok++
+		} else {
+			status = "failed"
+			failed++
+
+		}
+
+		if _, ok := cornerCases[filename]; ok {
+			fmt.Printf("\t\t[condidered corner case] %s\t%s\t%s\t%s\n", filename, expected, obtained, status)
+		} else {
+			assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\t%s\t%s\t%s\n", filename, expected, obtained, status))
+		}
+
+		return nil
+	})
+
+	fmt.Printf("\t\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
 }
