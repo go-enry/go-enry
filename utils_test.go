@@ -55,7 +55,7 @@ func (s *SimpleLinguistTestSuite) TestIsConfiguration() {
 	}{
 		{name: "TestIsConfiguration_1", path: "foo", expected: false},
 		{name: "TestIsConfiguration_2", path: "foo.ini", expected: true},
-		{name: "TestIsConfiguration_3", path: "foo.json", expected: true},
+		{name: "TestIsConfiguration_3", path: "/test/path/foo.json", expected: true},
 	}
 
 	for _, test := range tests {

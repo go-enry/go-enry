@@ -16,8 +16,8 @@ const (
 
 	// extension.go generation
 	extensionsFile     = "extension.go"
-	extensionsTmplPath = "internal/code-generator/assets/extensions.go.tmpl"
-	extensionsTmpl     = "extensions.go.tmpl"
+	extensionsTmplPath = "internal/code-generator/assets/extension.go.tmpl"
+	extensionsTmpl     = "extension.go.tmpl"
 
 	// content.go generation
 	heuristicsRuby  = ".linguist/lib/linguist/heuristics.rb"
@@ -39,23 +39,23 @@ const (
 
 	// type.go generation
 	typeFile     = "type.go"
-	typeTmplPath = "internal/code-generator/assets/types.go.tmpl"
-	typeTmpl     = "types.go.tmpl"
+	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
+	typeTmpl     = "type.go.tmpl"
 
 	// interpreter.go generation
 	interpretersFile     = "interpreter.go"
-	interpretersTmplPath = "internal/code-generator/assets/interpreters.go.tmpl"
-	interpretersTmpl     = "interpreters.go.tmpl"
+	interpretersTmplPath = "internal/code-generator/assets/interpreter.go.tmpl"
+	interpretersTmpl     = "interpreter.go.tmpl"
 
 	// filename.go generation
 	filenamesFile     = "filename.go"
-	filenamesTmplPath = "internal/code-generator/assets/filenames.go.tmpl"
-	filenamesTmpl     = "filenames.go.tmpl"
+	filenamesTmplPath = "internal/code-generator/assets/filename.go.tmpl"
+	filenamesTmpl     = "filename.go.tmpl"
 
 	// alias.go generation
 	aliasesFile     = "alias.go"
-	aliasesTmplPath = "internal/code-generator/assets/aliases.go.tmpl"
-	aliasesTmpl     = "aliases.go.tmpl"
+	aliasesTmplPath = "internal/code-generator/assets/alias.go.tmpl"
+	aliasesTmpl     = "alias.go.tmpl"
 
 	// frequencies.go generation
 	frequenciesFile     = "frequencies.go"

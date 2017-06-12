@@ -37,65 +37,64 @@ func (s *SimpleLinguistTestSuite) TestGetLanguage() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByModelineLinguist() {
+func (s *SimpleLinguistTestSuite) TestGetLanguagesByModelineLinguist() {
 	const (
 		modelinesDir = ".linguist/test/fixtures/Data/Modelines"
 		samplesDir   = ".linguist/samples"
 	)
 
 	tests := []struct {
-		name         string
-		filename     string
-		expectedLang string
-		expectedSafe bool
+		name       string
+		filename   string
+		candidates []string
+		expected   []string
 	}{
 		// Emacs
-		{name: "TestGetLanguageByModelineLinguist_1", filename: filepath.Join(modelinesDir, "example_smalltalk.md"), expectedLang: "Smalltalk", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_2", filename: filepath.Join(modelinesDir, "fundamentalEmacs.c"), expectedLang: "Text", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_3", filename: filepath.Join(modelinesDir, "iamphp.inc"), expectedLang: "PHP", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_4", filename: filepath.Join(modelinesDir, "seeplusplusEmacs1"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_5", filename: filepath.Join(modelinesDir, "seeplusplusEmacs2"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_6", filename: filepath.Join(modelinesDir, "seeplusplusEmacs3"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_7", filename: filepath.Join(modelinesDir, "seeplusplusEmacs4"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_8", filename: filepath.Join(modelinesDir, "seeplusplusEmacs5"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_9", filename: filepath.Join(modelinesDir, "seeplusplusEmacs6"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_10", filename: filepath.Join(modelinesDir, "seeplusplusEmacs7"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_11", filename: filepath.Join(modelinesDir, "seeplusplusEmacs9"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_12", filename: filepath.Join(modelinesDir, "seeplusplusEmacs10"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_13", filename: filepath.Join(modelinesDir, "seeplusplusEmacs11"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_14", filename: filepath.Join(modelinesDir, "seeplusplusEmacs12"), expectedLang: "C++", expectedSafe: true},
+		{name: "TestGetLanguagesByModelineLinguist_1", filename: filepath.Join(modelinesDir, "example_smalltalk.md"), expected: []string{"Smalltalk"}},
+		{name: "TestGetLanguagesByModelineLinguist_2", filename: filepath.Join(modelinesDir, "fundamentalEmacs.c"), expected: []string{"Text"}},
+		{name: "TestGetLanguagesByModelineLinguist_3", filename: filepath.Join(modelinesDir, "iamphp.inc"), expected: []string{"PHP"}},
+		{name: "TestGetLanguagesByModelineLinguist_4", filename: filepath.Join(modelinesDir, "seeplusplusEmacs1"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_5", filename: filepath.Join(modelinesDir, "seeplusplusEmacs2"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_6", filename: filepath.Join(modelinesDir, "seeplusplusEmacs3"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_7", filename: filepath.Join(modelinesDir, "seeplusplusEmacs4"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_8", filename: filepath.Join(modelinesDir, "seeplusplusEmacs5"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_9", filename: filepath.Join(modelinesDir, "seeplusplusEmacs6"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_10", filename: filepath.Join(modelinesDir, "seeplusplusEmacs7"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_11", filename: filepath.Join(modelinesDir, "seeplusplusEmacs9"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_12", filename: filepath.Join(modelinesDir, "seeplusplusEmacs10"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_13", filename: filepath.Join(modelinesDir, "seeplusplusEmacs11"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_14", filename: filepath.Join(modelinesDir, "seeplusplusEmacs12"), expected: []string{"C++"}},
 
 		// Vim
-		{name: "TestGetLanguageByModelineLinguist_15", filename: filepath.Join(modelinesDir, "seeplusplus"), expectedLang: "C++", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_16", filename: filepath.Join(modelinesDir, "iamjs.pl"), expectedLang: "JavaScript", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_17", filename: filepath.Join(modelinesDir, "iamjs2.pl"), expectedLang: "JavaScript", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_18", filename: filepath.Join(modelinesDir, "not_perl.pl"), expectedLang: "Prolog", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_19", filename: filepath.Join(modelinesDir, "ruby"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_20", filename: filepath.Join(modelinesDir, "ruby2"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_21", filename: filepath.Join(modelinesDir, "ruby3"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_22", filename: filepath.Join(modelinesDir, "ruby4"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_23", filename: filepath.Join(modelinesDir, "ruby5"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_24", filename: filepath.Join(modelinesDir, "ruby6"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_25", filename: filepath.Join(modelinesDir, "ruby7"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_26", filename: filepath.Join(modelinesDir, "ruby8"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_27", filename: filepath.Join(modelinesDir, "ruby9"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_28", filename: filepath.Join(modelinesDir, "ruby10"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_29", filename: filepath.Join(modelinesDir, "ruby11"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_30", filename: filepath.Join(modelinesDir, "ruby12"), expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByModelineLinguist_31", filename: filepath.Join(samplesDir, "C/main.c"), expectedLang: OtherLanguage, expectedSafe: false},
+		{name: "TestGetLanguagesByModelineLinguist_15", filename: filepath.Join(modelinesDir, "seeplusplus"), expected: []string{"C++"}},
+		{name: "TestGetLanguagesByModelineLinguist_16", filename: filepath.Join(modelinesDir, "iamjs.pl"), expected: []string{"JavaScript"}},
+		{name: "TestGetLanguagesByModelineLinguist_17", filename: filepath.Join(modelinesDir, "iamjs2.pl"), expected: []string{"JavaScript"}},
+		{name: "TestGetLanguagesByModelineLinguist_18", filename: filepath.Join(modelinesDir, "not_perl.pl"), expected: []string{"Prolog"}},
+		{name: "TestGetLanguagesByModelineLinguist_19", filename: filepath.Join(modelinesDir, "ruby"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_20", filename: filepath.Join(modelinesDir, "ruby2"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_21", filename: filepath.Join(modelinesDir, "ruby3"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_22", filename: filepath.Join(modelinesDir, "ruby4"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_23", filename: filepath.Join(modelinesDir, "ruby5"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_24", filename: filepath.Join(modelinesDir, "ruby6"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_25", filename: filepath.Join(modelinesDir, "ruby7"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_26", filename: filepath.Join(modelinesDir, "ruby8"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_27", filename: filepath.Join(modelinesDir, "ruby9"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_28", filename: filepath.Join(modelinesDir, "ruby10"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_29", filename: filepath.Join(modelinesDir, "ruby11"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_30", filename: filepath.Join(modelinesDir, "ruby12"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByModelineLinguist_31", filename: filepath.Join(samplesDir, "C/main.c"), expected: nil},
 	}
 
 	for _, test := range tests {
 		content, err := ioutil.ReadFile(test.filename)
 		assert.NoError(s.T(), err)
 
-		lang, safe := GetLanguageByModeline(content)
-		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		languages := GetLanguagesByModeline(test.filename, content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByModeline() {
+func (s *SimpleLinguistTestSuite) TestGetLanguagesByModeline() {
 	const (
 		wrongVim  = `# vim: set syntax=ruby ft  =python filetype=perl :`
 		rightVim  = `/* vim: set syntax=python ft   =python filetype=python */`
@@ -103,48 +102,48 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByModeline() {
 	)
 
 	tests := []struct {
-		name         string
-		content      []byte
-		expectedLang string
-		expectedSafe bool
+		name       string
+		filename   string
+		content    []byte
+		candidates []string
+		expected   []string
 	}{
-		{name: "TestGetLanguageByModeline_1", content: []byte(wrongVim), expectedLang: OtherLanguage, expectedSafe: false},
-		{name: "TestGetLanguageByModeline_2", content: []byte(rightVim), expectedLang: "Python", expectedSafe: true},
-		{name: "TestGetLanguageByModeline_3", content: []byte(noLangVim), expectedLang: OtherLanguage, expectedSafe: false},
+		{name: "TestGetLanguagesByModeline_1", content: []byte(wrongVim), expected: nil},
+		{name: "TestGetLanguagesByModeline_2", content: []byte(rightVim), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByModeline_3", content: []byte(noLangVim), expected: nil},
 	}
 
 	for _, test := range tests {
-		lang, safe := GetLanguageByModeline(test.content)
-		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		languages := GetLanguagesByModeline(test.filename, test.content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByFilename() {
+func (s *SimpleLinguistTestSuite) TestGetLanguagesByFilename() {
 	tests := []struct {
-		name         string
-		filename     string
-		expectedLang string
-		expectedSafe bool
+		name       string
+		filename   string
+		content    []byte
+		candidates []string
+		expected   []string
 	}{
-		{name: "TestGetLanguageByFilename_1", filename: "unknown.interpreter", expectedLang: OtherLanguage, expectedSafe: false},
-		{name: "TestGetLanguageByFilename_2", filename: ".bashrc", expectedLang: "Shell", expectedSafe: true},
-		{name: "TestGetLanguageByFilename_3", filename: "Dockerfile", expectedLang: "Dockerfile", expectedSafe: true},
-		{name: "TestGetLanguageByFilename_4", filename: "Makefile.frag", expectedLang: "Makefile", expectedSafe: true},
-		{name: "TestGetLanguageByFilename_5", filename: "makefile", expectedLang: "Makefile", expectedSafe: true},
-		{name: "TestGetLanguageByFilename_6", filename: "Vagrantfile", expectedLang: "Ruby", expectedSafe: true},
-		{name: "TestGetLanguageByFilename_7", filename: "_vimrc", expectedLang: "Vim script", expectedSafe: true},
-		{name: "TestGetLanguageByFilename_8", filename: "pom.xml", expectedLang: "Maven POM", expectedSafe: true},
+		{name: "TestGetLanguagesByFilename_1", filename: "unknown.interpreter", expected: nil},
+		{name: "TestGetLanguagesByFilename_2", filename: ".bashrc", expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByFilename_3", filename: "Dockerfile", expected: []string{"Dockerfile"}},
+		{name: "TestGetLanguagesByFilename_4", filename: "Makefile.frag", expected: []string{"Makefile"}},
+		{name: "TestGetLanguagesByFilename_5", filename: "makefile", expected: []string{"Makefile"}},
+		{name: "TestGetLanguagesByFilename_6", filename: "Vagrantfile", expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByFilename_7", filename: "_vimrc", expected: []string{"Vim script"}},
+		{name: "TestGetLanguagesByFilename_8", filename: "pom.xml", expected: []string{"Maven POM"}},
 	}
 
 	for _, test := range tests {
-		lang, safe := GetLanguageByFilename(test.filename)
-		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		languages := GetLanguagesByFilename(test.filename, test.content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByShebang() {
+func (s *SimpleLinguistTestSuite) TestGetLanguagesByShebang() {
 	const (
 		multilineExecHack = `#!/bin/sh
 # Next line is comment in Tcl, but not in sh... \
@@ -161,72 +160,112 @@ println("The shell script says ",vm.arglist.concat(" "));`
 	)
 
 	tests := []struct {
-		name         string
-		content      []byte
-		expectedLang string
-		expectedSafe bool
+		name       string
+		filename   string
+		content    []byte
+		candidates []string
+		expected   []string
 	}{
-		{name: "TestGetLanguageByShebang_1", content: []byte(`#!/unknown/interpreter`), expectedLang: OtherLanguage, expectedSafe: false},
-		{name: "TestGetLanguageByShebang_2", content: []byte(`no shebang`), expectedLang: OtherLanguage, expectedSafe: false},
-		{name: "TestGetLanguageByShebang_3", content: []byte(`#!/usr/bin/env`), expectedLang: OtherLanguage, expectedSafe: false},
-		{name: "TestGetLanguageByShebang_4", content: []byte(`#!/usr/bin/python -tt`), expectedLang: "Python", expectedSafe: true},
-		{name: "TestGetLanguageByShebang_5", content: []byte(`#!/usr/bin/env python2.6`), expectedLang: "Python", expectedSafe: true},
-		{name: "TestGetLanguageByShebang_6", content: []byte(`#!/usr/bin/env perl`), expectedLang: "Perl", expectedSafe: true},
-		{name: "TestGetLanguageByShebang_7", content: []byte(`#!	/bin/sh`), expectedLang: "Shell", expectedSafe: true},
-		{name: "TestGetLanguageByShebang_8", content: []byte(`#!bash`), expectedLang: "Shell", expectedSafe: true},
-		{name: "TestGetLanguageByShebang_9", content: []byte(multilineExecHack), expectedLang: "Tcl", expectedSafe: true},
-		{name: "TestGetLanguageByShebang_10", content: []byte(multilineNoExecHack), expectedLang: "Shell", expectedSafe: true},
+		{name: "TestGetLanguagesByShebang_1", content: []byte(`#!/unknown/interpreter`), expected: nil},
+		{name: "TestGetLanguagesByShebang_2", content: []byte(`no shebang`), expected: nil},
+		{name: "TestGetLanguagesByShebang_3", content: []byte(`#!/usr/bin/env`), expected: nil},
+		{name: "TestGetLanguagesByShebang_4", content: []byte(`#!/usr/bin/python -tt`), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByShebang_5", content: []byte(`#!/usr/bin/env python2.6`), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByShebang_6", content: []byte(`#!/usr/bin/env perl`), expected: []string{"Perl"}},
+		{name: "TestGetLanguagesByShebang_7", content: []byte(`#!	/bin/sh`), expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByShebang_8", content: []byte(`#!bash`), expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByShebang_9", content: []byte(multilineExecHack), expected: []string{"Tcl"}},
+		{name: "TestGetLanguagesByShebang_10", content: []byte(multilineNoExecHack), expected: []string{"Shell"}},
 	}
 
 	for _, test := range tests {
-		lang, safe := GetLanguageByShebang(test.content)
-		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		languages := GetLanguagesByShebang(test.filename, test.content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByExtension() {
+func (s *SimpleLinguistTestSuite) TestGetLanguagesByExtension() {
 	tests := []struct {
-		name         string
-		filename     string
-		expectedLang string
-		expectedSafe bool
+		name       string
+		filename   string
+		content    []byte
+		candidates []string
+		expected   []string
 	}{
-		{name: "TestGetLanguageByExtension_1", filename: "foo.foo", expectedLang: OtherLanguage, expectedSafe: false},
-		{name: "TestGetLanguageByExtension_2", filename: "foo.go", expectedLang: "Go", expectedSafe: true},
-		{name: "TestGetLanguageByExtension_3", filename: "foo.go.php", expectedLang: "Hack", expectedSafe: false},
+		{name: "TestGetLanguagesByExtension_1", filename: "foo.foo", expected: nil},
+		{name: "TestGetLanguagesByExtension_2", filename: "foo.go", expected: []string{"Go"}},
+		{name: "TestGetLanguagesByExtension_3", filename: "foo.go.php", expected: []string{"Hack", "PHP"}},
 	}
 
 	for _, test := range tests {
-		lang, safe := GetLanguageByExtension(test.filename)
-		assert.Equal(s.T(), test.expectedLang, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expectedLang))
-		assert.Equal(s.T(), test.expectedSafe, safe, fmt.Sprintf("%v: safe = %v, expected: %v", test.name, safe, test.expectedSafe))
+		languages := GetLanguagesByExtension(test.filename, test.content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByClassifier() {
+func (s *SimpleLinguistTestSuite) TestGetLanguagesByClassifier() {
 	const samples = `.linguist/samples/`
 	test := []struct {
 		name       string
 		filename   string
-		candidates map[string]float64
+		candidates []string
 		expected   string
 	}{
-		{name: "TestGetLanguageByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: map[string]float64{"python": 1.00, "ruby": 1.00, "c": 1.00, "c++": 1.00}, expected: "C"},
-		{name: "TestGetLanguageByClassifier_2", filename: filepath.Join(samples, "C/blob.c"), candidates: nil, expected: "C"},
-		{name: "TestGetLanguageByClassifier_3", filename: filepath.Join(samples, "C/main.c"), candidates: nil, expected: "C"},
-		{name: "TestGetLanguageByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: map[string]float64{"python": 1.00, "ruby": 1.00, "c++": 1.00}, expected: "C++"},
-		{name: "TestGetLanguageByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: map[string]float64{"ruby": 1.00}, expected: "Ruby"},
-		{name: "TestGetLanguageByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: map[string]float64{"python": 1.00, "ruby": 1.00, "c": 1.00, "c++": 1.00}, expected: "Python"},
-		{name: "TestGetLanguageByClassifier_7", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: nil, expected: "Python"},
+		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(samples, "C/blob.c"), candidates: nil, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(samples, "C/main.c"), candidates: []string{}, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
+		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
+		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
 	}
 
 	for _, test := range test {
 		content, err := ioutil.ReadFile(test.filename)
 		assert.NoError(s.T(), err)
 
-		lang := GetLanguageByClassifier(content, test.candidates, nil)
-		assert.Equal(s.T(), test.expected, lang, fmt.Sprintf("%v: lang = %v, expected: %v", test.name, lang, test.expected))
+		languages := GetLanguagesByClassifier(test.filename, content, test.candidates)
+		var language string
+		if len(languages) == 0 {
+			language = OtherLanguage
+		} else {
+			language = languages[0]
+		}
+
+		assert.Equal(s.T(), test.expected, language, fmt.Sprintf("%v: language = %v, expected: %v", test.name, language, test.expected))
+	}
+}
+
+func (s *SimpleLinguistTestSuite) TestGetLanguagesBySpecificClassifier() {
+	const samples = `.linguist/samples/`
+	test := []struct {
+		name       string
+		filename   string
+		candidates []string
+		classifier Classifier
+		expected   string
+	}{
+		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(samples, "C/blob.c"), candidates: nil, classifier: DefaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(samples, "C/main.c"), candidates: []string{}, classifier: DefaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: DefaultClassifier, expected: "C++"},
+		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"ruby"}, classifier: DefaultClassifier, expected: "Ruby"},
+		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "Python"},
+		{name: "TestGetLanguagesByClassifier_6", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: OtherLanguage},
+	}
+
+	for _, test := range test {
+		content, err := ioutil.ReadFile(test.filename)
+		assert.NoError(s.T(), err)
+
+		languages := GetLanguagesBySpecificClassifier(content, test.candidates, test.classifier)
+		var language string
+		if len(languages) == 0 {
+			language = OtherLanguage
+		} else {
+			language = languages[0]
+		}
+
+		assert.Equal(s.T(), test.expected, language, fmt.Sprintf("%v: language = %v, expected: %v", test.name, language, test.expected))
 	}
 }
 
@@ -323,6 +362,7 @@ func (s *SimpleLinguistTestSuite) TestLinguistCorpus() {
 		total++
 		obtained := GetLanguage(filename, content)
 		if obtained == OtherLanguage {
+			obtained = "Other"
 			other++
 		}
 
@@ -337,9 +377,9 @@ func (s *SimpleLinguistTestSuite) TestLinguistCorpus() {
 		}
 
 		if _, ok := cornerCases[filename]; ok {
-			fmt.Printf("\t\t[condidered corner case] %s\t%s\t%s\t%s\n", filename, expected, obtained, status)
+			fmt.Printf("\t\t[considered corner case] %s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status)
 		} else {
-			assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\t%s\t%s\t%s\n", filename, expected, obtained, status))
+			assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status))
 		}
 
 		return nil
