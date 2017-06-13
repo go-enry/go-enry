@@ -1,4 +1,4 @@
-package slinguist
+package enry
 
 import (
 	"bufio"
