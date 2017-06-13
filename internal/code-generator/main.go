@@ -11,6 +11,9 @@ const (
 	// languages info file
 	languagesYAML = ".linguist/lib/linguist/languages.yml"
 
+	// linguist's samples directory
+	samplesDir = ".linguist/samples"
+
 	// extension.go generation
 	extensionsFile     = "extension.go"
 	extensionsTmplPath = "internal/code-generator/assets/extensions.go.tmpl"
@@ -55,7 +58,6 @@ const (
 	aliasesTmpl     = "aliases.go.tmpl"
 
 	// frequencies.go generation
-	samplesDir          = ".linguist/samples"
 	frequenciesFile     = "frequencies.go"
 	frequenciesTmplPath = "internal/code-generator/assets/frequencies.go.tmpl"
 	frequenciesTmpl     = "frequencies.go.tmpl"
@@ -63,13 +65,14 @@ const (
 	commitPath = ".linguist/.git/refs/heads/master"
 )
 
-type generatorArgs struct {
+type generatorFiles struct {
+	generate    generator.File
 	fileToParse string
+	samplesDir  string
 	outPath     string
 	tmplPath    string
 	tmplName    string
 	commit      string
-	generate    generator.Func
 }
 
 func main() {
@@ -78,25 +81,22 @@ func main() {
 		log.Printf("couldn't find commit: %v", err)
 	}
 
-	argsList := []*generatorArgs{
-		&generatorArgs{languagesYAML, extensionsFile, extensionsTmplPath, extensionsTmpl, commit, generator.Extensions},
-		&generatorArgs{heuristicsRuby, contentFile, contentTmplPath, contentTmpl, commit, generator.Heuristics},
-		&generatorArgs{vendorYAML, vendorFile, vendorTmplPath, vendorTmpl, commit, generator.Vendor},
-		&generatorArgs{documentationYAML, documentationFile, documentationTmplPath, documentationTmpl, commit, generator.Documentation},
-		&generatorArgs{languagesYAML, typeFile, typeTmplPath, typeTmpl, commit, generator.Types},
-		&generatorArgs{languagesYAML, interpretersFile, interpretersTmplPath, interpretersTmpl, commit, generator.Interpreters},
-		&generatorArgs{languagesYAML, filenamesFile, filenamesTmplPath, filenamesTmpl, commit, generator.Filenames},
-		&generatorArgs{languagesYAML, aliasesFile, aliasesTmplPath, aliasesTmpl, commit, generator.Aliases},
+	fileList := []*generatorFiles{
+		&generatorFiles{generator.Extensions, languagesYAML, "", extensionsFile, extensionsTmplPath, extensionsTmpl, commit},
+		&generatorFiles{generator.Heuristics, heuristicsRuby, "", contentFile, contentTmplPath, contentTmpl, commit},
+		&generatorFiles{generator.Vendor, vendorYAML, "", vendorFile, vendorTmplPath, vendorTmpl, commit},
+		&generatorFiles{generator.Documentation, documentationYAML, "", documentationFile, documentationTmplPath, documentationTmpl, commit},
+		&generatorFiles{generator.Types, languagesYAML, "", typeFile, typeTmplPath, typeTmpl, commit},
+		&generatorFiles{generator.Interpreters, languagesYAML, "", interpretersFile, interpretersTmplPath, interpretersTmpl, commit},
+		&generatorFiles{generator.Filenames, languagesYAML, samplesDir, filenamesFile, filenamesTmplPath, filenamesTmpl, commit},
+		&generatorFiles{generator.Aliases, languagesYAML, "", aliasesFile, aliasesTmplPath, aliasesTmpl, commit},
+		&generatorFiles{generator.Frequencies, "", samplesDir, frequenciesFile, frequenciesTmplPath, frequenciesTmpl, commit},
 	}
 
-	for _, args := range argsList {
-		if err := generator.FromFile(args.fileToParse, args.outPath, args.tmplPath, args.tmplName, args.commit, args.generate); err != nil {
+	for _, file := range fileList {
+		if err := file.generate(file.fileToParse, file.samplesDir, file.outPath, file.tmplPath, file.tmplName, file.commit); err != nil {
 			log.Println(err)
 		}
-	}
-
-	if err := generator.Frequencies(samplesDir, frequenciesTmplPath, frequenciesTmpl, commit, frequenciesFile); err != nil {
-		log.Println(err)
 	}
 }
 

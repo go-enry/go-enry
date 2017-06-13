@@ -5,30 +5,37 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
 )
 
-// Heuristics reads from buf and builds source file from contentTmplPath.
-func Heuristics(heuristics []byte, contentTmplPath, contentTmplName, commit string) ([]byte, error) {
-	disambiguators, err := getDisambiguators(heuristics)
+// Heuristics reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+func Heuristics(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
+	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {
-		return nil, err
+		return err
+	}
+
+	disambiguators, err := getDisambiguators(data)
+	if err != nil {
+		return err
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeContentTemplate(buf, disambiguators, contentTmplPath, contentTmplName, commit); err != nil {
-		return nil, err
+	if err := executeContentTemplate(buf, disambiguators, tmplPath, tmplName, commit); err != nil {
+		return err
 	}
 
-	return buf.Bytes(), nil
-	// fmt.Println(string(buf.Bytes()))
-	// return nil, nil
+	return formatedWrite(outPath, buf.Bytes())
 }
 
-const unknownLanguage = "OtherLanguage"
+const (
+	unknownLanguage = "OtherLanguage"
+	emptyFile       = "^$"
+)
 
 var (
 	disambLine       = regexp.MustCompile(`^(\s*)disambiguate`)
@@ -297,7 +304,7 @@ func getHeuristics(line string) []*heuristic {
 		}
 
 		if strings.Contains(v, ".empty?") {
-			reg = `^$`
+			reg = emptyFile
 		}
 
 		if reg != "" {
@@ -339,6 +346,10 @@ func convertToValidRegexp(reg string) string {
 		rubyCaseSensitive = "i"
 		rubyMultiLine     = "m"
 	)
+
+	if reg == emptyFile {
+		return reg
+	}
 
 	reg = strings.TrimPrefix(reg, `/`)
 	flags := "(?m"
@@ -415,7 +426,7 @@ func buildLanguagesHeuristics(langsList [][]string, heuristicsList [][]*heuristi
 	return langsHeuristics
 }
 
-func executeContentTemplate(out io.Writer, disambiguators []*disambiguator, contentTmplPath, contentTmpl, commit string) error {
+func executeContentTemplate(out io.Writer, disambiguators []*disambiguator, tmplPath, tmplName, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit":        func() string { return commit },
 		"getAllHeuristics": getAllHeuristics,
@@ -430,7 +441,7 @@ func executeContentTemplate(out io.Writer, disambiguators []*disambiguator, cont
 		"avoidLanguage":   avoidLanguage,
 	}
 
-	t := template.Must(template.New(contentTmpl).Funcs(fmap).ParseFiles(contentTmplPath))
+	t := template.Must(template.New(tmplName).Funcs(fmap).ParseFiles(tmplPath))
 	if err := t.Execute(out, disambiguators); err != nil {
 		return err
 	}

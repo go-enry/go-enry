@@ -31,8 +31,10 @@ func (c *classifier) Classify(content []byte, candidates map[string]float64) map
 		languages = make(map[string]float64, len(candidates))
 		for candidate, weight := range candidates {
 			if lang, ok := GetLanguageByAlias(candidate); ok {
-				languages[lang] = weight
+				candidate = lang
 			}
+
+			languages[candidate] = weight
 		}
 	}
 

@@ -78,8 +78,32 @@ func GetLanguageByExtension(filename string) (lang string, safe bool) {
 // GetLanguagesByExtension returns a slice of possible languages for the given filename, content will be ignored.
 // It accomplish the signature to be a Strategy type.
 func GetLanguagesByExtension(filename string, content []byte) []string {
-	ext := strings.ToLower(filepath.Ext(filename))
-	return languagesByExtension[ext]
+	if !strings.Contains(filename, ".") {
+		return nil
+	}
+
+	filename = strings.ToLower(filename)
+	dots := getDotIndexes(filename)
+	for _, dot := range dots {
+		ext := filename[dot:]
+		languages, ok := languagesByExtension[ext]
+		if ok {
+			return languages
+		}
+	}
+
+	return nil
+}
+
+func getDotIndexes(filename string) []int {
+	dots := make([]int, 0, 2)
+	for i, letter := range filename {
+		if letter == rune('.') {
+			dots = append(dots, i)
+		}
+	}
+
+	return dots
 }
 
 // GetLanguageByContent returns a language based on the filename and heuristics applies to the content,
