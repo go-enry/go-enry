@@ -44,8 +44,8 @@ func main() {
 			relativePath = relativePath + "/"
 		}
 
-		if slinguist.IsVendor(relativePath) || slinguist.IsDotFile(relativePath) ||
-			slinguist.IsDocumentation(relativePath) || slinguist.IsConfiguration(relativePath) {
+		if enry.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
+			enry.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
 			if f.IsDir() {
 				return filepath.SkipDir
 			}
@@ -64,8 +64,8 @@ func main() {
 			return nil
 		}
 
-		language := slinguist.GetLanguage(filepath.Base(path), content)
-		if language == slinguist.OtherLanguage {
+		language := enry.GetLanguage(filepath.Base(path), content)
+		if language == enry.OtherLanguage {
 			return nil
 		}
 
