@@ -25,6 +25,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguage() {
 		filename string
 		content  []byte
 		expected string
+		safe     bool
 	}{
 		{name: "TestGetLanguage_1", filename: "foo.py", content: []byte{}, expected: "Python"},
 		{name: "TestGetLanguage_2", filename: "foo.m", content: []byte(":- module"), expected: "Mercury"},

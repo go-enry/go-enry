@@ -26,20 +26,8 @@ var DefaultStrategies = []Strategy{
 
 // GetLanguage applies a sequence of strategies based on the given filename and content
 // to find out the most probably language to return.
-func GetLanguage(filename string, content []byte) string {
-	var languages []string
-	candidates := []string{}
-	for _, strategy := range DefaultStrategies {
-		languages = strategy(filename, content, candidates)
-		if len(languages) == 1 {
-			return languages[0]
-		}
-
-		if len(languages) > 0 {
-			candidates = append(candidates, languages...)
-		}
-	}
-
+func GetLanguage(filename string, content []byte) (language string) {
+	languages := GetLanguages(filename, content)
 	return firstLanguage(languages)
 }
 
@@ -49,17 +37,6 @@ func firstLanguage(languages []string) string {
 	}
 
 	return languages[0]
-}
-
-func getLanguageByStrategy(strategy Strategy, filename string, content []byte, candidates []string) (string, bool) {
-	languages := strategy(filename, content, candidates)
-	return getFirstLanguageAndSafe(languages)
-}
-
-func getFirstLanguageAndSafe(languages []string) (language string, safe bool) {
-	language = firstLanguage(languages)
-	safe = len(languages) == 1
-	return
 }
 
 // GetLanguageByModeline returns detected language. If there are more than one possibles languages
@@ -110,11 +87,41 @@ func GetLanguageByClassifier(content []byte, candidates []string) (language stri
 	return getLanguageByStrategy(GetLanguagesByClassifier, "", content, candidates)
 }
 
+func getLanguageByStrategy(strategy Strategy, filename string, content []byte, candidates []string) (string, bool) {
+	languages := strategy(filename, content, candidates)
+	return getFirstLanguageAndSafe(languages)
+}
+
+func getFirstLanguageAndSafe(languages []string) (language string, safe bool) {
+	language = firstLanguage(languages)
+	safe = len(languages) == 1
+	return
+}
+
 // GetLanguageBySpecificClassifier returns the most probably language for the given content using
 // classifier to detect language.
 func GetLanguageBySpecificClassifier(content []byte, candidates []string, classifier Classifier) (language string, safe bool) {
 	languages := GetLanguagesBySpecificClassifier(content, candidates, classifier)
 	return getFirstLanguageAndSafe(languages)
+}
+
+// GetLanguages applies a sequence of strategies based on the given filename and content
+// to find out the most probably languages to return.
+func GetLanguages(filename string, content []byte) []string {
+	var languages []string
+	candidates := []string{}
+	for _, strategy := range DefaultStrategies {
+		languages = strategy(filename, content, candidates)
+		if len(languages) == 1 {
+			return languages
+		}
+
+		if len(languages) > 0 {
+			candidates = append(candidates, languages...)
+		}
+	}
+
+	return languages
 }
 
 // GetLanguagesByModeline returns a slice of possible languages for the given content, filename will be ignored.
@@ -242,7 +249,7 @@ func GetLanguagesByVimModeline(filename string, content []byte, candidates []str
 // GetLanguagesByFilename returns a slice of possible languages for the given filename, content and candidates
 // will be ignored. It is comply with the signature to be a Strategy type.
 func GetLanguagesByFilename(filename string, content []byte, candidates []string) []string {
-	return languagesByFilename[filename]
+	return languagesByFilename[filepath.Base(filename)]
 }
 
 // GetLanguagesByShebang returns a slice of possible languages for the given content, filename and candidates

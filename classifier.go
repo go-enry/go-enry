@@ -2,7 +2,6 @@ package enry
 
 import (
 	"math"
-
 	"sort"
 
 	"gopkg.in/src-d/enry.v1/internal/tokenizer"
