@@ -2,15 +2,15 @@ package enry
 
 import (
 	"math"
+	"sort"
 
 	"gopkg.in/src-d/enry.v1/internal/tokenizer"
 )
 
-// Classifier is the interface that contains the method Classify which is in charge to assign scores to the possibles candidates.
-// The scores must order the candidates so as the highest score be the most probably language of the content. The candidates is
-// a map which can be used to assign weights to languages dynamically.
+// Classifier is the interface in charge to detect the possible languages of the given content based on a set of
+// candidates. Candidates is a map which can be used to assign weights to languages dynamically.
 type Classifier interface {
-	Classify(content []byte, candidates map[string]float64) map[string]float64
+	Classify(content []byte, candidates map[string]float64) (languages []string)
 }
 
 type classifier struct {
@@ -19,7 +19,13 @@ type classifier struct {
 	tokensTotal               float64
 }
 
-func (c *classifier) Classify(content []byte, candidates map[string]float64) map[string]float64 {
+type scoredLanguage struct {
+	language string
+	score    float64
+}
+
+// Classify returns a sorted slice of possible languages sorted by decreasing language's probability
+func (c *classifier) Classify(content []byte, candidates map[string]float64) []string {
 	if len(content) == 0 {
 		return nil
 	}
@@ -31,18 +37,35 @@ func (c *classifier) Classify(content []byte, candidates map[string]float64) map
 		languages = make(map[string]float64, len(candidates))
 		for candidate, weight := range candidates {
 			if lang, ok := GetLanguageByAlias(candidate); ok {
-				languages[lang] = weight
+				candidate = lang
 			}
+
+			languages[candidate] = weight
 		}
 	}
 
 	tokens := tokenizer.Tokenize(content)
-	scores := make(map[string]float64, len(languages))
+	scoredLangs := make([]*scoredLanguage, 0, len(languages))
 	for language := range languages {
-		scores[language] = c.tokensLogProbability(tokens, language) + c.languagesLogProbabilities[language]
+		scoredLang := &scoredLanguage{
+			language: language,
+			score:    c.tokensLogProbability(tokens, language) + c.languagesLogProbabilities[language],
+		}
+
+		scoredLangs = append(scoredLangs, scoredLang)
 	}
 
-	return scores
+	return sortLanguagesByScore(scoredLangs)
+}
+
+func sortLanguagesByScore(scoredLangs []*scoredLanguage) []string {
+	sort.SliceStable(scoredLangs, func(i, j int) bool { return scoredLangs[j].score < scoredLangs[i].score })
+	sortedLanguages := make([]string, 0, len(scoredLangs))
+	for _, scoredLang := range scoredLangs {
+		sortedLanguages = append(sortedLanguages, scoredLang.language)
+	}
+
+	return sortedLanguages
 }
 
 func (c *classifier) knownLangs() map[string]float64 {

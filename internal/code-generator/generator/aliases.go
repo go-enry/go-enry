@@ -3,28 +3,34 @@ package generator
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"strings"
 	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Aliases reads from buf and builds source file from aliasesTmplPath.
-func Aliases(data []byte, aliasesTmplPath, aliasesTmplName, commit string) ([]byte, error) {
+// Aliases reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+func Aliases(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
+	data, err := ioutil.ReadFile(fileToParse)
+	if err != nil {
+		return err
+	}
+
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {
-		return nil, err
+		return err
 	}
 
 	orderedLangList := getAlphabeticalOrderedKeys(languages)
 	languagesByAlias := buildAliasLanguageMap(languages, orderedLangList)
 
 	buf := &bytes.Buffer{}
-	if err := executeAliasesTemplate(buf, languagesByAlias, aliasesTmplPath, aliasesTmplName, commit); err != nil {
-		return nil, err
+	if err := executeAliasesTemplate(buf, languagesByAlias, tmplPath, tmplName, commit); err != nil {
+		return err
 	}
 
-	return buf.Bytes(), nil
+	return formatedWrite(outPath, buf.Bytes())
 }
 
 func buildAliasLanguageMap(languages map[string]*languageInfo, orderedLangList []string) map[string]string {

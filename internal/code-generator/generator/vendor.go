@@ -3,32 +3,38 @@ package generator
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Vendor reads from buf and builds source file from vendorTmplPath.
-func Vendor(data []byte, vendorTmplPath, vendorTmplName, commit string) ([]byte, error) {
+// Vendor reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+func Vendor(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
+	data, err := ioutil.ReadFile(fileToParse)
+	if err != nil {
+		return err
+	}
+
 	var regexpList []string
 	if err := yaml.Unmarshal(data, &regexpList); err != nil {
-		return nil, err
+		return nil
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeVendorTemplate(buf, regexpList, vendorTmplPath, vendorTmplName, commit); err != nil {
-		return nil, err
+	if err := executeVendorTemplate(buf, regexpList, tmplPath, tmplName, commit); err != nil {
+		return nil
 	}
 
-	return buf.Bytes(), nil
+	return formatedWrite(outPath, buf.Bytes())
 }
 
-func executeVendorTemplate(out io.Writer, regexpList []string, vendorTmplPath, vendorTmpl, commit string) error {
+func executeVendorTemplate(out io.Writer, regexpList []string, tmplPath, tmplName, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit": func() string { return commit },
 	}
 
-	t := template.Must(template.New(vendorTmpl).Funcs(fmap).ParseFiles(vendorTmplPath))
+	t := template.Must(template.New(tmplName).Funcs(fmap).ParseFiles(tmplPath))
 	if err := t.Execute(out, regexpList); err != nil {
 		return err
 	}

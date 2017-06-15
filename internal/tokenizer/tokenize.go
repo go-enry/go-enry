@@ -44,7 +44,7 @@ var (
 	}
 
 	reLiteralStringQuotes = regexp.MustCompile(`(?sU)(".*"|'.*')`)
-	reSingleLineComment   = regexp.MustCompile(`(?m)(//|--|#|%|")(.*$)`)
+	reSingleLineComment   = regexp.MustCompile(`(?m)(//|--|#|%|")\s(.*$)`)
 	reMultilineComment    = regexp.MustCompile(`(?sU)(/\*.*\*/|<!--.*-->|\{-.*-\}|\(\*.*\*\)|""".*"""|'''.*''')`)
 	reLiteralNumber       = regexp.MustCompile(`(0x[0-9A-Fa-f]([0-9A-Fa-f]|\.)*|\d(\d|\.)*)([uU][lL]{0,2}|([eE][-+]\d*)?[fFlL]*)`)
 	reShebang             = regexp.MustCompile(`(?m)^#!(?:/\w+)*/(?:(\w+)|\w+(?:\s*\w+=\w+\s*)*\s*(\w+))(?:\s*-\w+\s*)*$`)

@@ -1,96 +1,371 @@
 package enry
 
 import (
-	"math"
+	"bufio"
+	"bytes"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
 // OtherLanguage is used as a zero value when a function can not return a specific language.
-const OtherLanguage = "Other"
+const OtherLanguage = ""
 
 // Strategy type fix the signature for the functions that can be used as a strategy.
-type Strategy func(filename string, content []byte) (languages []string)
+type Strategy func(filename string, content []byte, candidates []string) (languages []string)
 
-var strategies = []Strategy{
+// DefaultStrategies is the strategies' sequence GetLanguage uses to detect languages.
+var DefaultStrategies = []Strategy{
 	GetLanguagesByModeline,
 	GetLanguagesByFilename,
 	GetLanguagesByShebang,
 	GetLanguagesByExtension,
 	GetLanguagesByContent,
+	GetLanguagesByClassifier,
 }
 
 // GetLanguage applies a sequence of strategies based on the given filename and content
 // to find out the most probably language to return.
-func GetLanguage(filename string, content []byte) string {
-	candidates := map[string]float64{}
-	for _, strategy := range strategies {
-		languages := strategy(filename, content)
+func GetLanguage(filename string, content []byte) (language string) {
+	languages := GetLanguages(filename, content)
+	return firstLanguage(languages)
+}
+
+func firstLanguage(languages []string) string {
+	if len(languages) == 0 {
+		return OtherLanguage
+	}
+
+	return languages[0]
+}
+
+// GetLanguageByModeline returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByModeline(content []byte) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByModeline, "", content, nil)
+}
+
+// GetLanguageByEmacsModeline returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByEmacsModeline(content []byte) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByEmacsModeline, "", content, nil)
+}
+
+// GetLanguageByVimModeline returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByVimModeline(content []byte) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByVimModeline, "", content, nil)
+}
+
+// GetLanguageByFilename returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByFilename(filename string) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByFilename, filename, nil, nil)
+}
+
+// GetLanguageByShebang returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByShebang(content []byte) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByShebang, "", content, nil)
+}
+
+// GetLanguageByExtension returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByExtension(filename string) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByExtension, filename, nil, nil)
+}
+
+// GetLanguageByContent returns detected language. If there are more than one possibles languages
+// it returns the first language by alphabetically order and safe to false.
+func GetLanguageByContent(content []byte) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByContent, "", content, nil)
+}
+
+// GetLanguageByClassifier returns the most probably language detected for the given content. It uses
+// DefaultClassifier, if no candidates are provided it returns OtherLanguage.
+func GetLanguageByClassifier(content []byte, candidates []string) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByClassifier, "", content, candidates)
+}
+
+func getLanguageByStrategy(strategy Strategy, filename string, content []byte, candidates []string) (string, bool) {
+	languages := strategy(filename, content, candidates)
+	return getFirstLanguageAndSafe(languages)
+}
+
+func getFirstLanguageAndSafe(languages []string) (language string, safe bool) {
+	language = firstLanguage(languages)
+	safe = len(languages) == 1
+	return
+}
+
+// GetLanguageBySpecificClassifier returns the most probably language for the given content using
+// classifier to detect language.
+func GetLanguageBySpecificClassifier(content []byte, candidates []string, classifier Classifier) (language string, safe bool) {
+	languages := GetLanguagesBySpecificClassifier(content, candidates, classifier)
+	return getFirstLanguageAndSafe(languages)
+}
+
+// GetLanguages applies a sequence of strategies based on the given filename and content
+// to find out the most probably languages to return.
+func GetLanguages(filename string, content []byte) []string {
+	var languages []string
+	candidates := []string{}
+	for _, strategy := range DefaultStrategies {
+		languages = strategy(filename, content, candidates)
 		if len(languages) == 1 {
-			return languages[0]
+			return languages
 		}
 
 		if len(languages) > 0 {
-			for _, language := range languages {
-				candidates[language]++
+			candidates = append(candidates, languages...)
+		}
+	}
+
+	return languages
+}
+
+// GetLanguagesByModeline returns a slice of possible languages for the given content, filename will be ignored.
+// It is comply with the signature to be a Strategy type.
+func GetLanguagesByModeline(filename string, content []byte, candidates []string) []string {
+	headFoot := getHeaderAndFooter(content)
+	var languages []string
+	for _, getLang := range modelinesFunc {
+		languages = getLang("", headFoot, candidates)
+		if len(languages) > 0 {
+			break
+		}
+	}
+
+	return languages
+}
+
+var modelinesFunc = []Strategy{
+	GetLanguagesByEmacsModeline,
+	GetLanguagesByVimModeline,
+}
+
+func getHeaderAndFooter(content []byte) []byte {
+	const searchScope = 5
+	if bytes.Count(content, []byte("\n")) < 2*searchScope {
+		return content
+	}
+
+	header := headScope(content, searchScope)
+	footer := footScope(content, searchScope)
+	headerAndFooter := make([]byte, 0, len(content[:header])+len(content[footer:]))
+	headerAndFooter = append(headerAndFooter, content[:header]...)
+	headerAndFooter = append(headerAndFooter, content[footer:]...)
+	return headerAndFooter
+}
+
+func headScope(content []byte, scope int) (index int) {
+	for i := 0; i < scope; i++ {
+		eol := bytes.IndexAny(content, "\n")
+		content = content[eol+1:]
+		index += eol
+	}
+
+	return index + scope - 1
+}
+
+func footScope(content []byte, scope int) (index int) {
+	for i := 0; i < scope; i++ {
+		index = bytes.LastIndexAny(content, "\n")
+		content = content[:index]
+	}
+
+	return index + 1
+}
+
+var (
+	reEmacsModeline = regexp.MustCompile(`.*-\*-\s*(.+?)\s*-\*-.*(?m:$)`)
+	reEmacsLang     = regexp.MustCompile(`.*(?i:mode)\s*:\s*([^\s;]+)\s*;*.*`)
+	reVimModeline   = regexp.MustCompile(`(?:(?m:\s|^)vi(?:m[<=>]?\d+|m)?|[\t\x20]*ex)\s*[:]\s*(.*)(?m:$)`)
+	reVimLang       = regexp.MustCompile(`(?i:filetype|ft|syntax)\s*=(\w+)(?:\s|:|$)`)
+)
+
+// GetLanguagesByEmacsModeline returns a slice of possible languages for the given content, filename and candidates
+// will be ignored. It is comply with the signature to be a Strategy type.
+func GetLanguagesByEmacsModeline(filename string, content []byte, candidates []string) []string {
+	matched := reEmacsModeline.FindAllSubmatch(content, -1)
+	if matched == nil {
+		return nil
+	}
+
+	// only take the last matched line, discard previous lines
+	lastLineMatched := matched[len(matched)-1][1]
+	matchedAlias := reEmacsLang.FindSubmatch(lastLineMatched)
+	var alias string
+	if matchedAlias != nil {
+		alias = string(matchedAlias[1])
+	} else {
+		alias = string(lastLineMatched)
+	}
+
+	language, ok := GetLanguageByAlias(alias)
+	if !ok {
+		return nil
+	}
+
+	return []string{language}
+}
+
+// GetLanguagesByVimModeline returns a slice of possible languages for the given content, filename and candidates
+// will be ignored. It is comply with the signature to be a Strategy type.
+func GetLanguagesByVimModeline(filename string, content []byte, candidates []string) []string {
+	matched := reVimModeline.FindAllSubmatch(content, -1)
+	if matched == nil {
+		return nil
+	}
+
+	// only take the last matched line, discard previous lines
+	lastLineMatched := matched[len(matched)-1][1]
+	matchedAlias := reVimLang.FindAllSubmatch(lastLineMatched, -1)
+	if matchedAlias == nil {
+		return nil
+	}
+
+	alias := string(matchedAlias[0][1])
+	if len(matchedAlias) > 1 {
+		// cases:
+		// matchedAlias = [["syntax=ruby " "ruby"] ["ft=python " "python"] ["filetype=perl " "perl"]] returns OtherLanguage;
+		// matchedAlias = [["syntax=python " "python"] ["ft=python " "python"] ["filetype=python " "python"]] returns "Python";
+		for _, match := range matchedAlias {
+			otherAlias := string(match[1])
+			if otherAlias != alias {
+				return nil
 			}
 		}
 	}
 
-	if len(candidates) == 0 {
-		return OtherLanguage
+	language, ok := GetLanguageByAlias(alias)
+	if !ok {
+		return nil
 	}
 
-	lang := GetLanguageByClassifier(content, candidates, nil)
-	return lang
+	return []string{language}
 }
 
-// GetLanguageByModeline returns the language of the given content looking for the modeline,
-// and safe to indicate the sureness of returned language.
-func GetLanguageByModeline(content []byte) (lang string, safe bool) {
-	return getLangAndSafe("", content, GetLanguagesByModeline)
+// GetLanguagesByFilename returns a slice of possible languages for the given filename, content and candidates
+// will be ignored. It is comply with the signature to be a Strategy type.
+func GetLanguagesByFilename(filename string, content []byte, candidates []string) []string {
+	return languagesByFilename[filepath.Base(filename)]
 }
 
-// GetLanguageByFilename returns a language based on the given filename, and safe to indicate
-// the sureness of returned language.
-func GetLanguageByFilename(filename string) (lang string, safe bool) {
-	return getLangAndSafe(filename, nil, GetLanguagesByFilename)
+// GetLanguagesByShebang returns a slice of possible languages for the given content, filename and candidates
+// will be ignored. It is comply with the signature to be a Strategy type.
+func GetLanguagesByShebang(filename string, content []byte, candidates []string) (languages []string) {
+	interpreter := getInterpreter(content)
+	return languagesByInterpreter[interpreter]
 }
 
-// GetLanguagesByFilename returns a slice of possible languages for the given filename, content will be ignored.
-// It accomplish the signature to be a Strategy type.
-func GetLanguagesByFilename(filename string, content []byte) []string {
-	return languagesByFilename[filename]
+var (
+	shebangExecHack = regexp.MustCompile(`exec (\w+).+\$0.+\$@`)
+	pythonVersion   = regexp.MustCompile(`python\d\.\d+`)
+)
+
+func getInterpreter(data []byte) (interpreter string) {
+	line := getFirstLine(data)
+	if !hasShebang(line) {
+		return ""
+	}
+
+	// skip shebang
+	line = bytes.TrimSpace(line[2:])
+
+	splitted := bytes.Fields(line)
+	if bytes.Contains(splitted[0], []byte("env")) {
+		if len(splitted) > 1 {
+			interpreter = string(splitted[1])
+		}
+	} else {
+
+		splittedPath := bytes.Split(splitted[0], []byte{'/'})
+		interpreter = string(splittedPath[len(splittedPath)-1])
+	}
+
+	if interpreter == "sh" {
+		interpreter = lookForMultilineExec(data)
+	}
+
+	if pythonVersion.MatchString(interpreter) {
+		interpreter = interpreter[:strings.Index(interpreter, `.`)]
+	}
+
+	return
 }
 
-// GetLanguageByShebang returns the language of the given content looking for the shebang line,
-// and safe to indicate the sureness of returned language.
-func GetLanguageByShebang(content []byte) (lang string, safe bool) {
-	return getLangAndSafe("", content, GetLanguagesByShebang)
+func getFirstLine(data []byte) []byte {
+	buf := bufio.NewScanner(bytes.NewReader(data))
+	buf.Scan()
+	line := buf.Bytes()
+	if err := buf.Err(); err != nil {
+		return nil
+	}
+
+	return line
 }
 
-// GetLanguageByExtension returns a language based on the given filename, and safe to indicate
-// the sureness of returned language.
-func GetLanguageByExtension(filename string) (lang string, safe bool) {
-	return getLangAndSafe(filename, nil, GetLanguagesByExtension)
+func hasShebang(line []byte) bool {
+	const shebang = `#!`
+	prefix := []byte(shebang)
+	return bytes.HasPrefix(line, prefix)
 }
 
-// GetLanguagesByExtension returns a slice of possible languages for the given filename, content will be ignored.
-// It accomplish the signature to be a Strategy type.
-func GetLanguagesByExtension(filename string, content []byte) []string {
-	ext := strings.ToLower(filepath.Ext(filename))
-	return languagesByExtension[ext]
+func lookForMultilineExec(data []byte) string {
+	const magicNumOfLines = 5
+	interpreter := "sh"
+
+	buf := bufio.NewScanner(bytes.NewReader(data))
+	for i := 0; i < magicNumOfLines && buf.Scan(); i++ {
+		line := buf.Bytes()
+		if shebangExecHack.Match(line) {
+			interpreter = shebangExecHack.FindStringSubmatch(string(line))[1]
+			break
+		}
+	}
+
+	if err := buf.Err(); err != nil {
+		return interpreter
+	}
+
+	return interpreter
 }
 
-// GetLanguageByContent returns a language based on the filename and heuristics applies to the content,
-// and safe to indicate the sureness of returned language.
-func GetLanguageByContent(filename string, content []byte) (lang string, safe bool) {
-	return getLangAndSafe(filename, content, GetLanguagesByContent)
+// GetLanguagesByExtension returns a slice of possible languages for the given filename, content and candidates
+// will be ignored. It is comply with the signature to be a Strategy type.
+func GetLanguagesByExtension(filename string, content []byte, candidates []string) []string {
+	if !strings.Contains(filename, ".") {
+		return nil
+	}
+
+	filename = strings.ToLower(filename)
+	dots := getDotIndexes(filename)
+	for _, dot := range dots {
+		ext := filename[dot:]
+		languages, ok := languagesByExtension[ext]
+		if ok {
+			return languages
+		}
+	}
+
+	return nil
 }
 
-// GetLanguagesByContent returns a slice of possible languages for the given content, filename will be ignored.
-// It accomplish the signature to be a Strategy type.
-func GetLanguagesByContent(filename string, content []byte) []string {
+func getDotIndexes(filename string) []int {
+	dots := make([]int, 0, 2)
+	for i, letter := range filename {
+		if letter == rune('.') {
+			dots = append(dots, i)
+		}
+	}
+
+	return dots
+}
+
+// GetLanguagesByContent returns a slice of possible languages for the given content, filename and candidates
+// will be ignored. It is comply with the signature to be a Strategy type.
+func GetLanguagesByContent(filename string, content []byte, candidates []string) []string {
 	ext := strings.ToLower(filepath.Ext(filename))
 	fnMatcher, ok := contentMatchers[ext]
 	if !ok {
@@ -100,51 +375,24 @@ func GetLanguagesByContent(filename string, content []byte) []string {
 	return fnMatcher(content)
 }
 
-func getLangAndSafe(filename string, content []byte, getLanguageByStrategy Strategy) (lang string, safe bool) {
-	languages := getLanguageByStrategy(filename, content)
-	if len(languages) == 0 {
-		lang = OtherLanguage
-		return
+// GetLanguagesByClassifier uses DefaultClassifier as a Classifier and returns a sorted slice of possible languages ordered by
+// decreasing language's probability. If there are not candidates it returns nil. It is comply with the signature to be a Strategy type.
+func GetLanguagesByClassifier(filename string, content []byte, candidates []string) (languages []string) {
+	if len(candidates) == 0 {
+		return nil
 	}
 
-	lang = languages[0]
-	safe = len(languages) == 1
-	return
+	return GetLanguagesBySpecificClassifier(content, candidates, DefaultClassifier)
 }
 
-// GetLanguageByClassifier takes in a content and a list of candidates, and apply the classifier's Classify method to
-// get the most probably language. If classifier is null then DefaultClassfier will be used. If there aren't candidates
-// OtherLanguage is returned.
-func GetLanguageByClassifier(content []byte, candidates map[string]float64, classifier Classifier) string {
-	scores := GetLanguagesByClassifier(content, candidates, classifier)
-	if len(scores) == 0 {
-		return OtherLanguage
+// GetLanguagesBySpecificClassifier returns a slice of possible languages. It takes in a Classifier to be used.
+func GetLanguagesBySpecificClassifier(content []byte, candidates []string, classifier Classifier) (languages []string) {
+	mapCandidates := make(map[string]float64)
+	for _, candidate := range candidates {
+		mapCandidates[candidate]++
 	}
 
-	return getLangugeHigherScore(scores)
-}
-
-func getLangugeHigherScore(scores map[string]float64) string {
-	var language string
-	higher := -math.MaxFloat64
-	for lang, score := range scores {
-		if higher < score {
-			language = lang
-			higher = score
-		}
-	}
-
-	return language
-}
-
-// GetLanguagesByClassifier returns a map of possible languages as keys and a score as value based on content and candidates. The values can be ordered
-// with the highest value as the most probably language. If classifier is null then DefaultClassfier will be used.
-func GetLanguagesByClassifier(content []byte, candidates map[string]float64, classifier Classifier) map[string]float64 {
-	if classifier == nil {
-		classifier = DefaultClassifier
-	}
-
-	return classifier.Classify(content, candidates)
+	return classifier.Classify(content, mapCandidates)
 }
 
 // GetLanguageExtensions returns the different extensions being used by the language.
@@ -164,7 +412,7 @@ const (
 	Prose
 )
 
-// GetLanguageType returns the given language's type.
+// GetLanguageType returns the type of the given language.
 func GetLanguageType(language string) (langType Type) {
 	langType, ok := languagesType[language]
 	if !ok {

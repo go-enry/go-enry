@@ -16,8 +16,6 @@ import (
 	"gopkg.in/src-d/enry.v1/internal/tokenizer"
 )
 
-const samplesSubDir = "filenames"
-
 type samplesFrequencies struct {
 	LanguageTotal  int                       `json:"language_total,omitempty"`
 	Languages      map[string]int            `json:"languages,omitempty"`
@@ -27,15 +25,15 @@ type samplesFrequencies struct {
 }
 
 // Frequencies reads directories in samplesDir, retrieves information about frequencies of languages and tokens, and write
-// the file outPath using frequenciesTmplName as a template.
-func Frequencies(samplesDir, frequenciesTmplPath, frequenciesTmplName, commit, outPath string) error {
+// the file outPath using tmplName as a template.
+func Frequencies(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	freqs, err := getFrequencies(samplesDir)
 	if err != nil {
 		return err
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeFrequenciesTemplate(buf, freqs, frequenciesTmplPath, frequenciesTmplName, commit); err != nil {
+	if err := executeFrequenciesTemplate(buf, freqs, tmplPath, tmplName, commit); err != nil {
 		return err
 	}
 
@@ -96,6 +94,7 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 }
 
 func getSamples(samplesDir string, langDir os.FileInfo) ([]string, error) {
+	const samplesSubDir = "filenames"
 	samples := []string{}
 	path := filepath.Join(samplesDir, langDir.Name())
 	entries, err := ioutil.ReadDir(path)
@@ -156,7 +155,7 @@ func getTokens(samples []string) ([]string, error) {
 	return tokens, anyError
 }
 
-func executeFrequenciesTemplate(out io.Writer, freqs *samplesFrequencies, frequenciesTmplPath, frequenciesTmpl, commit string) error {
+func executeFrequenciesTemplate(out io.Writer, freqs *samplesFrequencies, tmplPath, tmplName, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit": func() string { return commit },
 		"toFloat64": func(num int) string { return fmt.Sprintf("%f", float64(num)) },
@@ -189,7 +188,7 @@ func executeFrequenciesTemplate(out io.Writer, freqs *samplesFrequencies, freque
 		"quote": strconv.Quote,
 	}
 
-	t := template.Must(template.New(frequenciesTmpl).Funcs(fmap).ParseFiles(frequenciesTmplPath))
+	t := template.Must(template.New(tmplName).Funcs(fmap).ParseFiles(tmplPath))
 	if err := t.Execute(out, freqs); err != nil {
 		return err
 	}

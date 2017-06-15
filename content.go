@@ -507,7 +507,7 @@ var (
 	m_Matlab_Matcher_0                     = regexp.MustCompile(`(?m)^\s*%`)
 	m_Limbo_Matcher_0                      = regexp.MustCompile(`(?m)^\w+\s*:\s*module\s*{`)
 	md_Markdown_Matcher_0                  = regexp.MustCompile(`(?mi)(^[-a-z0-9=#!\*\[|>])|<\/`)
-	md_Markdown_Matcher_1                  = regexp.MustCompile(`(?m)^$`)
+	md_Markdown_Matcher_1                  = regexp.MustCompile(`^$`)
 	md_GCCMachineDescription_Matcher_0     = regexp.MustCompile(`(?m)^(;;|\(define_)`)
 	ml_OCaml_Matcher_0                     = regexp.MustCompile(`(?m)(^\s*module)|let rec |match\s+(\S+\s)+with`)
 	ml_StandardML_Matcher_0                = regexp.MustCompile(`(?m)=> |case\s+(\S+\s)+of`)

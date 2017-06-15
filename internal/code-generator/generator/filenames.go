@@ -3,27 +3,79 @@ package generator
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Filenames reads from buf and builds source file from filenamesTmplPath.
-func Filenames(data []byte, filenamesTmplPath, filenamesTmplName, commit string) ([]byte, error) {
+// Filenames reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+func Filenames(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
+	data, err := ioutil.ReadFile(fileToParse)
+	if err != nil {
+		return err
+	}
+
 	languages := make(map[string]*languageInfo)
 	if err := yaml.Unmarshal(data, &languages); err != nil {
-		return nil, err
+		return err
+	}
+
+	if err := walkSamplesFilenames(samplesDir, languages); err != nil {
+		return err
 	}
 
 	languagesByFilename := buildFilenameLanguageMap(languages)
 
 	buf := &bytes.Buffer{}
-	if err := executeFilenamesTemplate(buf, languagesByFilename, filenamesTmplPath, filenamesTmplName, commit); err != nil {
-		return nil, err
+	if err := executeFilenamesTemplate(buf, languagesByFilename, tmplPath, tmplName, commit); err != nil {
+		return err
 	}
 
-	return buf.Bytes(), nil
+	return formatedWrite(outPath, buf.Bytes())
+}
+
+func walkSamplesFilenames(samplesDir string, languages map[string]*languageInfo) error {
+	const filenamesDir = "filenames"
+	var language string
+	err := filepath.Walk(samplesDir, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if f.IsDir() {
+			if f.Name() != filenamesDir {
+				language = f.Name()
+			}
+
+			return nil
+		}
+
+		parentDir := filepath.Base(filepath.Dir(path))
+		if parentDir != filenamesDir {
+			return nil
+		}
+
+		info, ok := languages[language]
+		if !ok {
+			info = &languageInfo{Filenames: []string{}}
+		}
+
+		for _, filename := range info.Filenames {
+			if filename == f.Name() {
+				return nil
+			}
+		}
+
+		info.Filenames = append(info.Filenames, f.Name())
+
+		return nil
+	})
+
+	return err
 }
 
 func buildFilenameLanguageMap(languages map[string]*languageInfo) map[string][]string {
@@ -37,13 +89,13 @@ func buildFilenameLanguageMap(languages map[string]*languageInfo) map[string][]s
 	return filenameLangMap
 }
 
-func executeFilenamesTemplate(out io.Writer, languagesByFilename map[string][]string, filenamesTmplPath, filenamesTmpl, commit string) error {
+func executeFilenamesTemplate(out io.Writer, languagesByFilename map[string][]string, tmplPath, tmplName, commit string) error {
 	fmap := template.FuncMap{
 		"getCommit":         func() string { return commit },
 		"formatStringSlice": func(slice []string) string { return `"` + strings.Join(slice, `","`) + `"` },
 	}
 
-	t := template.Must(template.New(filenamesTmpl).Funcs(fmap).ParseFiles(filenamesTmplPath))
+	t := template.Must(template.New(tmplName).Funcs(fmap).ParseFiles(tmplPath))
 	if err := t.Execute(out, languagesByFilename); err != nil {
 		return err
 	}

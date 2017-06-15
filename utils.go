@@ -31,9 +31,8 @@ func IsAuxiliaryLanguage(lang string) bool {
 
 // IsConfiguration returns whether or not path is using a configuration language.
 func IsConfiguration(path string) bool {
-	lang, _ := GetLanguageByExtension(path)
-	_, is := configurationLanguages[lang]
-
+	language, _ := GetLanguageByExtension(path)
+	_, is := configurationLanguages[language]
 	return is
 }
 

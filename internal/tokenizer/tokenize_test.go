@@ -53,6 +53,9 @@ abb (tokenByte, 0xAF02) | ,3.2L
 oneBool = 3 <= 2
 varBool = 3<=2>
  
+#ifndef
+#i'm not a comment if the single line comment symbol is not followed by a white
+
   PyErr_SetString(PyExc_RuntimeError, "Relative import is not supported for Python <=2.4.");
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -77,13 +80,15 @@ var (
 	tokensFromTestContent = []string{"SHEBANG#!ruby", "SHEBANG#!node", "SHEBANG#!awk", "<!DOCTYPE>", "PUBLIC", "W3C", "DTD", "XHTML", "1", "0",
 		"Strict", "EN", "http", "www", "w3", "org", "TR", "xhtml1", "DTD", "xhtml1", "strict", "dtd", "<html>", "<head>", "<title>", "class=",
 		"</title>", "<style>", "<![CDATA[>", "example", "background", "color", "yellow", "</style>", "</head>", "<body>", "<div>", "<strong>",
-		"</strong>", "</div>", "</body>", "</html>", "(", "[", "]", ")", "[", "]", "{", "(", ")", "(", ")", "{", "}", "(", ")", ";", ";", "}",
-		"]", "]", "aaa", "func", "Tokenize", "content", "byte", "string", "splitted", "bytes.Fields", "content", "tokens", "othercode", "ppp",
-		"no", "comment", "abb", "tokenByte", "notcatchasanumber", "number", "*", "anotherNumber", "if", "isTrue", "isToo", "b", "return",
-		"tokens", "oneBool", "varBool", "PyErr_SetString", "PyExc_RuntimeError", "html", "PUBLIC", "xmlns", "id", "class", "This", "is", "a",
-		"XHTML", "sample", "file", "type", "background", "color", "yellow", "id", "Just", "a", "simple", "XHTML", "test", "page.", "|", "+",
-		"&&", "<", "<", "-", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">", ",", ">", "=", ">", "=", "=", ">", "=", ">",
-		":", ">", "=", ">"}
+		"</strong>", "</div>", "</body>", "</html>", "(", "[", "]", ")", "[", "]", "{", "(", ")", "(", ")", "{", "}", "(", ")", ";", "{", ";",
+		"}", "]", "]", "#", "/usr/bin/ruby", "#", "/usr/bin/env", "node", "aaa", "#", "/usr/bin/env", "A", "B", "foo", "bar", "awk", "f", "#",
+		"python", "func", "Tokenize", "content", "byte", "string", "splitted", "bytes.Fields", "content", "tokens", "othercode", "ppp", "no",
+		"comment", "abb", "tokenByte", "notcatchasanumber", "number", "*", "anotherNumber", "if", "isTrue", "isToo", "b", "return", "tokens",
+		"oneBool", "varBool", "#ifndef", "#i", "m", "not", "a", "comment", "if", "the", "single", "line", "comment", "symbol", "is", "not",
+		"followed", "by", "a", "white", "PyErr_SetString", "PyExc_RuntimeError", "html", "PUBLIC", "xmlns", "id", "class", "This", "is", "a",
+		"XHTML", "sample", "file", "type", "#example", "background", "color", "yellow", "id", "Just", "a", "simple", "XHTML", "test", "page.",
+		"-", "|", "+", "&&", "<", "<", "-", "!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">",
+		"'", ",", ">", "=", ">", "=", "=", ">", "=", ">", ":", ">", "=", ">"}
 )
 
 func TestTokenize(t *testing.T) {
