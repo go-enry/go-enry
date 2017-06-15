@@ -87,7 +87,7 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(
-		os.Stderr, "simple-linguist, A simple (and faster) implementation of linguist \nusage: %s <path>\n",
+		os.Stderr, "enry, A simple (and faster) implementation of github/linguist \nusage: %s <path>\n",
 		os.Args[0],
 	)
 
