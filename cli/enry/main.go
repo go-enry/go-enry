@@ -79,10 +79,6 @@ func main() {
 
 	data, _ := json.MarshalIndent(out, "", "  ")
 	fmt.Printf("%s\n", data)
-
-	if errors {
-		os.Exit(2)
-	}
 }
 
 func usage() {
