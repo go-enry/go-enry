@@ -62,7 +62,7 @@ const (
 	frequenciesTmplPath = "internal/code-generator/assets/frequencies.go.tmpl"
 	frequenciesTmpl     = "frequencies.go.tmpl"
 
-	commitPath = ".linguist/.git/refs/heads/master"
+	commitPath = ".linguist/.git/HEAD"
 )
 
 type generatorFiles struct {
@@ -104,6 +104,16 @@ func getCommit(path string) (string, error) {
 	commit, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
+	}
+
+	if string(commit) == "ref: refs/heads/master\n" {
+		path = ".linguist/.git/" + string(commit[5:len(commit)-1])
+		commit, err := ioutil.ReadFile(path)
+		if err != nil {
+			return "", err
+		}
+
+		return string(commit), nil
 	}
 
 	return string(commit), nil
