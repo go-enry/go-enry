@@ -28,13 +28,16 @@ fmt.Println(lang)
 lang, _ = GetLanguageByContent("bar.m", "<pbjective-c-code>")
 fmt.Println(lang)
 // result: Objective-C
+
+// all strategies together
+lang := enry.GetLanguage("foo.cpp", "<cpp-code>")
 ```
 
 Developmemt
 -----------
 *enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal datastructures. In oreder to update to latest upstream run
 
-    make clen code-generate
+    make clean code-generate
 
 To run the tests
 
