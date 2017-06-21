@@ -30,6 +30,17 @@ fmt.Println(lang)
 // result: Objective-C
 ```
 
+Developmemt
+-----------
+*enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal datastructures. In oreder to update to latest upstream run
+
+    make clen code-generate
+
+To run the tests
+
+    make test
+
+
 Why Enry?
 ---------
 In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the nationality of people based on their accent.
