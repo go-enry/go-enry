@@ -62,6 +62,11 @@ const (
 	frequenciesTmplPath = "internal/code-generator/assets/frequencies.go.tmpl"
 	frequenciesTmpl     = "frequencies.go.tmpl"
 
+	// commit.go generation
+	commitFile     = "commit.go"
+	commitTmplPath = "internal/code-generator/assets/commit.go.tmpl"
+	commitTmpl     = "commit.go.tmpl"
+
 	commitPath = ".linguist/.git/HEAD"
 )
 
@@ -91,6 +96,7 @@ func main() {
 		&generatorFiles{generator.Filenames, languagesYAML, samplesDir, filenamesFile, filenamesTmplPath, filenamesTmpl, commit},
 		&generatorFiles{generator.Aliases, languagesYAML, "", aliasesFile, aliasesTmplPath, aliasesTmpl, commit},
 		&generatorFiles{generator.Frequencies, "", samplesDir, frequenciesFile, frequenciesTmplPath, frequenciesTmpl, commit},
+		&generatorFiles{generator.Commit, "", "", commitFile, commitTmplPath, commitTmpl, commit},
 	}
 
 	for _, file := range fileList {
@@ -108,13 +114,11 @@ func getCommit(path string) (string, error) {
 
 	if string(commit) == "ref: refs/heads/master\n" {
 		path = ".linguist/.git/" + string(commit[5:len(commit)-1])
-		commit, err := ioutil.ReadFile(path)
+		commit, err = ioutil.ReadFile(path)
 		if err != nil {
 			return "", err
 		}
-
-		return string(commit), nil
 	}
 
-	return string(commit), nil
+	return string(commit[:len(commit)-1]), nil
 }

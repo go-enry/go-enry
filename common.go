@@ -125,7 +125,7 @@ func GetLanguages(filename string, content []byte) []string {
 }
 
 // GetLanguagesByModeline returns a slice of possible languages for the given content, filename will be ignored.
-// It is comply with the signature to be a Strategy type.
+// It complies with the signature to be a Strategy type.
 func GetLanguagesByModeline(filename string, content []byte, candidates []string) []string {
 	headFoot := getHeaderAndFooter(content)
 	var languages []string
@@ -185,7 +185,7 @@ var (
 )
 
 // GetLanguagesByEmacsModeline returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It is comply with the signature to be a Strategy type.
+// will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByEmacsModeline(filename string, content []byte, candidates []string) []string {
 	matched := reEmacsModeline.FindAllSubmatch(content, -1)
 	if matched == nil {
@@ -211,7 +211,7 @@ func GetLanguagesByEmacsModeline(filename string, content []byte, candidates []s
 }
 
 // GetLanguagesByVimModeline returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It is comply with the signature to be a Strategy type.
+// will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByVimModeline(filename string, content []byte, candidates []string) []string {
 	matched := reVimModeline.FindAllSubmatch(content, -1)
 	if matched == nil {
@@ -247,13 +247,13 @@ func GetLanguagesByVimModeline(filename string, content []byte, candidates []str
 }
 
 // GetLanguagesByFilename returns a slice of possible languages for the given filename, content and candidates
-// will be ignored. It is comply with the signature to be a Strategy type.
+// will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByFilename(filename string, content []byte, candidates []string) []string {
 	return languagesByFilename[filepath.Base(filename)]
 }
 
 // GetLanguagesByShebang returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It is comply with the signature to be a Strategy type.
+// will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByShebang(filename string, content []byte, candidates []string) (languages []string) {
 	interpreter := getInterpreter(content)
 	return languagesByInterpreter[interpreter]
@@ -333,7 +333,7 @@ func lookForMultilineExec(data []byte) string {
 }
 
 // GetLanguagesByExtension returns a slice of possible languages for the given filename, content and candidates
-// will be ignored. It is comply with the signature to be a Strategy type.
+// will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByExtension(filename string, content []byte, candidates []string) []string {
 	if !strings.Contains(filename, ".") {
 		return nil
@@ -364,7 +364,7 @@ func getDotIndexes(filename string) []int {
 }
 
 // GetLanguagesByContent returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It is comply with the signature to be a Strategy type.
+// will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByContent(filename string, content []byte, candidates []string) []string {
 	ext := strings.ToLower(filepath.Ext(filename))
 	fnMatcher, ok := contentMatchers[ext]
@@ -376,7 +376,7 @@ func GetLanguagesByContent(filename string, content []byte, candidates []string)
 }
 
 // GetLanguagesByClassifier uses DefaultClassifier as a Classifier and returns a sorted slice of possible languages ordered by
-// decreasing language's probability. If there are not candidates it returns nil. It is comply with the signature to be a Strategy type.
+// decreasing language's probability. If there are not candidates it returns nil. It complies with the signature to be a Strategy type.
 func GetLanguagesByClassifier(filename string, content []byte, candidates []string) (languages []string) {
 	if len(candidates) == 0 {
 		return nil

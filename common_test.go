@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -11,15 +12,46 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type SimpleLinguistTestSuite struct {
+const linguistURL = "https://github.com/github/linguist.git"
+
+type EnryTestSuite struct {
 	suite.Suite
+	repoLinguist string
 }
 
-func TestSimpleLinguistTestSuite(t *testing.T) {
-	suite.Run(t, new(SimpleLinguistTestSuite))
+func TestEnryTestSuite(t *testing.T) {
+	suite.Run(t, new(EnryTestSuite))
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguage() {
+func (s *EnryTestSuite) SetupSuite() {
+	var err error
+	s.repoLinguist, err = ioutil.TempDir("", "linguist-")
+	assert.NoError(s.T(), err)
+
+	cmd := exec.Command("git", "clone", linguistURL, s.repoLinguist)
+	err = cmd.Run()
+	assert.NoError(s.T(), err)
+
+	cwd, err := os.Getwd()
+	assert.NoError(s.T(), err)
+
+	err = os.Chdir(s.repoLinguist)
+	assert.NoError(s.T(), err)
+
+	cmd = exec.Command("git", "checkout", linguistCommit)
+	err = cmd.Run()
+	assert.NoError(s.T(), err)
+
+	err = os.Chdir(cwd)
+	assert.NoError(s.T(), err)
+}
+
+func (s *EnryTestSuite) TearDownSuite() {
+	err := os.RemoveAll(s.repoLinguist)
+	assert.NoError(s.T(), err)
+}
+
+func (s *EnryTestSuite) TestGetLanguage() {
 	tests := []struct {
 		name     string
 		filename string
@@ -38,7 +70,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguage() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesByModelineLinguist() {
+func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
 	const (
 		modelinesDir = ".linguist/test/fixtures/Data/Modelines"
 		samplesDir   = ".linguist/samples"
@@ -95,7 +127,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguagesByModelineLinguist() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesByModeline() {
+func (s *EnryTestSuite) TestGetLanguagesByModeline() {
 	const (
 		wrongVim  = `# vim: set syntax=ruby ft  =python filetype=perl :`
 		rightVim  = `/* vim: set syntax=python ft   =python filetype=python */`
@@ -120,7 +152,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguagesByModeline() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesByFilename() {
+func (s *EnryTestSuite) TestGetLanguagesByFilename() {
 	tests := []struct {
 		name       string
 		filename   string
@@ -144,7 +176,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguagesByFilename() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesByShebang() {
+func (s *EnryTestSuite) TestGetLanguagesByShebang() {
 	const (
 		multilineExecHack = `#!/bin/sh
 # Next line is comment in Tcl, but not in sh... \
@@ -185,7 +217,7 @@ println("The shell script says ",vm.arglist.concat(" "));`
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesByExtension() {
+func (s *EnryTestSuite) TestGetLanguagesByExtension() {
 	tests := []struct {
 		name       string
 		filename   string
@@ -204,7 +236,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguagesByExtension() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesByClassifier() {
+func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 	const samples = `.linguist/samples/`
 	test := []struct {
 		name       string
@@ -236,7 +268,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguagesByClassifier() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguagesBySpecificClassifier() {
+func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 	const samples = `.linguist/samples/`
 	test := []struct {
 		name       string
@@ -270,7 +302,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguagesBySpecificClassifier() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageExtensions() {
+func (s *EnryTestSuite) TestGetLanguageExtensions() {
 	tests := []struct {
 		name     string
 		language string
@@ -287,7 +319,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageExtensions() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageType() {
+func (s *EnryTestSuite) TestGetLanguageType() {
 	tests := []struct {
 		name     string
 		language string
@@ -310,7 +342,7 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageType() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestGetLanguageByAlias() {
+func (s *EnryTestSuite) TestGetLanguageByAlias() {
 	tests := []struct {
 		name         string
 		alias        string
@@ -336,12 +368,9 @@ func (s *SimpleLinguistTestSuite) TestGetLanguageByAlias() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestLinguistCorpus() {
-	const (
-		samplesDir   = ".linguist/samples"
-		filenamesDir = "filenames"
-	)
-
+func (s *EnryTestSuite) TestLinguistCorpus() {
+	const filenamesDir = "filenames"
+	var samplesDir = filepath.Join(s.repoLinguist, "samples")
 	var cornerCases = map[string]bool{
 		"hello.ms": true,
 	}

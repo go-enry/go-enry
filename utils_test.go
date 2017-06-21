@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *SimpleLinguistTestSuite) TestIsVendor() {
+func (s *EnryTestSuite) TestIsVendor() {
 	tests := []struct {
 		name     string
 		path     string
@@ -31,7 +31,7 @@ func (s *SimpleLinguistTestSuite) TestIsVendor() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestIsDocumentation() {
+func (s *EnryTestSuite) TestIsDocumentation() {
 	tests := []struct {
 		name     string
 		path     string
@@ -47,7 +47,7 @@ func (s *SimpleLinguistTestSuite) TestIsDocumentation() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestIsConfiguration() {
+func (s *EnryTestSuite) TestIsConfiguration() {
 	tests := []struct {
 		name     string
 		path     string
@@ -64,7 +64,7 @@ func (s *SimpleLinguistTestSuite) TestIsConfiguration() {
 	}
 }
 
-func (s *SimpleLinguistTestSuite) TestIsBinary() {
+func (s *EnryTestSuite) TestIsBinary() {
 	tests := []struct {
 		name     string
 		data     []byte

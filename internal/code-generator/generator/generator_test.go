@@ -65,6 +65,11 @@ const (
 	frequenciesGold         = "test_files/frequencies.gold"
 	frequenciesTestTmplPath = "../assets/frequencies.go.tmpl"
 	frequenciesTestTmplName = "frequencies.go.tmpl"
+
+	// commit test
+	commitGold         = "test_files/commit.gold"
+	commitTestTmplPath = "../assets/commit.go.tmpl"
+	commitTestTmplName = "commit.go.tmpl"
 )
 
 type GeneratorTestSuite struct {
@@ -76,35 +81,35 @@ func TestGeneratorTestSuite(t *testing.T) {
 	suite.Run(t, new(GeneratorTestSuite))
 }
 
-func (g *GeneratorTestSuite) SetupSuite() {
-	tmpLinguist, err := ioutil.TempDir("", "linguist-")
-	assert.NoError(g.T(), err)
-	g.tmpLinguist = tmpLinguist
+func (s *GeneratorTestSuite) SetupSuite() {
+	var err error
+	s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
+	assert.NoError(s.T(), err)
 
-	cmd := exec.Command("git", "clone", lingustURL, tmpLinguist)
+	cmd := exec.Command("git", "clone", lingustURL, s.tmpLinguist)
 	err = cmd.Run()
-	assert.NoError(g.T(), err)
+	assert.NoError(s.T(), err)
 
 	cwd, err := os.Getwd()
-	assert.NoError(g.T(), err)
+	assert.NoError(s.T(), err)
 
-	err = os.Chdir(tmpLinguist)
-	assert.NoError(g.T(), err)
+	err = os.Chdir(s.tmpLinguist)
+	assert.NoError(s.T(), err)
 
 	cmd = exec.Command("git", "checkout", commit)
 	err = cmd.Run()
-	assert.NoError(g.T(), err)
+	assert.NoError(s.T(), err)
 
 	err = os.Chdir(cwd)
-	assert.NoError(g.T(), err)
+	assert.NoError(s.T(), err)
 }
 
-func (g *GeneratorTestSuite) TearDownSuite() {
-	err := os.RemoveAll(g.tmpLinguist)
-	assert.NoError(g.T(), err)
+func (s *GeneratorTestSuite) TearDownSuite() {
+	err := os.RemoveAll(s.tmpLinguist)
+	assert.NoError(s.T(), err)
 }
 
-func (g *GeneratorTestSuite) TestGenerationFiles() {
+func (s *GeneratorTestSuite) TestGenerationFiles() {
 	tests := []struct {
 		name        string
 		fileToParse string
@@ -117,7 +122,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 	}{
 		{
 			name:        "Extensions()",
-			fileToParse: filepath.Join(g.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
 			samplesDir:  "",
 			tmplPath:    extensionTestTmplPath,
 			tmplName:    extensionTestTmplName,
@@ -127,7 +132,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Heuristics()",
-			fileToParse: filepath.Join(g.tmpLinguist, heuristicsTestFile),
+			fileToParse: filepath.Join(s.tmpLinguist, heuristicsTestFile),
 			samplesDir:  "",
 			tmplPath:    contentTestTmplPath,
 			tmplName:    contentTestTmplName,
@@ -137,7 +142,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Vendor()",
-			fileToParse: filepath.Join(g.tmpLinguist, vendorTestFile),
+			fileToParse: filepath.Join(s.tmpLinguist, vendorTestFile),
 			samplesDir:  "",
 			tmplPath:    vendorTestTmplPath,
 			tmplName:    vendorTestTmplName,
@@ -147,7 +152,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Documentation()",
-			fileToParse: filepath.Join(g.tmpLinguist, documentationTestFile),
+			fileToParse: filepath.Join(s.tmpLinguist, documentationTestFile),
 			samplesDir:  "",
 			tmplPath:    documentationTestTmplPath,
 			tmplName:    documentationTestTmplName,
@@ -157,7 +162,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Types()",
-			fileToParse: filepath.Join(g.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
 			samplesDir:  "",
 			tmplPath:    typeTestTmplPath,
 			tmplName:    typeTestTmplName,
@@ -167,7 +172,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Interpreters()",
-			fileToParse: filepath.Join(g.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
 			samplesDir:  "",
 			tmplPath:    interpreterTestTmplPath,
 			tmplName:    interpreterTestTmplName,
@@ -177,8 +182,8 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Filenames()",
-			fileToParse: filepath.Join(g.tmpLinguist, languagesFile),
-			samplesDir:  filepath.Join(g.tmpLinguist, samplesDir),
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			samplesDir:  filepath.Join(s.tmpLinguist, samplesDir),
 			tmplPath:    filenameTestTmplPath,
 			tmplName:    filenameTestTmplName,
 			commit:      commit,
@@ -187,7 +192,7 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:        "Aliases()",
-			fileToParse: filepath.Join(g.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
 			samplesDir:  "",
 			tmplPath:    aliasTestTmplPath,
 			tmplName:    aliasTestTmplName,
@@ -197,27 +202,36 @@ func (g *GeneratorTestSuite) TestGenerationFiles() {
 		},
 		{
 			name:       "Frequencies()",
-			samplesDir: filepath.Join(g.tmpLinguist, samplesDir),
+			samplesDir: filepath.Join(s.tmpLinguist, samplesDir),
 			tmplPath:   frequenciesTestTmplPath,
 			tmplName:   frequenciesTestTmplName,
 			commit:     commit,
 			generate:   Frequencies,
 			wantOut:    frequenciesGold,
 		},
+		{
+			name:       "Commit()",
+			samplesDir: "",
+			tmplPath:   commitTestTmplPath,
+			tmplName:   commitTestTmplName,
+			commit:     commit,
+			generate:   Commit,
+			wantOut:    commitGold,
+		},
 	}
 
 	for _, test := range tests {
 		gold, err := ioutil.ReadFile(test.wantOut)
-		assert.NoError(g.T(), err)
+		assert.NoError(s.T(), err)
 
 		outPath, err := ioutil.TempFile("/tmp", "generator-test-")
-		assert.NoError(g.T(), err)
+		assert.NoError(s.T(), err)
 		defer os.Remove(outPath.Name())
 
 		err = test.generate(test.fileToParse, test.samplesDir, outPath.Name(), test.tmplPath, test.tmplName, test.commit)
-		assert.NoError(g.T(), err)
+		assert.NoError(s.T(), err)
 		out, err := ioutil.ReadFile(outPath.Name())
-		assert.NoError(g.T(), err)
-		assert.EqualValues(g.T(), gold, out, fmt.Sprintf("%v: %v, expected: %v", test.name, string(out), string(gold)))
+		assert.NoError(s.T(), err)
+		assert.EqualValues(s.T(), gold, out, fmt.Sprintf("%v: %v, expected: %v", test.name, string(out), string(gold)))
 	}
 }

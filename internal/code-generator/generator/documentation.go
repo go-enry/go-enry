@@ -9,7 +9,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Documentation reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+// Documentation reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
 func Documentation(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {
