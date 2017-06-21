@@ -4,9 +4,7 @@ package data
 // THIS FILE SHOULD NOT BE EDITED BY HAND
 // Extracted from github/linguist commit: {{ getCommit }}
 
-import (
-	"regexp"
-)
+import "gopkg.in/toqueteos/substring.v1"
 
 type languageMatcher func ([]byte) []string
 
@@ -17,8 +15,8 @@ var ContentMatchers = map[string]languageMatcher{
 
 		{{- if not (avoidLanguage $language) }}
 		{{- if gt (len $language.Heuristics) 0 }}
-		{{- if gt $i 0 }} else {{ end -}}
-		if {{- range $j, $heuristic := $language.Heuristics }} {{ $heuristic.Name }}.Match(i)
+		{{- if gt $i 0 }} else {{ end -}} 
+		if {{- range $j, $heuristic := $language.Heuristics }} {{ $heuristic.Name }}.Match(string(i)) 
 		{{- if lt $j (len $language.LogicRelations) }} {{index $language.LogicRelations $j}} {{- end -}} {{ end }} {
 			return []string{ {{- printf "%q" $language.Language -}} }
 		}
@@ -34,6 +32,6 @@ var ContentMatchers = map[string]languageMatcher{
 
 var (
     {{ range $index, $heuristic := getAllHeuristics . -}}
-    {{ $heuristic.Name }} = regexp.MustCompile(`{{ $heuristic.Regexp }}`)
+    {{ $heuristic.Name }} = substring.Regexp(`{{ $heuristic.Regexp }}`)
     {{ end -}}
 )

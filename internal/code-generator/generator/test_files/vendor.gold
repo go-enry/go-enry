@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
+// Extracted from github/linguist commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
 
 import "gopkg.in/toqueteos/substring.v1"
 
@@ -35,6 +35,7 @@ var VendorMatchers = substring.Or(
 	substring.Regexp(`(^|/)font-awesome\.(css|less|scss|styl)$`),
 	substring.Regexp(`(^|/)foundation\.(css|less|scss|styl)$`),
 	substring.Regexp(`(^|/)normalize\.(css|less|scss|styl)$`),
+	substring.Regexp(`(^|/)skeleton\.(css|less|scss|styl)$`),
 	substring.Regexp(`(^|/)[Bb]ourbon/.*\.(css|less|scss|styl)$`),
 	substring.Regexp(`(^|/)animate\.(css|less|scss|styl)$`),
 	substring.Regexp(`third[-_]?party/`),

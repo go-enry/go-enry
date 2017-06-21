@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
+// Extracted from github/linguist commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
 
 var LanguagesByFilename = map[string][]string{
 	".Rprofile":          {"R"},
@@ -107,7 +107,7 @@ var LanguagesByFilename = map[string][]string{
 	"README.mysql":       {"Text"},
 	"ROOT":               {"Isabelle ROOT"},
 	"Rakefile":           {"Ruby"},
-	"Rexfile":            {"Perl6"},
+	"Rexfile":            {"Perl 6"},
 	"SConscript":         {"Python"},
 	"SConstruct":         {"Python"},
 	"Settings.StyleCop":  {"XML"},
