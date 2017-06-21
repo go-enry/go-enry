@@ -25,7 +25,7 @@ lang, _ = GetLanguageByContent("foo.m", "<matlab-code>")
 fmt.Println(lang)
 // result: Matlab
 
-lang, _ = GetLanguageByContent("bar.m", "<pbjective-c-code>")
+lang, _ = GetLanguageByContent("bar.m", "<objective-c-code>")
 fmt.Println(lang)
 // result: Objective-C
 
@@ -35,7 +35,7 @@ lang := enry.GetLanguage("foo.cpp", "<cpp-code>")
 
 Developmemt
 -----------
-*enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal datastructures. In oreder to update to latest upstream run
+*enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal data structures. In oreder to update to latest upstream run
 
     make clean code-generate
 
