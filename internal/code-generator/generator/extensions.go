@@ -15,7 +15,7 @@ type extensionsInfo struct {
 	ExtensionsByLanguage map[string][]string
 }
 
-// Extensions reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+// Extensions reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
 func Extensions(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {

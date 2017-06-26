@@ -16,7 +16,7 @@ var typeToTypeConst = map[string]string{
 	"prose":       "Prose",
 }
 
-// Types reads from fileToParse and builds source file from tmplPath. It's comply with type File signature.
+// Types reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
 func Types(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {

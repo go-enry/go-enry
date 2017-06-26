@@ -25,7 +25,7 @@ type samplesFrequencies struct {
 }
 
 // Frequencies reads directories in samplesDir, retrieves information about frequencies of languages and tokens, and write
-// the file outPath using tmplName as a template.
+// the file outPath using tmplName as a template. It complies with type File signature.
 func Frequencies(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	freqs, err := getFrequencies(samplesDir)
 	if err != nil {
