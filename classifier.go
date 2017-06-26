@@ -59,7 +59,7 @@ func (c *classifier) Classify(content []byte, candidates map[string]float64) []s
 }
 
 func sortLanguagesByScore(scoredLangs []*scoredLanguage) []string {
-	sort.SliceStable(scoredLangs, func(i, j int) bool { return scoredLangs[j].score < scoredLangs[i].score })
+	sort.Stable(byScore(scoredLangs))
 	sortedLanguages := make([]string, 0, len(scoredLangs))
 	for _, scoredLang := range scoredLangs {
 		sortedLanguages = append(sortedLanguages, scoredLang.language)
@@ -94,3 +94,9 @@ func (c *classifier) tokenProbability(token, language string) float64 {
 
 	return tokenProb
 }
+
+type byScore []*scoredLanguage
+
+func (b byScore) Len() int           { return len(b) }
+func (b byScore) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b byScore) Less(i, j int) bool { return b[j].score < b[i].score }
