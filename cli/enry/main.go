@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -14,7 +15,10 @@ import (
 
 func main() {
 	flag.Usage = usage
+	breakdownFlag := flag.Bool("breakdown", false, "")
+	jsonFlag := flag.Bool("json", false, "")
 	flag.Parse()
+
 	root, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
@@ -77,15 +81,61 @@ func main() {
 		log.Fatal(err)
 	}
 
-	data, _ := json.MarshalIndent(out, "", "  ")
-	fmt.Printf("%s\n", data)
+	var buff bytes.Buffer
+	switch {
+	case *jsonFlag && !*breakdownFlag:
+		printJson(out, &buff)
+	case *jsonFlag && *breakdownFlag:
+		printBreakDown(out, &buff)
+	case *breakdownFlag:
+		printPercents(out, &buff)
+		buff.WriteByte('\n')
+		printBreakDown(out, &buff)
+	default:
+		printPercents(out, &buff)
+	}
+
+	fmt.Print(buff.String())
 }
 
 func usage() {
 	fmt.Fprintf(
-		os.Stderr, "enry, A simple (and faster) implementation of github/linguist \nusage: %s <path>\n",
-		os.Args[0],
+		os.Stderr, "enry, A simple (and faster) implementation of github/linguist \nusage: %s <path>\n       %s <path> [-json] [-breakdown]\n       %s [-json] [-breakdown]\n",
+		os.Args[0], os.Args[0], os.Args[0],
 	)
+}
 
-	flag.PrintDefaults()
+func printBreakDown(out map[string][]string, buff *bytes.Buffer) {
+	for name, language := range out {
+		writeStringLn(name, buff)
+		for _, file := range language {
+			writeStringLn(file, buff)
+		}
+
+		writeStringLn("", buff)
+	}
+}
+
+func printJson(out map[string][]string, buff *bytes.Buffer) {
+	data, _ := json.Marshal(out)
+	buff.Write(data)
+}
+
+func printPercents(out map[string][]string, buff *bytes.Buffer) {
+	fileCount := make(map[string]int, len(out))
+	total := 0
+	for name, language := range out {
+		fileCount[name] = len(language)
+		total += len(language)
+	}
+
+	for name, count := range fileCount {
+		percent := float32(count) / float32(total) * 100
+		buff.WriteString(fmt.Sprintf("%.2f%%	%s\n", percent, name))
+	}
+}
+
+func writeStringLn(s string, buff *bytes.Buffer) {
+	buff.WriteString(s)
+	buff.WriteByte('\n')
 }
