@@ -63,7 +63,7 @@ const (
 	frequenciesTmpl     = "frequencies.go.tmpl"
 
 	// commit.go generation
-	commitFile     = "commit.go"
+	commitFile     = "data/commit.go"
 	commitTmplPath = "internal/code-generator/assets/commit.go.tmpl"
 	commitTmpl     = "commit.go.tmpl"
 
