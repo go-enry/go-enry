@@ -375,7 +375,7 @@ func getDotIndexes(filename string) []int {
 // will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByContent(filename string, content []byte, candidates []string) []string {
 	ext := strings.ToLower(filepath.Ext(filename))
-	fnMatcher, ok := contentMatchers[ext]
+	fnMatcher, ok := data.ContentMatchers[ext]
 	if !ok {
 		return nil
 	}
