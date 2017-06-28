@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"gopkg.in/src-d/enry.v1/data"
 )
 
 // OtherLanguage is used as a zero value when a function can not return a specific language.
@@ -22,6 +24,12 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByExtension,
 	GetLanguagesByContent,
 	GetLanguagesByClassifier,
+}
+
+var DefaultClassifier Classifier = &classifier{
+	languagesLogProbabilities: data.LanguagesLogProbabilities,
+	tokensLogProbabilities:    data.TokensLogProbabilities,
+	tokensTotal:               data.TokensTotal,
 }
 
 // GetLanguage applies a sequence of strategies based on the given filename and content
@@ -249,14 +257,14 @@ func GetLanguagesByVimModeline(filename string, content []byte, candidates []str
 // GetLanguagesByFilename returns a slice of possible languages for the given filename, content and candidates
 // will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByFilename(filename string, content []byte, candidates []string) []string {
-	return languagesByFilename[filepath.Base(filename)]
+	return data.LanguagesByFilename[filepath.Base(filename)]
 }
 
 // GetLanguagesByShebang returns a slice of possible languages for the given content, filename and candidates
 // will be ignored. It complies with the signature to be a Strategy type.
 func GetLanguagesByShebang(filename string, content []byte, candidates []string) (languages []string) {
 	interpreter := getInterpreter(content)
-	return languagesByInterpreter[interpreter]
+	return data.LanguagesByInterpreter[interpreter]
 }
 
 var (
@@ -343,7 +351,7 @@ func GetLanguagesByExtension(filename string, content []byte, candidates []strin
 	dots := getDotIndexes(filename)
 	for _, dot := range dots {
 		ext := filename[dot:]
-		languages, ok := languagesByExtension[ext]
+		languages, ok := data.LanguagesByExtension[ext]
 		if ok {
 			return languages
 		}
@@ -397,7 +405,7 @@ func GetLanguagesBySpecificClassifier(content []byte, candidates []string, class
 
 // GetLanguageExtensions returns the different extensions being used by the language.
 func GetLanguageExtensions(language string) []string {
-	return extensionsByLanguage[language]
+	return data.ExtensionsByLanguage[language]
 }
 
 // Type represent language's type. Either data, programming, markup, prose, or unknown.
@@ -414,11 +422,11 @@ const (
 
 // GetLanguageType returns the type of the given language.
 func GetLanguageType(language string) (langType Type) {
-	langType, ok := languagesType[language]
+	intType, ok := data.LanguagesType[language]
+	langType = Type(intType)
 	if !ok {
 		langType = Unknown
 	}
-
 	return langType
 }
 
@@ -427,7 +435,7 @@ func GetLanguageType(language string) (langType Type) {
 func GetLanguageByAlias(alias string) (lang string, ok bool) {
 	a := strings.Split(alias, `,`)[0]
 	a = strings.ToLower(a)
-	lang, ok = languagesByAlias[a]
+	lang, ok = data.LanguagesByAlias[a]
 	if !ok {
 		lang = OtherLanguage
 	}

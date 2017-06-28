@@ -1,4 +1,4 @@
-package enry
+package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
@@ -6,7 +6,7 @@ package enry
 
 import "gopkg.in/toqueteos/substring.v1"
 
-var documentationMatchers = substring.Or(
+var DocumentationMatchers = substring.Or(
 	substring.Regexp(`^[Dd]ocs?/`),
 	substring.Regexp(`(^|/)[Dd]ocumentation/`),
 	substring.Regexp(`(^|/)[Jj]avadoc/`),

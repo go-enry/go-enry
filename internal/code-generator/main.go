@@ -15,50 +15,50 @@ const (
 	samplesDir = ".linguist/samples"
 
 	// extension.go generation
-	extensionsFile     = "extension.go"
+	extensionsFile     = "data/extension.go"
 	extensionsTmplPath = "internal/code-generator/assets/extension.go.tmpl"
 	extensionsTmpl     = "extension.go.tmpl"
 
 	// content.go generation
 	heuristicsRuby  = ".linguist/lib/linguist/heuristics.rb"
-	contentFile     = "content.go"
+	contentFile     = "data/content.go"
 	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
 
 	// vendor.go generation
 	vendorYAML     = ".linguist/lib/linguist/vendor.yml"
-	vendorFile     = "vendor.go"
+	vendorFile     = "data/vendor.go"
 	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
 	vendorTmpl     = "vendor.go.tmpl"
 
 	// documentation.go generation
 	documentationYAML     = ".linguist/lib/linguist/documentation.yml"
-	documentationFile     = "documentation.go"
+	documentationFile     = "data/documentation.go"
 	documentationTmplPath = "internal/code-generator/assets/documentation.go.tmpl"
 	documentationTmpl     = "documentation.go.tmpl"
 
 	// type.go generation
-	typeFile     = "type.go"
+	typeFile     = "data/type.go"
 	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
 	typeTmpl     = "type.go.tmpl"
 
 	// interpreter.go generation
-	interpretersFile     = "interpreter.go"
+	interpretersFile     = "data/interpreter.go"
 	interpretersTmplPath = "internal/code-generator/assets/interpreter.go.tmpl"
 	interpretersTmpl     = "interpreter.go.tmpl"
 
 	// filename.go generation
-	filenamesFile     = "filename.go"
+	filenamesFile     = "data/filename.go"
 	filenamesTmplPath = "internal/code-generator/assets/filename.go.tmpl"
 	filenamesTmpl     = "filename.go.tmpl"
 
 	// alias.go generation
-	aliasesFile     = "alias.go"
+	aliasesFile     = "data/alias.go"
 	aliasesTmplPath = "internal/code-generator/assets/alias.go.tmpl"
 	aliasesTmpl     = "alias.go.tmpl"
 
 	// frequencies.go generation
-	frequenciesFile     = "frequencies.go"
+	frequenciesFile     = "data/frequencies.go"
 	frequenciesTmplPath = "internal/code-generator/assets/frequencies.go.tmpl"
 	frequenciesTmpl     = "frequencies.go.tmpl"
 
