@@ -3,7 +3,6 @@ package enry
 import (
 	"bytes"
 	"fmt"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -78,22 +77,5 @@ func (s *EnryTestSuite) TestIsBinary() {
 	for _, test := range tests {
 		is := IsBinary(test.data)
 		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
-	}
-}
-
-const (
-	htmlPath = "some/random/dir/file.html"
-	jsPath   = "some/random/dir/file.js"
-)
-
-func BenchmarkVendor(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = IsVendor(htmlPath)
-	}
-}
-
-func BenchmarkVendorJS(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = IsVendor(jsPath)
 	}
 }
