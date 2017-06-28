@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
+// Extracted from github/linguist commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
 
 var LanguagesType = map[string]int{
 	"1C Enterprise":    2,
@@ -107,6 +107,7 @@ var LanguagesType = map[string]int{
 	"EJS":            3,
 	"EQ":             2,
 	"Eagle":          3,
+	"Easybuild":      1,
 	"Ecere Projects": 1,
 	"Eiffel":         2,
 	"Elixir":         2,
@@ -302,7 +303,7 @@ var LanguagesType = map[string]int{
 	"Pascal":                       2,
 	"Pep8":                         2,
 	"Perl":                         2,
-	"Perl6":                        2,
+	"Perl 6":                       2,
 	"Pic":                          3,
 	"Pickle":                       1,
 	"PicoLisp":                     2,
@@ -349,6 +350,7 @@ var LanguagesType = map[string]int{
 	"Regular Expression":           1,
 	"Ren'Py":                       2,
 	"RenderScript":                 2,
+	"Ring":                         2,
 	"RobotFramework":               2,
 	"Roff":                         3,
 	"Rouge":                        2,
