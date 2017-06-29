@@ -100,7 +100,7 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(
-		os.Stderr, "enry, A simple (and faster) implementation of github/linguist \nusage: %s <path>\n       %s <path> [-json] [-breakdown]\n       %s [-json] [-breakdown]\n",
+		os.Stderr, "enry, A simple (and faster) implementation of github/linguist \nusage: %s <path>\n       %s [-json] [-breakdown] <path>\n       %s [-json] [-breakdown]\n",
 		os.Args[0], os.Args[0], os.Args[0],
 	)
 }
