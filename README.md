@@ -1,6 +1,6 @@
 # enry [![GoDoc](https://godoc.org/gopkg.in/src-d/enry.v1?status.svg)](https://godoc.org/gopkg.in/src-d/enry.v1) [![Build Status](https://travis-ci.org/src-d/enry.svg?branch=master)](https://travis-ci.org/src-d/enry) [![codecov](https://codecov.io/gh/src-d/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/src-d/enry)
 
-File programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *performance of 100x*.
+File programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
 
 
 Installation
@@ -18,8 +18,9 @@ To build enry's CLI you must run
 
 it generates a binary in the project's root directory called `enry`. You can move this binary to anywhere in your `PATH`.
 
+
 Examples
---------
+------------
 
 ```go
 lang, safe := enry.GetLanguageByExtension("foo.go")
@@ -55,7 +56,7 @@ langs := enry.GetLanguagesByFilename("Gemfile", "<content>", []string{})
 
 
 CLI
------------------
+------------
 
 You can use enry as a command,
 
@@ -115,7 +116,7 @@ Note that even if enry's CLI is compatible with linguist's, its main point is th
 
 
 Development
------------
+------------
 
 *enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal data structures. In oreder to update to latest upstream run
 
@@ -139,8 +140,40 @@ Using [linguist/samples](https://github.com/github/linguist/tree/master/samples)
 * all files for SQL language fall to the classifier because we don't parse this [disambiguator expresion](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L433) for `*.sql` files right. This expression doesn't comply with the pattern for the rest of [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb) file.
 
 
+Benchmarks
+------------
+
+Enry's language detection has been compared with Linguist's language detection. In order to do that, linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
+
+ Following results were obtained:
+
+![histogram](https://raw.githubusercontent.com/src-c/enry/master/benchmarks/histogram/distribution.jpg)
+
+The histogram represents the number of files for which spent time in language detection was in the range of the time interval indicated in x axis.
+
+So reviewing the comparison enry/linguist, you can see the most of the files were detected in less time than linguist does.
+
+We detected some few cases enry turns slower than linguist. This is due to Golang's regexp engine being slower than Ruby's, which uses [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
+
+You can find scripts and additional information (as software and hardware used, and benchmarks' results per sample file) in [*benchmarks*](https://github.com/src-d/enry/tree/master/benchmarks) directory.
+
+If you want to reproduce the same experiment you can run:
+
+    benchmarks/run.sh
+
+from the root's project directory and It runs benchmarks for enry and linguist, parse the output, create csv files and create a histogram (you must have installed [gnuplot](http://gnuplot.info) in your system to get the histogram). It can take to much time, so to run local benchmarks to take a quick look you can run either:
+
+    make benchmarks
+
+to get time averages for main detection function and strategies for the whole samples set or:
+
+    make benchmarks-samples
+
+if you want see measures by sample file
+
+
 Why Enry?
----------
+------------
 
 In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the nationality of people based on their accent.
 
@@ -148,6 +181,6 @@ In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Profes
 
 
 License
--------
+------------
 
 MIT, see [LICENSE](LICENSE)
