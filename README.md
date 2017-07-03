@@ -118,9 +118,19 @@ Note that even if enry's CLI is compatible with linguist's, its main point is th
 Development
 ------------
 
-*enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal data structures. In oreder to update to latest upstream run
+*enry* re-uses parts of original [linguist](https://github.com/github/linguist)  to generate internal data structures. In order to update to latest upstream and generate the necessary code you must run:
 
-    make clean code-generate
+    go generate
+
+We update enry due to changes  in linguist's master branch related to the following files:
+* [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)
+* [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb)
+* [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
+* [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
+
+For the moment we don't have any procedure established to detect changes in the linguist project automatically and regenerate the code. So we are updating the generated code as needed, without any specific criteria.
+
+If you want update *enry* because of changes in linguist, you can run the *go generate* command and do a pull request that only contains the changes in generated files (those files in the subdirectory [data](https://github.com/src-d/enry/tree/master/data)).
 
 To run the tests
 
