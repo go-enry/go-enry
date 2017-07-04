@@ -1,5 +1,5 @@
-set terminal jpeg large font arial size 1920,1080
-set output 'benchmark/histogram/distribution.jpg'
+set terminal png large font "arial,26" size 1920,1080
+set output 'benchmark/histogram/distribution.png'
 
 set datafile separator comma
 set key under
@@ -11,7 +11,7 @@ set boxwidth 0.95
 set grid y
 set bmargin 12
 set autoscale
-set title "Number of files whose processed time was inside time interval"
+set title "Number of files per processing time"
 
 plot newhistogram, 'benchmark/csv/enry-distribution.csv' using 3:xtic(1) title "enry", 'benchmark/csv/linguist-distribution.csv' using 3 title "linguist"
 
