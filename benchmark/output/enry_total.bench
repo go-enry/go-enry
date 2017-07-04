@@ -1,9 +1,0 @@
-BenchmarkGetLanguageTotal/GetLanguage()_TOTAL-4         	     100	1915861259 ns/op
-BenchmarkClassifyTotal/Classify()_TOTAL-4               	       5	39977943775 ns/op
-BenchmarkStrategiesTotal/GetLanguagesByModeline()_TOTAL-4         	    1000	 196571071 ns/op
-BenchmarkStrategiesTotal/GetLanguagesByFilename()_TOTAL-4         	 2000000	     89774 ns/op
-BenchmarkStrategiesTotal/GetLanguagesByShebang()_TOTAL-4          	  100000	   1892569 ns/op
-BenchmarkStrategiesTotal/GetLanguagesByExtension()_TOTAL-4        	  200000	    921160 ns/op
-BenchmarkStrategiesTotal/GetLanguagesByContent()_TOTAL-4          	    1000	 286159159 ns/op
-PASS
-ok  	gopkg.in/src-d/enry.v1	1837.814s

@@ -39,7 +39,7 @@ benchmarks-samples: $(LINGUIST_PATH)
 	go test -run=NONE -bench=. -benchtime=5us && benchmark/linguist-samples.rb
 
 benchmarks-slow: $(LINGUST_PATH)
-	go test -run=NONE -bench=. -slow -benchtime=100ms -timeout=100h >benchmark/output/enry_samples.bench && \
+	mkdir -p benchmark/output && go test -run=NONE -bench=. -slow -benchtime=100ms -timeout=100h >benchmark/output/enry_samples.bench && \
 	benchmark/linguist-samples.rb 5 >benchmark/output/linguist_samples.bench
 
 clean:
