@@ -64,6 +64,7 @@ func (s *EnryTestSuite) TestGetLanguage() {
 		{name: "TestGetLanguage_1", filename: "foo.py", content: []byte{}, expected: "Python"},
 		{name: "TestGetLanguage_2", filename: "foo.m", content: []byte(":- module"), expected: "Mercury"},
 		{name: "TestGetLanguage_3", filename: "foo.m", content: nil, expected: OtherLanguage},
+		{name: "TestGetLanguage_4", filename: "foo.mo", content: []byte{0xDE, 0x12, 0x04, 0x95, 0x00, 0x00, 0x00, 0x00}, expected: OtherLanguage},
 	}
 
 	for _, test := range tests {
