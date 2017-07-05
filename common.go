@@ -116,6 +116,10 @@ func GetLanguageBySpecificClassifier(content []byte, candidates []string, classi
 // GetLanguages applies a sequence of strategies based on the given filename and content
 // to find out the most probably languages to return.
 func GetLanguages(filename string, content []byte) []string {
+	if IsBinary(content) {
+		return nil
+	}
+
 	var languages []string
 	candidates := []string{}
 	for _, strategy := range DefaultStrategies {
