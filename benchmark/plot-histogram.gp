@@ -1,3 +1,5 @@
+#!/usr/bin/env gnuplot
+
 set terminal png large font "arial,26" size 1920,1080
 set output 'benchmark/histogram/distribution.png'
 
