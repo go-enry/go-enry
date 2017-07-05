@@ -119,6 +119,7 @@ func printBreakDown(out map[string][]string, buff *bytes.Buffer) {
 func printJson(out map[string][]string, buff *bytes.Buffer) {
 	data, _ := json.Marshal(out)
 	buff.Write(data)
+	buff.WriteByte('\n')
 }
 
 func printPercents(out map[string][]string, buff *bytes.Buffer) {
