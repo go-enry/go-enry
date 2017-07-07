@@ -13,6 +13,11 @@ import (
 	"gopkg.in/src-d/enry.v1"
 )
 
+var (
+	Version = "undefined"
+	GitHash = "undefined"
+)
+
 func main() {
 	flag.Usage = usage
 	breakdownFlag := flag.Bool("breakdown", false, "")
@@ -100,8 +105,14 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(
-		os.Stderr, "enry, A simple (and faster) implementation of github/linguist \nusage: %s <path>\n       %s [-json] [-breakdown] <path>\n       %s [-json] [-breakdown]\n",
-		os.Args[0], os.Args[0], os.Args[0],
+		os.Stderr,
+		`  %[1]s %[2]s commit: %[3]s
+  enry, A simple (and faster) implementation of github/linguist
+  usage: %[1]s <path>
+         %[1]s [-json] [-breakdown] <path>
+         %[1]s [-json] [-breakdown]
+`,
+		os.Args[0], Version, GitHash,
 	)
 }
 
