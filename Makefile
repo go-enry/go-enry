@@ -4,6 +4,11 @@ COVERAGE_MODE := atomic
 
 LINGUIST_PATH = .linguist
 
+# build CLI
+VERSION := $(shell git describe --tags --abbrev=0)
+COMMIT := $(shell git rev-parse --short HEAD)
+LDFLAGS = -s -X main.Version=$(VERSION) -X main.GitHash=$(COMMIT)
+
 $(LINGUIST_PATH):
 	git clone https://github.com/github/linguist.git $@
 
@@ -29,3 +34,6 @@ code-generate: $(LINGUIST_PATH)
 
 clean:
 	rm -rf $(LINGUIST_PATH)
+
+build-cli:
+	go build -o enry -ldflags "$(LDFLAGS)" cli/enry/main.go
