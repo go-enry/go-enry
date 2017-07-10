@@ -33,8 +33,70 @@ fmt.Println(lang)
 lang := enry.GetLanguage("foo.cpp", "<cpp-code>")
 ```
 
-Developmemt
+
+CLI
+-----------------
+
+You can use enry as a command,
+
+```bash
+$ enry --help
+enry, A simple (and faster) implementation of github/linguist
+usage: enry <path>
+              enry <path> [--json] [--breakdown]
+              enry [--json] [--breakdown]
+```
+
+and it will return an output similar to *linguist*'s output,
+
+```bash
+$ enry
+11.11%    Gnuplot
+22.22%    Ruby
+55.56%    Shell
+11.11%    Go
+```
+
+but not only the output, also its flags are the same as *linguist*'s ones,
+
+```bash
+$ enry --breakdown
+11.11%    Gnuplot
+22.22%    Ruby
+55.56%    Shell
+11.11%    Go
+
+Gnuplot
+plot-histogram.gp
+
+Ruby
+linguist-samples.rb
+linguist-total.rb
+
+Shell
+parse.sh
+plot-histogram.sh
+run-benchmark.sh
+run-slow-benchmark.sh
+run.sh
+
+Go
+parser/main.go
+```
+
+even the JSON flag,
+
+```bash
+$ enry --json
+{"Gnuplot":["plot-histogram.gp"],"Go":["parser/main.go"],"Ruby":["linguist-samples.rb","linguist-total.rb"],"Shell":["parse.sh","plot-histogram.sh","run-benchmark.sh","run-slow-benchmark.sh","run.sh"]}
+```
+
+Note that even if enry's CLI is compatible with linguist's, its main point is that, contrary to linguist, **_enry doesn't need a git repository to work!_**
+
+
+Development
 -----------
+
 *enry* re-uses parts of original [linguist](https://github.com/github/linguist) especially data in `languages.yml` to generate internal data structures. In oreder to update to latest upstream run
 
     make clean code-generate
@@ -46,6 +108,7 @@ To run the tests
 
 Why Enry?
 ---------
+
 In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the nationality of people based on their accent.
 
 `Enry Iggins` is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/?ref_=tt_cl_t1), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor during the first half of the movie.
