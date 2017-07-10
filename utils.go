@@ -53,8 +53,12 @@ func IsDocumentation(path string) bool {
 	return data.DocumentationMatchers.Match(path)
 }
 
-func GetMimeType(file string) string {
-	return data.LanguagesMime[file]
+func GetMimeType(language string) string {
+	if mime, ok := data.LanguagesMime[language]; ok {
+		return mime
+	}
+
+	return "text/plain"
 }
 
 const sniffLen = 8000
