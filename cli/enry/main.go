@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/src-d/enry.v1"
 )
@@ -46,6 +47,9 @@ func main() {
 		}
 
 		if relativePath == "." {
+			var buff bytes.Buffer
+			printFile(root, &buff)
+			fmt.Print(buff.String())
 			return nil
 		}
 
@@ -86,7 +90,6 @@ func main() {
 		out[language] = append(out[language], relativePath)
 		return nil
 	})
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -150,6 +153,50 @@ func printPercents(out map[string][]string, buff *bytes.Buffer) {
 		percent := float32(count) / float32(total) * 100
 		buff.WriteString(fmt.Sprintf("%.2f%%	%s\n", percent, name))
 	}
+}
+
+func printFile(file string, buff *bytes.Buffer) {
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Println(err)
+	}
+	totalLines, sloc := getLines(file, content)
+	fileType := getFileType(file, content)
+	//mime type left
+	language := enry.GetLanguage(file, content)
+
+	buff.WriteString(fmt.Sprintf("%s: %d lines (%d sloc)\n", filepath.Base(file), totalLines, sloc))
+	buff.WriteString(fmt.Sprintf("  type:      %s\n", fileType))
+	buff.WriteString(fmt.Sprint("  mime type: \n"))
+	buff.WriteString(fmt.Sprintf("  language:  %s\n", language))
+}
+
+func getLines(file string, content []byte) (int, int) {
+
+	totalLines := bytes.Count(content, []byte("\n"))
+	sloc := totalLines - strings.Count(string(content), "\n\n")
+
+	return totalLines, sloc
+}
+
+func getFileType(file string, content []byte) string {
+	switch {
+	case isImage(file):
+		return "Image"
+	case enry.IsBinary(content):
+		return "Binary"
+	default:
+		return "Text"
+	}
+}
+
+func isImage(file string) bool {
+	index := strings.LastIndex(file, ".")
+	extension := file[index:]
+	if extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" {
+		return true
+	}
+	return false
 }
 
 func writeStringLn(s string, buff *bytes.Buffer) {
