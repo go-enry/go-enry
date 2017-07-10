@@ -61,16 +61,21 @@ func main() {
 			return nil
 		}
 
-		content, err := ioutil.ReadFile(path)
-		if err != nil {
-			errors = true
-			log.Println(err)
-			return nil
-		}
+		language, ok := enry.GetLanguageByExtension(path)
+		if !ok {
+			if language, ok = enry.GetLanguageByFilename(path); !ok {
+				content, err := ioutil.ReadFile(path)
+				if err != nil {
+					errors = true
+					log.Println(err)
+					return nil
+				}
 
-		language := enry.GetLanguage(filepath.Base(path), content)
-		if language == enry.OtherLanguage {
-			return nil
+				language = enry.GetLanguage(filepath.Base(path), content)
+				if language == enry.OtherLanguage {
+					return nil
+				}
+			}
 		}
 
 		out[language] = append(out[language], relativePath)
