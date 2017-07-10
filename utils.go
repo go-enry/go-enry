@@ -53,6 +53,10 @@ func IsDocumentation(path string) bool {
 	return data.DocumentationMatchers.Match(path)
 }
 
+func GetMimeType(file string) string {
+	return data.LanguagesMime[file]
+}
+
 const sniffLen = 8000
 
 // IsBinary detects if data is a binary value based on:

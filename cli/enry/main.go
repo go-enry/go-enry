@@ -162,12 +162,12 @@ func printFile(file string, buff *bytes.Buffer) {
 	}
 	totalLines, sloc := getLines(file, content)
 	fileType := getFileType(file, content)
-	//mime type left
 	language := enry.GetLanguage(file, content)
+	mimeType := enry.GetMimeType(language)
 
 	buff.WriteString(fmt.Sprintf("%s: %d lines (%d sloc)\n", filepath.Base(file), totalLines, sloc))
 	buff.WriteString(fmt.Sprintf("  type:      %s\n", fileType))
-	buff.WriteString(fmt.Sprint("  mime type: \n"))
+	buff.WriteString(fmt.Sprintf("  mime type: %s\n", mimeType))
 	buff.WriteString(fmt.Sprintf("  language:  %s\n", language))
 }
 

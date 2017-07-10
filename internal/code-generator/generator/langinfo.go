@@ -8,6 +8,7 @@ type languageInfo struct {
 	Extensions   []string `yaml:"extensions,omitempty,flow"`
 	Interpreters []string `yaml:"interpreters,omitempty,flow"`
 	Filenames    []string `yaml:"filenames,omitempty,flow"`
+	MimeType     string   `yaml:"codemirror_mime_type,omitempty,flow"`
 }
 
 func getAlphabeticalOrderedKeys(languages map[string]*languageInfo) []string {
