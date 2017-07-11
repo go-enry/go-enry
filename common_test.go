@@ -19,6 +19,7 @@ const linguistURL = "https://github.com/github/linguist.git"
 type EnryTestSuite struct {
 	suite.Suite
 	repoLinguist string
+	samplesDir   string
 }
 
 func TestEnryTestSuite(t *testing.T) {
@@ -29,6 +30,8 @@ func (s *EnryTestSuite) SetupSuite() {
 	var err error
 	s.repoLinguist, err = ioutil.TempDir("", "linguist-")
 	assert.NoError(s.T(), err)
+
+	s.samplesDir = filepath.Join(s.repoLinguist, "samples")
 
 	cmd := exec.Command("git", "clone", linguistURL, s.repoLinguist)
 	err = cmd.Run()
@@ -74,10 +77,7 @@ func (s *EnryTestSuite) TestGetLanguage() {
 }
 
 func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
-	const (
-		modelinesDir = ".linguist/test/fixtures/Data/Modelines"
-		samplesDir   = ".linguist/samples"
-	)
+	var modelinesDir = filepath.Join(s.repoLinguist, "test/fixtures/Data/Modelines")
 
 	tests := []struct {
 		name       string
@@ -118,7 +118,7 @@ func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
 		{name: "TestGetLanguagesByModelineLinguist_28", filename: filepath.Join(modelinesDir, "ruby10"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByModelineLinguist_29", filename: filepath.Join(modelinesDir, "ruby11"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByModelineLinguist_30", filename: filepath.Join(modelinesDir, "ruby12"), expected: []string{"Ruby"}},
-		{name: "TestGetLanguagesByModelineLinguist_31", filename: filepath.Join(samplesDir, "C/main.c"), expected: nil},
+		{name: "TestGetLanguagesByModelineLinguist_31", filename: filepath.Join(s.samplesDir, "C/main.c"), expected: nil},
 	}
 
 	for _, test := range tests {
@@ -240,19 +240,18 @@ func (s *EnryTestSuite) TestGetLanguagesByExtension() {
 }
 
 func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
-	const samples = `.linguist/samples/`
 	test := []struct {
 		name       string
 		filename   string
 		candidates []string
 		expected   string
 	}{
-		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(samples, "C/blob.c"), candidates: nil, expected: OtherLanguage},
-		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(samples, "C/main.c"), candidates: []string{}, expected: OtherLanguage},
-		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
-		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
-		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
+		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: nil, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C/main.c"), candidates: []string{}, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
+		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
+		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
 	}
 
 	for _, test := range test {
@@ -272,7 +271,6 @@ func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 }
 
 func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
-	const samples = `.linguist/samples/`
 	test := []struct {
 		name       string
 		filename   string
@@ -280,12 +278,12 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 		classifier Classifier
 		expected   string
 	}{
-		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(samples, "C/blob.c"), candidates: nil, classifier: DefaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(samples, "C/main.c"), candidates: []string{}, classifier: DefaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: DefaultClassifier, expected: "C++"},
-		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(samples, "C/blob.c"), candidates: []string{"ruby"}, classifier: DefaultClassifier, expected: "Ruby"},
-		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(samples, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "Python"},
+		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: nil, classifier: DefaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C/main.c"), candidates: []string{}, classifier: DefaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: DefaultClassifier, expected: "C++"},
+		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, classifier: DefaultClassifier, expected: "Ruby"},
+		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "Python"},
 		{name: "TestGetLanguagesByClassifier_6", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: OtherLanguage},
 	}
 
@@ -373,14 +371,13 @@ func (s *EnryTestSuite) TestGetLanguageByAlias() {
 
 func (s *EnryTestSuite) TestLinguistCorpus() {
 	const filenamesDir = "filenames"
-	var samplesDir = filepath.Join(s.repoLinguist, "samples")
 	var cornerCases = map[string]bool{
 		"hello.ms": true,
 	}
 
 	var total, failed, ok, other int
 	var expected string
-	filepath.Walk(samplesDir, func(path string, f os.FileInfo, err error) error {
+	filepath.Walk(s.samplesDir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
 			if f.Name() != filenamesDir {
 				expected = f.Name()
