@@ -22,20 +22,35 @@ Examples
 --------
 
 ```go
-lang, _ := GetLanguageByExtension("foo.go")
+lang, safe := enry.GetLanguageByExtension("foo.go")
 fmt.Println(lang)
 // result: Go
 
-lang, _ = GetLanguageByContent("foo.m", "<matlab-code>")
+lang, safe := enry.GetLanguageByContent("foo.m", "<matlab-code>")
 fmt.Println(lang)
 // result: Matlab
 
-lang, _ = GetLanguageByContent("bar.m", "<objective-c-code>")
+lang, safe := enry.GetLanguageByContent("bar.m", "<objective-c-code>")
 fmt.Println(lang)
 // result: Objective-C
 
 // all strategies together
 lang := enry.GetLanguage("foo.cpp", "<cpp-code>")
+```
+
+Note the returned boolean value "safe" is set either to true, if there is only one possible language detected or, to false otherwise.
+
+To get a list of possible languages for a given file, you can use the plural version of the detecting functions.
+
+```go
+langs := enry.GetLanguages("foo.h",  "<cpp-code>")
+// result: []string{"C++", "C"}
+
+langs := enry.GetLanguagesByExtension("foo.asc", "<content>", nil)
+// result: []string{"AGS Script", "AsciiDoc", "Public Key"}
+
+langs := enry.GetLanguagesByFilename("Gemfile", "<content>", []string{})
+// result: []string{"Ruby"}
 ```
 
 
