@@ -53,6 +53,15 @@ func IsDocumentation(path string) bool {
 	return data.DocumentationMatchers.Match(path)
 }
 
+func IsImage(file string) bool {
+	index := strings.LastIndex(file, ".")
+	extension := file[index:]
+	if extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" {
+		return true
+	}
+	return false
+}
+
 func GetMimeType(language string) string {
 	if mime, ok := data.LanguagesMime[language]; ok {
 		return mime

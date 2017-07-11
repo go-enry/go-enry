@@ -70,6 +70,11 @@ const (
 	commitGold         = "test_files/commit.gold"
 	commitTestTmplPath = "../assets/commit.go.tmpl"
 	commitTestTmplName = "commit.go.tmpl"
+
+	// mime test
+	mimeTypeGold         = "test_files/mimeType.gold"
+	mimeTypeTestTmplPath = "../assets/mimeType.go.tmpl"
+	mimeTypeTestTmplName = "mimeType.go.tmpl"
 )
 
 type GeneratorTestSuite struct {
@@ -218,6 +223,16 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 			generate:   Commit,
 			wantOut:    commitGold,
 		},
+		{
+			name:        "MimeType()",
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			samplesDir:  "",
+			tmplPath:    mimeTypeTestTmplPath,
+			tmplName:    mimeTypeTestTmplName,
+			commit:      commit,
+			generate:    MimeType,
+			wantOut:     mimeTypeGold,
+		},
 	}
 
 	for _, test := range tests {
@@ -227,7 +242,6 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 		outPath, err := ioutil.TempFile("/tmp", "generator-test-")
 		assert.NoError(s.T(), err)
 		defer os.Remove(outPath.Name())
-
 		err = test.generate(test.fileToParse, test.samplesDir, outPath.Name(), test.tmplPath, test.tmplName, test.commit)
 		assert.NoError(s.T(), err)
 		out, err := ioutil.ReadFile(outPath.Name())

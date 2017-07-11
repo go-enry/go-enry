@@ -47,10 +47,7 @@ func main() {
 		}
 
 		if relativePath == "." {
-			var buff bytes.Buffer
-			printFile(root, &buff)
-			fmt.Print(buff.String())
-			return nil
+			return printFileAnalysis(root)
 		}
 
 		if f.IsDir() {
@@ -155,48 +152,42 @@ func printPercents(out map[string][]string, buff *bytes.Buffer) {
 	}
 }
 
-func printFile(file string, buff *bytes.Buffer) {
+func printFileAnalysis(file string) string {
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Println(err)
 	}
-	totalLines, sloc := getLines(file, content)
+	totalLines, linesOfCode := getLines(file, string(content))
 	fileType := getFileType(file, content)
 	language := enry.GetLanguage(file, content)
 	mimeType := enry.GetMimeType(language)
 
-	buff.WriteString(fmt.Sprintf("%s: %d lines (%d sloc)\n", filepath.Base(file), totalLines, sloc))
-	buff.WriteString(fmt.Sprintf("  type:      %s\n", fileType))
-	buff.WriteString(fmt.Sprintf("  mime type: %s\n", mimeType))
-	buff.WriteString(fmt.Sprintf("  language:  %s\n", language))
+	return fmt.Sprintf(
+		`%s: %d lines (%d sloc)
+		   type:      %s
+			 mime_type: %s
+			 language:  %s
+		`,
+		filepath.Base(file), totalLines, linesOfCode, fileType, mimeType, language)
 }
 
-func getLines(file string, content []byte) (int, int) {
+func getLines(file string, content string) (int, int) {
 
-	totalLines := bytes.Count(content, []byte("\n"))
-	sloc := totalLines - strings.Count(string(content), "\n\n")
+	totalLines := strings.Count(content, "\n")
+	linesOfCode := totalLines - strings.Count(content, "\n\n")
 
-	return totalLines, sloc
+	return totalLines, linesOfCode
 }
 
 func getFileType(file string, content []byte) string {
 	switch {
-	case isImage(file):
+	case enry.IsImage(file):
 		return "Image"
 	case enry.IsBinary(content):
 		return "Binary"
 	default:
 		return "Text"
 	}
-}
-
-func isImage(file string) bool {
-	index := strings.LastIndex(file, ".")
-	extension := file[index:]
-	if extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" {
-		return true
-	}
-	return false
 }
 
 func writeStringLn(s string, buff *bytes.Buffer) {

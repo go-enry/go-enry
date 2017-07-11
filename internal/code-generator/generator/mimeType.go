@@ -2,9 +2,9 @@ package generator
 
 import (
 	"bytes"
-	"html/template"
 	"io"
 	"io/ioutil"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -33,7 +33,9 @@ func MimeType(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit strin
 func buildLanguageMimeMap(languages map[string]*languageInfo) map[string]string {
 	langMimeMap := make(map[string]string)
 	for lang, info := range languages {
-		langMimeMap[lang] = info.MimeType
+		if len(info.MimeType) != 0 {
+			langMimeMap[lang] = info.MimeType
+		}
 	}
 
 	return langMimeMap
