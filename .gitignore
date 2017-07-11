@@ -1,2 +1,4 @@
 .linguist
 benchmarks/output
+.ci
+Makefile.main

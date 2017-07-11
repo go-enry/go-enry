@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	Version = "undefined"
-	GitHash = "undefined"
+	version = "undefined"
+	build   = "undefined"
+	commit  = "undefined"
 )
 
 func main() {
@@ -111,13 +112,13 @@ func main() {
 func usage() {
 	fmt.Fprintf(
 		os.Stderr,
-		`  %[1]s %[2]s commit: %[3]s
-  enry, A simple (and faster) implementation of github/linguist
+		`  %[1]s %[2]s build: %[3]s commit: %[4]s
+  %[1]s, A simple (and faster) implementation of github/linguist
   usage: %[1]s <path>
          %[1]s [-json] [-breakdown] <path>
          %[1]s [-json] [-breakdown]
 `,
-		os.Args[0], Version, GitHash,
+		os.Args[0], version, build, commit,
 	)
 }
 
