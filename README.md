@@ -126,6 +126,19 @@ To run the tests
     make test
 
 
+Divergences from linguist
+------------
+
+Using [linguist/samples](https://github.com/github/linguist/tree/master/samples) as a set against run tests the following issues were found:
+* with [hello.ms](https://github.com/github/linguist/blob/master/samples/Unix%20Assembly/hello.ms) we can't detect the language (Unix Assembly) because we don't have a matcher in contentMatchers (content.go) for Unix Assembly. Linguist uses this [regexp](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L300) in its code,
+
+    `elsif /(?<!\S)\.(include|globa?l)\s/.match(data) || /(?<!\/\*)(\A|\n)\s*\.[A-Za-z][_A-Za-z0-9]*:/.match(data.gsub(/"([^\\"]|\\.)*"|'([^\\']|\\.)*'|\\\s*(?:--.*)?\n/, ""))`
+
+    which we can't port.
+
+* all files for SQL language fall to the classifier because we don't parse this [disambiguator expresion](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L433) for `*.sql` files right. This expression doesn't comply with the pattern for the rest of [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb) file.
+
+
 Why Enry?
 ---------
 
