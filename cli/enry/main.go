@@ -47,7 +47,8 @@ func main() {
 		}
 
 		if relativePath == "." {
-			return printFileAnalysis(root)
+			fmt.Print(printFileAnalysis(root))
+			return nil
 		}
 
 		if f.IsDir() {
@@ -87,6 +88,7 @@ func main() {
 		out[language] = append(out[language], relativePath)
 		return nil
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -157,26 +159,26 @@ func printFileAnalysis(file string) string {
 	if err != nil {
 		fmt.Println(err)
 	}
-	totalLines, linesOfCode := getLines(file, string(content))
+
+	totalLines, nonBlank := getLines(file, string(content))
 	fileType := getFileType(file, content)
 	language := enry.GetLanguage(file, content)
-	mimeType := enry.GetMimeType(language)
+	mimeType := enry.GetMimeType(file, language)
 
 	return fmt.Sprintf(
 		`%s: %d lines (%d sloc)
-		   type:      %s
-			 mime_type: %s
-			 language:  %s
-		`,
-		filepath.Base(file), totalLines, linesOfCode, fileType, mimeType, language)
+  type:      %s
+  mime_type: %s
+  language:  %s
+`,
+		filepath.Base(file), totalLines, nonBlank, fileType, mimeType, language,
+	)
 }
 
 func getLines(file string, content string) (int, int) {
-
 	totalLines := strings.Count(content, "\n")
-	linesOfCode := totalLines - strings.Count(content, "\n\n")
-
-	return totalLines, linesOfCode
+	nonBlank := totalLines - strings.Count(content, "\n\n")
+	return totalLines, nonBlank
 }
 
 func getFileType(file string, content []byte) string {
