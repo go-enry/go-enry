@@ -9,7 +9,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func Mime(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
+func MimeType(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {
 		return err

@@ -67,10 +67,10 @@ const (
 	commitTmplPath = "internal/code-generator/assets/commit.go.tmpl"
 	commitTmpl     = "commit.go.tmpl"
 
-	// mime.go generation
-	mimeFile     = "data/mime.go"
-	mimeTmplPath = "internal/code-generator/assets/mime.go.tmpl"
-	mimeTmpl     = "mime.go.tmpl"
+	// mimeType.go generation
+	mimeTypeFile     = "data/mimeType.go"
+	mimeTypeTmplPath = "internal/code-generator/assets/mimeType.go.tmpl"
+	mimeTypeTmpl     = "mimeType.go.tmpl"
 
 	commitPath = ".linguist/.git/HEAD"
 )
@@ -102,7 +102,7 @@ func main() {
 		&generatorFiles{generator.Aliases, languagesYAML, "", aliasesFile, aliasesTmplPath, aliasesTmpl, commit},
 		&generatorFiles{generator.Frequencies, "", samplesDir, frequenciesFile, frequenciesTmplPath, frequenciesTmpl, commit},
 		&generatorFiles{generator.Commit, "", "", commitFile, commitTmplPath, commitTmpl, commit},
-		&generatorFiles{generator.Mime, languagesYAML, "", mimeFile, mimeTmplPath, mimeTmpl, commit},
+		&generatorFiles{generator.MimeType, languagesYAML, "", mimeTypeFile, mimeTypeTmplPath, mimeTypeTmpl, commit},
 	}
 
 	for _, file := range fileList {
