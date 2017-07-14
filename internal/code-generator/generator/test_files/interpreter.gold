@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
+// Extracted from github/linguist commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
 
 var LanguagesByInterpreter = map[string][]string{
 	"Rscript":     {"R"},
@@ -60,7 +60,7 @@ var LanguagesByInterpreter = map[string][]string{
 	"osascript":   {"AppleScript"},
 	"parrot":      {"Parrot Assembly", "Parrot Internal Representation"},
 	"perl":        {"Perl"},
-	"perl6":       {"Perl6"},
+	"perl6":       {"Perl 6"},
 	"php":         {"PHP"},
 	"picolisp":    {"PicoLisp"},
 	"pike":        {"Pike"},

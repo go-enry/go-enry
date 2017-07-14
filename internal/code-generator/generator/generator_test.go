@@ -14,7 +14,7 @@ import (
 
 const (
 	lingustURL    = "https://github.com/github/linguist.git"
-	commit        = "b6460f8ed6b249281ada099ca28bd8f1230b8892"
+	commit        = "d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68"
 	samplesDir    = "samples"
 	languagesFile = "lib/linguist/languages.yml"
 
