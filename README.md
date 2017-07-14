@@ -183,4 +183,4 @@ In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Profes
 License
 ------------
 
-MIT, see [LICENSE](LICENSE)
+Apache License, Version 2.0. See [LICENSE](LICENSE)
