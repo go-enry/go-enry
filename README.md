@@ -157,7 +157,7 @@ Enry's language detection has been compared with Linguist's language detection. 
 
  Following results were obtained:
 
-![histogram](https://raw.githubusercontent.com/src-c/enry/master/benchmarks/histogram/distribution.jpg)
+![histogram](https://raw.githubusercontent.com/src-d/enry/master/benchmarks/histogram/distribution.png)
 
 The histogram represents the number of files for which spent time in language detection was in the range of the time interval indicated in x axis.
 
