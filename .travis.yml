@@ -21,6 +21,9 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
+before_deploy:
+  - make packages
+
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN 
