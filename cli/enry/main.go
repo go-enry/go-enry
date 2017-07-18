@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"gopkg.in/src-d/enry.v1"
+	"gopkg.in/src-d/enry.v1/data"
 )
 
 var (
@@ -112,13 +113,13 @@ func main() {
 func usage() {
 	fmt.Fprintf(
 		os.Stderr,
-		`  %[1]s %[2]s build: %[3]s commit: %[4]s
+		`  %[1]s %[2]s build: %[3]s commit: %[4]s, based on linguist commit: %[5]s
   %[1]s, A simple (and faster) implementation of github/linguist
   usage: %[1]s <path>
          %[1]s [-json] [-breakdown] <path>
          %[1]s [-json] [-breakdown]
 `,
-		os.Args[0], version, build, commit,
+		os.Args[0], version, build, commit, data.LinguistCommit[:7],
 	)
 }
 
