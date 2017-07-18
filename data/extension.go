@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
+// Extracted from github/linguist commit: 37979b26b04e10868017469e5cc56263b0a39c84
 
 var LanguagesByExtension = map[string][]string{
 	".1":                   {"Roff"},
@@ -984,6 +984,7 @@ var LanguagesByExtension = map[string][]string{
 	".xslt":                {"XSLT"},
 	".xsp-config":          {"XPages"},
 	".xsp.metadata":        {"XPages"},
+	".xspec":               {"XML"},
 	".xtend":               {"Xtend"},
 	".xul":                 {"XML"},
 	".y":                   {"Yacc"},
@@ -1428,7 +1429,7 @@ var ExtensionsByLanguage = map[string][]string{
 	"World of Warcraft Addon Data": {".toc"},
 	"X10":              {".x10"},
 	"XC":               {".xc"},
-	"XML":              {".xml", ".adml", ".admx", ".ant", ".axml", ".builds", ".ccxml", ".clixml", ".cproject", ".csl", ".csproj", ".ct", ".dita", ".ditamap", ".ditaval", ".dll.config", ".dotsettings", ".filters", ".fsproj", ".fxml", ".glade", ".gml", ".grxml", ".iml", ".ivy", ".jelly", ".jsproj", ".kml", ".launch", ".mdpolicy", ".mjml", ".mm", ".mod", ".mxml", ".nproj", ".nuspec", ".odd", ".osm", ".pkgproj", ".plist", ".pluginspec", ".props", ".ps1xml", ".psc1", ".pt", ".rdf", ".resx", ".rss", ".sch", ".scxml", ".sfproj", ".srdf", ".storyboard", ".sttheme", ".sublime-snippet", ".targets", ".tmcommand", ".tml", ".tmlanguage", ".tmpreferences", ".tmsnippet", ".tmtheme", ".ts", ".tsx", ".ui", ".urdf", ".ux", ".vbproj", ".vcxproj", ".vsixmanifest", ".vssettings", ".vstemplate", ".vxml", ".wixproj", ".wsdl", ".wsf", ".wxi", ".wxl", ".wxs", ".x3d", ".xacro", ".xaml", ".xib", ".xlf", ".xliff", ".xmi", ".xml.dist", ".xproj", ".xsd", ".xul", ".zcml"},
+	"XML":              {".xml", ".adml", ".admx", ".ant", ".axml", ".builds", ".ccxml", ".clixml", ".cproject", ".csl", ".csproj", ".ct", ".dita", ".ditamap", ".ditaval", ".dll.config", ".dotsettings", ".filters", ".fsproj", ".fxml", ".glade", ".gml", ".grxml", ".iml", ".ivy", ".jelly", ".jsproj", ".kml", ".launch", ".mdpolicy", ".mjml", ".mm", ".mod", ".mxml", ".nproj", ".nuspec", ".odd", ".osm", ".pkgproj", ".plist", ".pluginspec", ".props", ".ps1xml", ".psc1", ".pt", ".rdf", ".resx", ".rss", ".sch", ".scxml", ".sfproj", ".srdf", ".storyboard", ".sttheme", ".sublime-snippet", ".targets", ".tmcommand", ".tml", ".tmlanguage", ".tmpreferences", ".tmsnippet", ".tmtheme", ".ts", ".tsx", ".ui", ".urdf", ".ux", ".vbproj", ".vcxproj", ".vsixmanifest", ".vssettings", ".vstemplate", ".vxml", ".wixproj", ".wsdl", ".wsf", ".wxi", ".wxl", ".wxs", ".x3d", ".xacro", ".xaml", ".xib", ".xlf", ".xliff", ".xmi", ".xml.dist", ".xproj", ".xsd", ".xspec", ".xul", ".zcml"},
 	"XPages":           {".xsp-config", ".xsp.metadata"},
 	"XProc":            {".xpl", ".xproc"},
 	"XQuery":           {".xquery", ".xq", ".xql", ".xqm", ".xqy"},
