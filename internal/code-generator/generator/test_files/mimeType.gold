@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: b6460f8ed6b249281ada099ca28bd8f1230b8892
+// Extracted from github/linguist commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
 
 var LanguagesMime = map[string]string{
 	"AGS Script":              "text/x-c++src",
@@ -43,6 +43,7 @@ var LanguagesMime = map[string]string{
 	"ECL":                     "text/x-ecl",
 	"EQ":                      "text/x-csharp",
 	"Eagle":                   "text/xml",
+	"Easybuild":               "text/x-python",
 	"Ecere Projects":          "application/json",
 	"Eiffel":                  "text/x-eiffel",
 	"Elm":                     "text/x-elm",
@@ -128,7 +129,7 @@ var LanguagesMime = map[string]string{
 	"PLpgSQL":             "text/x-sql",
 	"Pascal":              "text/x-pascal",
 	"Perl":                "text/x-perl",
-	"Perl6":               "text/x-perl",
+	"Perl 6":              "text/x-perl",
 	"Pic":                 "text/troff",
 	"Pod":                 "text/x-perl",
 	"PowerShell":          "application/x-powershell",
