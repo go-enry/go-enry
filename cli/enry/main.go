@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/src-d/enry.v1"
 	"gopkg.in/src-d/enry.v1/data"
@@ -48,6 +49,7 @@ func main() {
 		}
 
 		if relativePath == "." {
+			fmt.Print(printFileAnalysis(root))
 			return nil
 		}
 
@@ -151,6 +153,44 @@ func printPercents(out map[string][]string, buff *bytes.Buffer) {
 	for name, count := range fileCount {
 		percent := float32(count) / float32(total) * 100
 		buff.WriteString(fmt.Sprintf("%.2f%%	%s\n", percent, name))
+	}
+}
+
+func printFileAnalysis(file string) string {
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	totalLines, nonBlank := getLines(file, string(content))
+	fileType := getFileType(file, content)
+	language := enry.GetLanguage(file, content)
+	mimeType := enry.GetMimeType(file, language)
+
+	return fmt.Sprintf(
+		`%s: %d lines (%d sloc)
+  type:      %s
+  mime_type: %s
+  language:  %s
+`,
+		filepath.Base(file), totalLines, nonBlank, fileType, mimeType, language,
+	)
+}
+
+func getLines(file string, content string) (int, int) {
+	totalLines := strings.Count(content, "\n")
+	nonBlank := totalLines - strings.Count(content, "\n\n")
+	return totalLines, nonBlank
+}
+
+func getFileType(file string, content []byte) string {
+	switch {
+	case enry.IsImage(file):
+		return "Image"
+	case enry.IsBinary(content):
+		return "Binary"
+	default:
+		return "Text"
 	}
 }
 

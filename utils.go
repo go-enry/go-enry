@@ -53,6 +53,27 @@ func IsDocumentation(path string) bool {
 	return data.DocumentationMatchers.Match(path)
 }
 
+func IsImage(path string) bool {
+	extension := filepath.Ext(path)
+	if extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" {
+		return true
+	}
+
+	return false
+}
+
+func GetMimeType(path string, language string) string {
+	if mime, ok := data.LanguagesMime[language]; ok {
+		return mime
+	}
+
+	if IsImage(path) {
+		return "image/" + filepath.Ext(path)[1:]
+	}
+
+	return "text/plain"
+}
+
 const sniffLen = 8000
 
 // IsBinary detects if data is a binary value based on:
