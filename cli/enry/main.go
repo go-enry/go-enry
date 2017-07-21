@@ -32,24 +32,30 @@ func main() {
 		log.Fatal(err)
 	}
 
-	errors := false
+	fileInfo, err := os.Stat(root)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if fileInfo.Mode().IsRegular() {
+		printFileAnalysis(root)
+		return
+	}
+
 	out := make(map[string][]string, 0)
 	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
-			errors = true
 			log.Println(err)
 			return filepath.SkipDir
 		}
 
 		relativePath, err := filepath.Rel(root, path)
 		if err != nil {
-			errors = true
 			log.Println(err)
 			return nil
 		}
 
 		if relativePath == "." {
-			fmt.Print(printFileAnalysis(root))
 			return nil
 		}
 
@@ -75,7 +81,6 @@ func main() {
 			if language, ok = enry.GetLanguageByFilename(path); !ok {
 				content, err := ioutil.ReadFile(path)
 				if err != nil {
-					errors = true
 					log.Println(err)
 					return nil
 				}
@@ -156,7 +161,7 @@ func printPercents(out map[string][]string, buff *bytes.Buffer) {
 	}
 }
 
-func printFileAnalysis(file string) string {
+func printFileAnalysis(file string) {
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Println(err)
@@ -167,7 +172,7 @@ func printFileAnalysis(file string) string {
 	language := enry.GetLanguage(file, content)
 	mimeType := enry.GetMimeType(file, language)
 
-	return fmt.Sprintf(
+	fmt.Printf(
 		`%s: %d lines (%d sloc)
   type:      %s
   mime_type: %s
