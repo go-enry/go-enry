@@ -212,6 +212,7 @@ println("The shell script says ",vm.arglist.concat(" "));`
 		{name: "TestGetLanguagesByShebang_8", content: []byte(`#!bash`), expected: []string{"Shell"}},
 		{name: "TestGetLanguagesByShebang_9", content: []byte(multilineExecHack), expected: []string{"Tcl"}},
 		{name: "TestGetLanguagesByShebang_10", content: []byte(multilineNoExecHack), expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByShebang_11", content: []byte(`#!`), expected: nil},
 	}
 
 	for _, test := range tests {

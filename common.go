@@ -284,14 +284,16 @@ func getInterpreter(data []byte) (interpreter string) {
 
 	// skip shebang
 	line = bytes.TrimSpace(line[2:])
-
 	splitted := bytes.Fields(line)
+	if len(splitted) == 0 {
+		return ""
+	}
+
 	if bytes.Contains(splitted[0], []byte("env")) {
 		if len(splitted) > 1 {
 			interpreter = string(splitted[1])
 		}
 	} else {
-
 		splittedPath := bytes.Split(splitted[0], []byte{'/'})
 		interpreter = string(splittedPath[len(splittedPath)-1])
 	}
