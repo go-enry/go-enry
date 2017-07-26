@@ -6,7 +6,7 @@ File programming language detector and toolbox to ignore binary or vendored file
 Installation
 ------------
 
-The recommended way to install simple-linguist
+The recommended way to install enry is
 
 ```
 go get gopkg.in/src-d/enry.v1/...
