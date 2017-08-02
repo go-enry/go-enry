@@ -49,6 +49,10 @@ func main() {
 			return filepath.SkipDir
 		}
 
+		if !f.Mode().IsDir() && !f.Mode().IsRegular() {
+			return nil
+		}
+
 		relativePath, err := filepath.Rel(root, path)
 		if err != nil {
 			log.Println(err)
