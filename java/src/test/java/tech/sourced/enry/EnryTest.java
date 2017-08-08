@@ -18,14 +18,13 @@ public class EnryTest {
         assertEquals("PHP", Enry.getLanguage("foobar.php", code.getBytes()));
     }
 
-    // TODO: this is a bug in enry, fix when it's fixed there
-    @Test(expected = AssertionError.class)
+    @Test
     public void getLanguageByContent() {
         String code = "<?php $foo = bar();";
         assertGuess(
                 "PHP",
                 true,
-                Enry.getLanguageByContent(code.getBytes())
+                Enry.getLanguageByContent("foo.php", code.getBytes())
         );
     }
 

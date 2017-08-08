@@ -37,11 +37,15 @@ public class Enry {
      * If there are more than one possible language, it returns the first
      * language in alphabetical order and safe to false.
      *
-     * @param content of the file
+     * @param filename name of the file with the extension
+     * @param content  of the file
      * @return guessed result
      */
-    public static Guess getLanguageByContent(byte[] content) {
-        GetLanguageByContent_return.ByValue res = nativeLib.GetLanguageByContent(toGoByteSlice(content));
+    public static Guess getLanguageByContent(String filename, byte[] content) {
+        GetLanguageByContent_return.ByValue res = nativeLib.GetLanguageByContent(
+                toGoString(filename),
+                toGoByteSlice(content)
+        );
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
 
