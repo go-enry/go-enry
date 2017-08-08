@@ -85,8 +85,8 @@ func GetLanguageByExtension(filename string) (language string, safe bool) {
 
 // GetLanguageByContent returns detected language. If there are more than one possibles languages
 // it returns the first language by alphabetically order and safe to false.
-func GetLanguageByContent(content []byte) (language string, safe bool) {
-	return getLanguageByStrategy(GetLanguagesByContent, "", content, nil)
+func GetLanguageByContent(filename string, content []byte) (language string, safe bool) {
+	return getLanguageByStrategy(GetLanguagesByContent, filename, content, nil)
 }
 
 // GetLanguageByClassifier returns the most probably language detected for the given content. It uses
