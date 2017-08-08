@@ -7,6 +7,8 @@ RESOURCES_SRC=../.shared
 RESOURCES_DIR=./shared
 HEADER_FILE=$(RESOURCES_DIR)/libenry.h
 
+SHELL := /bin/bash
+
 all: $(JAR)
 
 $(JAR): $(RESOURCES_DIR) $(JNAERATOR_JAR)

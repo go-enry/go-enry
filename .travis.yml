@@ -1,4 +1,5 @@
 language: go
+sudo: required
 
 go:
   - 1.8
@@ -7,6 +8,24 @@ go:
 matrix:
   allow_failures:
     - go: tip
+  include:
+    - language: scala
+      jdk: oraclejdk8
+
+      install:
+        - GIMME_OUTPUT=$(gimme 1.8 | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
+        - export GOPATH=$HOME/gopath
+        - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
+        - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
+        - go get -v gopkg.in/src-d/enry.v1/...
+        - sudo apt-get install maven
+
+      before_script:
+        - cd java
+        - make
+
+      script:
+        - make test
 
 install:
   - rm -rf $GOPATH/src/gopkg.in/src-d
@@ -26,7 +45,7 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: $GITHUB_TOKEN 
+  api_key: $GITHUB_TOKEN
   file_glob: true
   file: build/*.tar.gz
   skip_cleanup: true
