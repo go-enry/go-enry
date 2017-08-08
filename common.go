@@ -136,9 +136,9 @@ func GetLanguages(filename string, content []byte) []string {
 	return languages
 }
 
-// GetLanguagesByModeline returns a slice of possible languages for the given content, filename will be ignored.
+// GetLanguagesByModeline returns a slice of possible languages for the given content.
 // It complies with the signature to be a Strategy type.
-func GetLanguagesByModeline(filename string, content []byte, candidates []string) []string {
+func GetLanguagesByModeline(_ string, content []byte, candidates []string) []string {
 	headFoot := getHeaderAndFooter(content)
 	var languages []string
 	for _, getLang := range modelinesFunc {
@@ -196,9 +196,9 @@ var (
 	reVimLang       = regexp.MustCompile(`(?i:filetype|ft|syntax)\s*=(\w+)(?:\s|:|$)`)
 )
 
-// GetLanguagesByEmacsModeline returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It complies with the signature to be a Strategy type.
-func GetLanguagesByEmacsModeline(filename string, content []byte, candidates []string) []string {
+// GetLanguagesByEmacsModeline returns a slice of possible languages for the given content.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByEmacsModeline(_ string, content []byte, _ []string) []string {
 	matched := reEmacsModeline.FindAllSubmatch(content, -1)
 	if matched == nil {
 		return nil
@@ -222,9 +222,9 @@ func GetLanguagesByEmacsModeline(filename string, content []byte, candidates []s
 	return []string{language}
 }
 
-// GetLanguagesByVimModeline returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It complies with the signature to be a Strategy type.
-func GetLanguagesByVimModeline(filename string, content []byte, candidates []string) []string {
+// GetLanguagesByVimModeline returns a slice of possible languages for the given content.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByVimModeline(_ string, content []byte, _ []string) []string {
 	matched := reVimModeline.FindAllSubmatch(content, -1)
 	if matched == nil {
 		return nil
@@ -258,15 +258,15 @@ func GetLanguagesByVimModeline(filename string, content []byte, candidates []str
 	return []string{language}
 }
 
-// GetLanguagesByFilename returns a slice of possible languages for the given filename, content and candidates
-// will be ignored. It complies with the signature to be a Strategy type.
-func GetLanguagesByFilename(filename string, content []byte, candidates []string) []string {
+// GetLanguagesByFilename returns a slice of possible languages for the given filename.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByFilename(filename string, _ []byte, _ []string) []string {
 	return data.LanguagesByFilename[filepath.Base(filename)]
 }
 
-// GetLanguagesByShebang returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It complies with the signature to be a Strategy type.
-func GetLanguagesByShebang(filename string, content []byte, candidates []string) (languages []string) {
+// GetLanguagesByShebang returns a slice of possible languages for the given content.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByShebang(_ string, content []byte, _ []string) (languages []string) {
 	interpreter := getInterpreter(content)
 	return data.LanguagesByInterpreter[interpreter]
 }
@@ -346,9 +346,9 @@ func lookForMultilineExec(data []byte) string {
 	return interpreter
 }
 
-// GetLanguagesByExtension returns a slice of possible languages for the given filename, content and candidates
-// will be ignored. It complies with the signature to be a Strategy type.
-func GetLanguagesByExtension(filename string, content []byte, candidates []string) []string {
+// GetLanguagesByExtension returns a slice of possible languages for the given filename.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByExtension(filename string, _ []byte, _ []string) []string {
 	if !strings.Contains(filename, ".") {
 		return nil
 	}
@@ -377,9 +377,9 @@ func getDotIndexes(filename string) []int {
 	return dots
 }
 
-// GetLanguagesByContent returns a slice of possible languages for the given content, filename and candidates
-// will be ignored. It complies with the signature to be a Strategy type.
-func GetLanguagesByContent(filename string, content []byte, candidates []string) []string {
+// GetLanguagesByContent returns a slice of possible languages for the given content.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByContent(filename string, content []byte, _ []string) []string {
 	ext := strings.ToLower(filepath.Ext(filename))
 	fnMatcher, ok := data.ContentMatchers[ext]
 	if !ok {
