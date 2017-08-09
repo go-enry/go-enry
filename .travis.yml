@@ -1,5 +1,4 @@
 language: go
-sudo: required
 
 go:
   - 1.8
@@ -18,7 +17,6 @@ matrix:
         - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
         - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
         - go get -v gopkg.in/src-d/enry.v1/...
-        - sudo apt-get install maven
 
       before_script:
         - cd java
