@@ -6,18 +6,18 @@ package tech.sourced.enry;
  */
 public class Guess {
     /**
-     * Result is the resultant language of the detection.
+     * The resultant language of the detection.
      */
-    public String result;
+    public String language;
 
     /**
-     * Sure indicates whether the enry was completely sure the language is
+     * Indicates whether the enry was completely sure the language is
      * the correct one or it might not be.
      */
-    public boolean sure;
+    public boolean safe;
 
-    public Guess(String result, boolean sure) {
-        this.result = result;
-        this.sure = sure;
+    public Guess(String language, boolean safe) {
+        this.language = language;
+        this.safe = safe;
     }
 }

@@ -141,9 +141,9 @@ public class EnryTest {
         assertFalse(Enry.isImage("nope.go"));
     }
 
-    void assertGuess(String language, boolean sure, Guess result) {
-        assertEquals(language, result.result);
-        assertEquals(sure, result.sure);
+    void assertGuess(String language, boolean safe, Guess guess) {
+        assertEquals(language, guess.language);
+        assertEquals(safe, guess.safe);
     }
 
 }
