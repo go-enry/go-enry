@@ -29,6 +29,15 @@ public class EnryTest {
     }
 
     @Test
+    public void getLanguageByFilename() {
+        assertGuess(
+                "Maven POM",
+                true,
+                Enry.getLanguageByFilename("pom.xml")
+        );
+    }
+
+    @Test
     public void getLanguageByEmacsModeline() {
         String code = "// -*- font:bar;mode:c++ -*-\n" +
                 "template <typename X> class { X i; };";
