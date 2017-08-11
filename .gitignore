@@ -3,3 +3,4 @@ benchmarks/output
 .ci
 Makefile.main
 .shared
+.idea

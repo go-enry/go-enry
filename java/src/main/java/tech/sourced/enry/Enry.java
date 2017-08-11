@@ -5,6 +5,8 @@ import tech.sourced.enry.nativelib.*;
 import static tech.sourced.enry.GoUtils.*;
 
 public class Enry {
+    public static final Guess unknownLanguage = new Guess("", false);
+
     private static final EnryLibrary nativeLib = EnryLibrary.INSTANCE;
 
     /**
