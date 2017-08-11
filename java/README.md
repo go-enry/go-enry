@@ -32,4 +32,5 @@ make test
 make package
 ```
 
-Jar will be located in `./target/enry-java-assembly-X.X.X.jar`.
+Will build fatJar under `./target/enry-java-assembly-X.X.X.jar`.
+One can use `./sbt publish-local` to install enry-java dependency on local machine.

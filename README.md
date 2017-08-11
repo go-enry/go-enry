@@ -114,6 +114,10 @@ $ enry --json
 
 Note that even if enry's CLI is compatible with linguist's, its main point is that, contrary to linguist, **_enry doesn't need a git repository to work!_**
 
+Java bindings
+------------
+
+Generated Java binidings using a C shared library + JNI are located under [`./java`](https://github.com/src-d/enry/tree/master/java)
 
 Development
 ------------
