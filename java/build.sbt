@@ -15,10 +15,11 @@ unmanagedClasspath in Runtime += baseDirectory.value / "shared"
 unmanagedClasspath in Compile += baseDirectory.value / "shared"
 testOptions += Tests.Argument(TestFrameworks.JUnit)
 
+publishArtifact in (Compile, packageBin) := false
 
 artifact in (Compile, assembly) := {
   val art = (artifact in (Compile, assembly)).value
-  art.copy(`classifier` = Some("assembly"))
+  art.copy(`classifier` = None)
 }
 
 addArtifact(artifact in (Compile, assembly), assembly)
