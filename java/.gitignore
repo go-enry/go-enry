@@ -25,3 +25,7 @@ target
 .jnaerator
 shared
 *.jar
+*.gpg
+key.asc
+project/.gnupg
+
