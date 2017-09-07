@@ -19,6 +19,17 @@ public class EnryTest {
     }
 
     @Test
+    public void getLanguageWithNullContent() {
+        assertEquals("Python", Enry.getLanguage("foo.py",  null));
+    }
+
+    @Test
+    public void getLanguageWithNullFilename() {
+        byte[] content = "#!/usr/bin/env python".getBytes();
+        assertEquals("Python", Enry.getLanguage(null, content));
+    }
+
+    @Test
     public void getLanguageByContent() {
         String code = "<?php $foo = bar();";
         assertGuess(
