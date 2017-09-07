@@ -15,12 +15,19 @@ class GoUtils {
             bytes = str.getBytes("utf-8");
         } catch (UnsupportedEncodingException e) {
             bytes = str.getBytes();
+        } catch (NullPointerException e) {
+            bytes = null;
+        }
+
+        int length = 0;
+        Pointer ptr = null;
+        if (bytes != null) {
+            length = bytes.length;
+            ptr = ptrFromBytes(bytes);
         }
 
         GoString.ByValue val = new GoString.ByValue();
-        val.n = bytes.length;
-        Pointer ptr = new Memory(bytes.length);
-        ptr.write(0, bytes, 0, bytes.length);
+        val.n = length;
         val.p = ptr;
         return val;
     }
@@ -49,7 +56,14 @@ class GoUtils {
     }
 
     static GoSlice.ByValue toGoByteSlice(byte[] bytes) {
-        return sliceFromPtr(bytes.length, ptrFromBytes(bytes));
+        int length = 0;
+        Pointer ptr = null;
+        if (bytes != null) {
+            length = bytes.length;
+            ptr = ptrFromBytes(bytes);
+        }
+
+        return sliceFromPtr(length, ptr);
     }
 
     static GoSlice.ByValue sliceFromPtr(int len, Pointer ptr) {
