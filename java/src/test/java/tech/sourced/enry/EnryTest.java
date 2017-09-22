@@ -24,6 +24,12 @@ public class EnryTest {
     }
 
     @Test
+    public void getLanguageWithEmptyContent() {
+        assertEquals("Go", Enry.getLanguage("baz.go",  "".getBytes()));
+        assertEquals("Go", Enry.getLanguage("baz.go",  null));
+    }
+
+    @Test
     public void getLanguageWithNullFilename() {
         byte[] content = "#!/usr/bin/env python".getBytes();
         assertEquals("Python", Enry.getLanguage(null, content));
