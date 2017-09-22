@@ -49,10 +49,10 @@ darwin-shared:
 	$(MAKE) darwin-shared
 
 test:
-	sbt clean test
+	./sbt clean test
 
 package:
-	sbt clean assembly
+	./sbt clean assembly
 
 clean:
 	rm -rf $(JAR)
