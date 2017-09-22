@@ -58,7 +58,7 @@ class GoUtils {
     static GoSlice.ByValue toGoByteSlice(byte[] bytes) {
         int length = 0;
         Pointer ptr = null;
-        if (bytes != null) {
+        if (bytes != null && bytes.length > 0) {
             length = bytes.length;
             ptr = ptrFromBytes(bytes);
         }

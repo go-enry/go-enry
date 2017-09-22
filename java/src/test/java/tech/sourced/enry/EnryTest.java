@@ -26,6 +26,7 @@ public class EnryTest {
     @Test
     public void getLanguageWithEmptyContent() {
         assertEquals("Go", Enry.getLanguage("baz.go",  "".getBytes()));
+        assertEquals("Go", Enry.getLanguage("baz.go",  null));
     }
 
     @Test
