@@ -20,6 +20,7 @@ type EnryTestSuite struct {
 	suite.Suite
 	repoLinguist string
 	samplesDir   string
+	cloned       bool
 }
 
 func TestEnryTestSuite(t *testing.T) {
@@ -28,14 +29,20 @@ func TestEnryTestSuite(t *testing.T) {
 
 func (s *EnryTestSuite) SetupSuite() {
 	var err error
-	s.repoLinguist, err = ioutil.TempDir("", "linguist-")
-	assert.NoError(s.T(), err)
+	s.repoLinguist = os.Getenv("ENRY_TEST_REPO")
+	s.cloned = len(s.repoLinguist) == 0
+	if s.cloned {
+		s.repoLinguist, err = ioutil.TempDir("", "linguist-")
+		assert.NoError(s.T(), err)
+	}
 
 	s.samplesDir = filepath.Join(s.repoLinguist, "samples")
 
-	cmd := exec.Command("git", "clone", linguistURL, s.repoLinguist)
-	err = cmd.Run()
-	assert.NoError(s.T(), err)
+	if s.cloned {
+		cmd := exec.Command("git", "clone", linguistURL, s.repoLinguist)
+		err = cmd.Run()
+		assert.NoError(s.T(), err)
+	}
 
 	cwd, err := os.Getwd()
 	assert.NoError(s.T(), err)
@@ -43,7 +50,7 @@ func (s *EnryTestSuite) SetupSuite() {
 	err = os.Chdir(s.repoLinguist)
 	assert.NoError(s.T(), err)
 
-	cmd = exec.Command("git", "checkout", data.LinguistCommit)
+	cmd := exec.Command("git", "checkout", data.LinguistCommit)
 	err = cmd.Run()
 	assert.NoError(s.T(), err)
 
@@ -52,8 +59,10 @@ func (s *EnryTestSuite) SetupSuite() {
 }
 
 func (s *EnryTestSuite) TearDownSuite() {
-	err := os.RemoveAll(s.repoLinguist)
-	assert.NoError(s.T(), err)
+	if s.cloned {
+		err := os.RemoveAll(s.repoLinguist)
+		assert.NoError(s.T(), err)
+	}
 }
 
 func (s *EnryTestSuite) TestGetLanguage() {

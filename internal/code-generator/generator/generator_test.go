@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	lingustURL    = "https://github.com/github/linguist.git"
+	linguistURL    = "https://github.com/github/linguist.git"
 	commit        = "d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68"
 	samplesDir    = "samples"
 	languagesFile = "lib/linguist/languages.yml"
@@ -80,6 +80,7 @@ const (
 type GeneratorTestSuite struct {
 	suite.Suite
 	tmpLinguist string
+	cloned      bool
 }
 
 func TestGeneratorTestSuite(t *testing.T) {
@@ -88,12 +89,18 @@ func TestGeneratorTestSuite(t *testing.T) {
 
 func (s *GeneratorTestSuite) SetupSuite() {
 	var err error
-	s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
-	assert.NoError(s.T(), err)
+	s.tmpLinguist = os.Getenv("ENRY_TEST_REPO")
+	s.cloned = len(s.tmpLinguist) == 0
+	if s.cloned {
+		s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
+		assert.NoError(s.T(), err)
+	}
 
-	cmd := exec.Command("git", "clone", lingustURL, s.tmpLinguist)
-	err = cmd.Run()
-	assert.NoError(s.T(), err)
+	if s.cloned {
+		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguist)
+		err = cmd.Run()
+		assert.NoError(s.T(), err)
+	}
 
 	cwd, err := os.Getwd()
 	assert.NoError(s.T(), err)
@@ -101,7 +108,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 	err = os.Chdir(s.tmpLinguist)
 	assert.NoError(s.T(), err)
 
-	cmd = exec.Command("git", "checkout", commit)
+	cmd := exec.Command("git", "checkout", commit)
 	err = cmd.Run()
 	assert.NoError(s.T(), err)
 
@@ -110,8 +117,10 @@ func (s *GeneratorTestSuite) SetupSuite() {
 }
 
 func (s *GeneratorTestSuite) TearDownSuite() {
-	err := os.RemoveAll(s.tmpLinguist)
-	assert.NoError(s.T(), err)
+	if s.cloned {
+		err := os.RemoveAll(s.tmpLinguist)
+		assert.NoError(s.T(), err)
+	}
 }
 
 func (s *GeneratorTestSuite) TestGenerationFiles() {
