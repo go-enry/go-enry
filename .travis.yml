@@ -7,23 +7,7 @@ go:
 matrix:
   allow_failures:
     - go: tip
-  include:
-    - language: scala
-      jdk: oraclejdk8
-
-      install:
-        - GIMME_OUTPUT=$(gimme 1.8 | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
-        - export GOPATH=$HOME/gopath
-        - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
-        - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
-        - go get -v gopkg.in/src-d/enry.v1/...
-
-      before_script:
-        - cd java
-        - make
-
-      script:
-        - make test
+  fast_finish: true
 
 install:
   - rm -rf $GOPATH/src/gopkg.in/src-d
@@ -50,3 +34,82 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
+
+jobs:
+  include:
+    - stage: test
+      language: scala
+      jdk: oraclejdk8
+
+      install:
+        - GIMME_OUTPUT=$(gimme 1.8 | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
+        - export GOPATH=$HOME/gopath
+        - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
+        - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
+        - go get -v gopkg.in/src-d/enry.v1/...
+
+      before_script:
+        - cd java
+        - make
+
+      script:
+        - make test
+
+      before_deploy:
+        - cd ..
+
+      deploy:
+        provider: releases
+        api_key:
+          secure: $GITHUB_TOKEN
+        file:
+          - ./.shared/linux-x86-64/libenry.so
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - stage: Build macOS shared
+
+      env:
+        - OSXCROSS_PATH="$HOME/osxcross"
+        - OSXCROSS_REV=3034f7149716d815bc473d0a7b35d17e4cf175aa
+        - SDK_VERSION=10.11
+        - DARWIN_VERSION=15
+        - OSX_VERSION_MIN=10.6
+        - OSXCROSS_SDK_URL="https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.11.sdk.tar.xz"
+        - PATH="/$HOME/osxcross/bin:$PATH"
+
+      sudo: true
+
+      install:
+        - if [[ -z "$TRAVIS_TAG" ]]; then echo "Skipping this build for non-tag builds."; exit 0; fi
+        - rm -rf $GOPATH/src/gopkg.in/src-d
+        - mkdir -p $GOPATH/src/gopkg.in/src-d
+        - ln -s $PWD $GOPATH/src/gopkg.in/src-d/enry.v1
+        - cd $GOPATH/src/gopkg.in/src-d/enry.v1
+        - go get -v -t ./...
+        - sudo apt-get update
+        - sudo apt-get install -y --no-install-recommends clang g++ gcc gcc-multilib libc6-dev libc6-dev-i386 mingw-w64 patch xz-utils
+        - mkdir -p /tmp/osxcross
+        - cd /tmp/osxcross
+        - curl -sSL "https://codeload.github.com/tpoechtrager/osxcross/tar.gz/${OSXCROSS_REV}" | tar -C /tmp/osxcross --strip=1 -xzf -
+        - curl -s -S -L -o tarballs/MacOSX${SDK_VERSION}.sdk.tar.xz ${OSXCROSS_SDK_URL}
+        - UNATTENDED=yes ./build.sh >/dev/null
+        - mv target "${OSXCROSS_PATH}"
+        - rm -rf /tmp/osxcross "${OSXCROSS_PATH}/SDK/MacOSX${SDK_VERSION}.sdk/usr/share/man"
+        - cd $GOPATH/src/gopkg.in/src-d/enry.v1
+
+      script:
+        - make darwin-shared
+
+      before_deploy:
+        - echo "skip before_deploy"
+
+      deploy:
+        provider: releases
+        api_key:
+          secure: $GITHUB_TOKEN
+        file: ./.shared/darwin/libenry.dylib
+        skip_cleanup: true
+        on:
+          tags: true
