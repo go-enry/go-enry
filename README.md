@@ -19,6 +19,31 @@ To build enry's CLI you must run
 this will generate a binary in the project's root directory called `enry`. You can then move this binary to anywhere in your `PATH`.
 
 
+### Faster regexp engine
+
+[Onigumura](https://github.com/kkos/oniguruma) is CRuby's regular expression engine.
+It is very fast and performs better than the one built into Go runtime.
+The typical overall speedup is 1.5-2x. However, it requires CGo and the external shared library.
+On macOS with brew, it is
+
+```
+brew install onigumura
+```
+
+On Ubuntu, it is
+
+```
+sudo apt install libonig-dev
+```
+
+To build enry with Onigumura regexps, patch the imports with
+
+```
+make onigumura
+```
+
+nnd then rebuild the project.
+
 Examples
 ------------
 
