@@ -67,7 +67,7 @@ darwin-shared: $(DARWIN_SHARED_LIB)
 
 $(DARWIN_SHARED_LIB):
 	mkdir -p $(DARWIN_DIR) && \
-	GOOS=darwin GOARCH=amd64 go build -buildmode=c-shared -o $(DARWIN_SHARED_LIB) $(NATIVE_LIB) && \
+	CC="o64-clang" CXX="o64-clang++" CGO_ENABLED=1 GOOS=darwin go build -buildmode=c-shared -o $(DARWIN_SHARED_LIB) $(NATIVE_LIB) && \
 	mv $(DARWIN_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
 
 $(LINUX_SHARED_LIB):
