@@ -63,6 +63,16 @@ benchmarks-slow: $(LINGUST_PATH)
 	mkdir -p benchmarks/output && go test -run=NONE -bench=. -slow -benchtime=100ms -timeout=100h >benchmarks/output/enry_samples.bench && \
 	benchmarks/linguist-samples.rb 5 >benchmarks/output/linguist_samples.bench
 
+onigumura:
+	sed -i.orig -e 's/"regexp"/regexp "github.com\/moovweb\/rubex"/g' internal/code-generator/generator/heuristics.go
+	sed -i.orig -e 's/"regexp"/regexp "github.com\/moovweb\/rubex"/g' internal/tokenizer/tokenize.go
+	sed -i.orig -e 's/"regexp"/regexp "github.com\/moovweb\/rubex"/g' common.go
+
+revert-onigumura:
+	mv internal/code-generator/generator/heuristics.go.orig internal/code-generator/generator/heuristics.go
+	mv internal/tokenizer/tokenize.go.orig internal/tokenizer/tokenize.go
+	mv common.go.orig common.go
+
 build-cli:
 	go build -o enry -ldflags "$(LOCAL_LDFLAGS)" cli/enry/main.go
 
