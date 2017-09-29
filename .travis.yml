@@ -4,16 +4,26 @@ go:
   - 1.8
   - tip
 
+addons:
+  apt:
+    packages:
+      - libonig-dev
+
 matrix:
   allow_failures:
     - go: tip
   fast_finish: true
+
+env:
+  - ONIGUMURA=1
+  - ONIGUMURA=0
 
 install:
   - rm -rf $GOPATH/src/gopkg.in/src-d
   - mkdir -p $GOPATH/src/gopkg.in/src-d
   - ln -s $PWD $GOPATH/src/gopkg.in/src-d/enry.v1
   - cd $GOPATH/src/gopkg.in/src-d/enry.v1
+  - if [ "$ONIGUMURA" == "1" ]; then make onigumura; fi
   - go get -v -t ./...
 
 script:
