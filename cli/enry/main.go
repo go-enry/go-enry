@@ -25,7 +25,13 @@ func main() {
 	flag.Usage = usage
 	breakdownFlag := flag.Bool("breakdown", false, "")
 	jsonFlag := flag.Bool("json", false, "")
+	showVersion := flag.Bool("version", false, "Show the enry version information")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		return
+	}
 
 	root, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
@@ -129,6 +135,7 @@ func usage() {
   usage: %[1]s <path>
          %[1]s [-json] [-breakdown] <path>
          %[1]s [-json] [-breakdown]
+         %[1]s [-version]
 `,
 		os.Args[0], version, build, commit, data.LinguistCommit[:7],
 	)
