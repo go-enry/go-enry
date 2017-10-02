@@ -31,7 +31,6 @@ credentials += Credentials(
 val SONATYPE_PASSPHRASE = scala.util.Properties.envOrElse("SONATYPE_PASSPHRASE", "not set")
 
 useGpg := false
-usePgpKeyHex("F75439CAE8DDB254")
 pgpSecretRing := baseDirectory.value / "project" / ".gnupg" / "secring.gpg"
 pgpPublicRing := baseDirectory.value / "project" / ".gnupg" / "pubring.gpg"
 pgpPassphrase := Some(SONATYPE_PASSPHRASE.toArray)
