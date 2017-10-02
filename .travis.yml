@@ -113,3 +113,39 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
+
+    - stage: Publish Maven
+      language: scala
+      jdk: oraclejdk8
+
+      before_script:
+        - if [[ -z "$TRAVIS_TAG" ]]; then echo "Skipping this build for non-tag builds."; exit 0; fi
+        - cd java
+        - make
+        - curl -o ./shared/linux-x86-64/libenry.so -sL "https://github.com/$TRAVIS_REPO_SLUG/releases/download/$TRAVIS_TAG/libenry.so"
+        - mkdir -p ./shared/darwin
+        - curl -o ./shared/darwin/libenry.dylib -sL "https://github.com/$TRAVIS_REPO_SLUG/releases/download/$TRAVIS_TAG/libenry.dylib"
+        - openssl aes-256-cbc -K $encrypted_a0e1c69dbbc7_key -iv $encrypted_a0e1c69dbbc7_iv -in key.asc.enc -out key.asc -d
+        - gpg --no-default-keyring --primary-keyring ./project/.gnupg/pubring.gpg --secret-keyring ./project/.gnupg/secring.gpg --keyring ./project/.gnupg/pubring.gpg --fingerprint --import key.asc
+
+      script:
+        - make test # ensure the shared objects are functional
+        - ./sbt publishLocal
+        - ./sbt publishSigned
+        - ./sbt sonatypeRelease
+
+      before_deploy:
+        - rm ./target/enry-java-*-javadoc.jar
+        - rm ./target/enry-java-*-sources.jar
+        - rm ./target/enry-java-*-tests.jar
+        - rm ./target/enry-java-assembly-*.jar
+
+      deploy:
+        provider: releases
+        api_key:
+          secure: $GITHUB_TOKEN
+        file_glob: true
+        file: ./target/enry-java*.jar
+        skip_cleanup: true
+        on:
+          tags: true
