@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"gopkg.in/src-d/enry.v1"
@@ -159,16 +160,19 @@ func printJson(out map[string][]string, buff *bytes.Buffer) {
 }
 
 func printPercents(out map[string][]string, buff *bytes.Buffer) {
-	fileCount := make(map[string]int, len(out))
+	var fileCountList enry.FileCountList
 	total := 0
 	for name, language := range out {
-		fileCount[name] = len(language)
+		fc := enry.FileCount{Name: name, Count: len(language)}
+		fileCountList = append(fileCountList, fc)
 		total += len(language)
 	}
+	// Sort the fileCountList in descending order of their count value.
+	sort.Sort(sort.Reverse(fileCountList))
 
-	for name, count := range fileCount {
-		percent := float32(count) / float32(total) * 100
-		buff.WriteString(fmt.Sprintf("%.2f%%	%s\n", percent, name))
+	for _, fc := range fileCountList {
+		percent := float32(fc.Count) / float32(total) * 100
+		buff.WriteString(fmt.Sprintf("%.2f%%	%s\n", percent, fc.Name))
 	}
 }
 

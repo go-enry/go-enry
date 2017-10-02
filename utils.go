@@ -89,3 +89,17 @@ func IsBinary(data []byte) bool {
 
 	return true
 }
+
+// FileCount type stores language name and count of files belonging to the
+// language.
+type FileCount struct {
+	Name  string
+	Count int
+}
+
+// FileCountList type is a list of FileCounts.
+type FileCountList []FileCount
+
+func (fcl FileCountList) Len() int           { return len(fcl) }
+func (fcl FileCountList) Less(i, j int) bool { return fcl[i].Count < fcl[j].Count }
+func (fcl FileCountList) Swap(i, j int)      { fcl[i], fcl[j] = fcl[j], fcl[i] }

@@ -3,6 +3,8 @@ package enry
 import (
 	"bytes"
 	"fmt"
+	"sort"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -77,5 +79,45 @@ func (s *EnryTestSuite) TestIsBinary() {
 	for _, test := range tests {
 		is := IsBinary(test.data)
 		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
+}
+
+func TestFileCountListSort(t *testing.T) {
+	sampleData := FileCountList{{"a", 8}, {"b", 65}, {"c", 20}, {"d", 90}}
+	const ascending = "ASC"
+	const descending = "DESC"
+
+	tests := []struct {
+		name         string
+		data         FileCountList
+		order        string
+		expectedData FileCountList
+	}{
+		{
+			name:         "ascending order",
+			data:         sampleData,
+			order:        ascending,
+			expectedData: FileCountList{{"a", 8}, {"c", 20}, {"b", 65}, {"d", 90}},
+		},
+		{
+			name:         "descending order",
+			data:         sampleData,
+			order:        descending,
+			expectedData: FileCountList{{"d", 90}, {"b", 65}, {"c", 20}, {"a", 8}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if test.order == descending {
+				sort.Sort(sort.Reverse(test.data))
+			} else {
+				sort.Sort(test.data)
+			}
+
+			for i := 0; i < len(test.data); i++ {
+				assert.Equal(t, test.data[i], test.expectedData[i], fmt.Sprintf("%v: FileCount at position %d = %v, expected: %v", test.name, i, test.data[i], test.expectedData[i]))
+			}
+		})
 	}
 }
