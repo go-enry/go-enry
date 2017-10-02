@@ -55,9 +55,10 @@ addArtifact(artifact in (Compile, assembly), assembly)
 
 isSnapshot := version.value endsWith "SNAPSHOT"
 
-publishTo := Some(
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
-    "snapshots" at nexus + "content/repositories/snapshots"
+    Some("snapshots" at nexus + "content/repositories/snapshots")
   else
-    "releases" at nexus + "service/local/staging/deploy/maven2"
-)
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
