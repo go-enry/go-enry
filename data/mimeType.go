@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 37979b26b04e10868017469e5cc56263b0a39c84
+// Extracted from github/linguist commit: e98728595bc2f3e72b0668d60e31cbe441c48799
 
 var LanguagesMime = map[string]string{
 	"AGS Script":              "text/x-c++src",
@@ -89,6 +89,7 @@ var LanguagesMime = map[string]string{
 	"JavaScript":          "text/javascript",
 	"Julia":               "text/x-julia",
 	"Jupyter Notebook":    "application/json",
+	"KiCad Layout":        "text/x-common-lisp",
 	"Kit":                 "text/html",
 	"Kotlin":              "text/x-kotlin",
 	"LFE":                 "text/x-common-lisp",

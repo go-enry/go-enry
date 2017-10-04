@@ -2,12 +2,13 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 37979b26b04e10868017469e5cc56263b0a39c84
+// Extracted from github/linguist commit: e98728595bc2f3e72b0668d60e31cbe441c48799
 
 var LanguagesByInterpreter = map[string][]string{
 	"Rscript":     {"R"},
 	"apl":         {"APL"},
 	"aplx":        {"APL"},
+	"ash":         {"Shell"},
 	"awk":         {"Awk"},
 	"bash":        {"Shell"},
 	"bigloo":      {"Scheme"},
@@ -20,6 +21,7 @@ var LanguagesByInterpreter = map[string][]string{
 	"csi":         {"Scheme"},
 	"cvc4":        {"SMT"},
 	"dart":        {"Dart"},
+	"dash":        {"Shell"},
 	"dtrace":      {"DTrace"},
 	"dyalog":      {"APL"},
 	"ecl":         {"Common Lisp"},
@@ -27,6 +29,8 @@ var LanguagesByInterpreter = map[string][]string{
 	"escript":     {"Erlang"},
 	"fish":        {"fish"},
 	"gawk":        {"Awk"},
+	"gerbv":       {"Gerber Image"},
+	"gerbview":    {"Gerber Image"},
 	"gn":          {"GN"},
 	"gnuplot":     {"Gnuplot"},
 	"gosh":        {"Scheme"},
@@ -39,6 +43,7 @@ var LanguagesByInterpreter = map[string][]string{
 	"jolie":       {"Jolie"},
 	"jruby":       {"Ruby"},
 	"julia":       {"Julia"},
+	"ksh":         {"Shell"},
 	"lisp":        {"Common Lisp"},
 	"lsl":         {"LSL"},
 	"lua":         {"Lua", "Terra"},
@@ -46,6 +51,7 @@ var LanguagesByInterpreter = map[string][]string{
 	"make":        {"Makefile"},
 	"mathsat5":    {"SMT"},
 	"mawk":        {"Awk"},
+	"mksh":        {"Shell"},
 	"mmi":         {"Mercury"},
 	"moon":        {"MoonScript"},
 	"nawk":        {"Awk"},
@@ -59,7 +65,8 @@ var LanguagesByInterpreter = map[string][]string{
 	"opensmt":     {"SMT"},
 	"osascript":   {"AppleScript"},
 	"parrot":      {"Parrot Assembly", "Parrot Internal Representation"},
-	"perl":        {"Perl"},
+	"pdksh":       {"Shell"},
+	"perl":        {"Perl", "Pod"},
 	"perl6":       {"Perl 6"},
 	"php":         {"PHP"},
 	"picolisp":    {"PicoLisp"},
