@@ -16,7 +16,7 @@ To build enry's CLI you must run
 
     make build-cli
 
-it generates a binary in the project's root directory called `enry`. You can move this binary to anywhere in your `PATH`.
+this will generate a binary in the project's root directory called `enry`. You can then move this binary to anywhere in your `PATH`.
 
 
 Examples
@@ -40,7 +40,7 @@ lang := enry.GetLanguage("foo.cpp", []byte("<cpp-code>"))
 // result: C++ true
 ```
 
-Note the returned boolean value "safe" is set either to true, if there is only one possible language detected or, to false otherwise.
+Note that the returned boolean value `safe` is set either to `true`, if there is only one possible language detected, or to `false` otherwise.
 
 To get a list of possible languages for a given file, you can use the plural version of the detecting functions.
 
@@ -71,7 +71,7 @@ $ enry --help
          enry [-version]
 ```
 
-and it will return an output similar to *linguist*'s output,
+and it'll return an output similar to *linguist*'s output,
 
 ```bash
 $ enry
@@ -81,7 +81,7 @@ $ enry
 11.11%    Go
 ```
 
-but not only the output, also its flags are the same as *linguist*'s ones,
+but not only the output; its flags are also the same as *linguist*'s ones,
 
 ```bash
 $ enry --breakdown
@@ -115,7 +115,7 @@ $ enry --json
 {"Gnuplot":["plot-histogram.gp"],"Go":["parser/main.go"],"Ruby":["linguist-samples.rb","linguist-total.rb"],"Shell":["parse.sh","plot-histogram.sh","run-benchmark.sh","run-slow-benchmark.sh","run.sh"]}
 ```
 
-Note that even if enry's CLI is compatible with linguist's, its main point is that, contrary to linguist, **_enry doesn't need a git repository to work!_**
+Note that even if enry's CLI is compatible with linguist's, its main point is that **_enry doesn't need a git repository to work!_**
 
 Java bindings
 ------------
@@ -125,21 +125,25 @@ Generated Java binidings using a C shared library + JNI are located under [`java
 Development
 ------------
 
-*enry* re-uses parts of original [linguist](https://github.com/github/linguist)  to generate internal data structures. In order to update to latest upstream and generate the necessary code you must run:
+*enry* re-uses parts of original [linguist](https://github.com/github/linguist) to generate internal data structures. In order to update to the latest upstream and generate the necessary code you must run:
 
     go generate
 
-We update enry due to changes  in linguist's master branch related to the following files:
+We update enry when changes are done in linguist's master branch on the following files:
+
 * [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)
 * [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb)
 * [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
 * [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
 
-For the moment we don't have any procedure established to detect changes in the linguist project automatically and regenerate the code. So we are updating the generated code as needed, without any specific criteria.
+Currently we don't have any procedure established to automatically detect changes in the linguist project and regenerate the code. 
+So we update the generated code as needed, without any specific criteria.
 
-If you want update *enry* because of changes in linguist, you can run the *go generate* command and do a pull request that only contains the changes in generated files (those files in the subdirectory [data](data)).
+If you want to update *enry* because of changes in linguist, you can run the *go
+generate* command and do a pull request that only contains the changes in
+generated files (those files in the subdirectory [data](data)).
 
-To run the tests
+To run the tests,
 
     make test
 
@@ -147,46 +151,57 @@ To run the tests
 Divergences from linguist
 ------------
 
-Using [linguist/samples](https://github.com/github/linguist/tree/master/samples) as a set against run tests the following issues were found:
-* with [hello.ms](https://github.com/github/linguist/blob/master/samples/Unix%20Assembly/hello.ms) we can't detect the language (Unix Assembly) because we don't have a matcher in contentMatchers (content.go) for Unix Assembly. Linguist uses this [regexp](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L300) in its code,
+Using [linguist/samples](https://github.com/github/linguist/tree/master/samples)
+as a set for the tests, the following issues were found:
+
+* With [hello.ms](https://github.com/github/linguist/blob/master/samples/Unix%20Assembly/hello.ms) we can't detect the language (Unix Assembly) because we don't have a matcher in contentMatchers (content.go) for Unix Assembly. Linguist uses this [regexp](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L300) in its code,
 
     `elsif /(?<!\S)\.(include|globa?l)\s/.match(data) || /(?<!\/\*)(\A|\n)\s*\.[A-Za-z][_A-Za-z0-9]*:/.match(data.gsub(/"([^\\"]|\\.)*"|'([^\\']|\\.)*'|\\\s*(?:--.*)?\n/, ""))`
 
     which we can't port.
 
-* all files for SQL language fall to the classifier because we don't parse this [disambiguator expresion](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L433) for `*.sql` files right. This expression doesn't comply with the pattern for the rest of [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb) file.
+* All files for the SQL language fall to the classifier because we don't parse
+this [disambiguator
+expression](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L433)
+for `*.sql` files right. This expression doesn't comply with the pattern for the
+rest in [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb).
 
 
 Benchmarks
 ------------
 
-Enry's language detection has been compared with Linguist's language detection. In order to do that, linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
+Enry's language detection has been compared with Linguist's one. In order to do that, linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
 
- Following results were obtained:
+We got these results:
 
 ![histogram](https://raw.githubusercontent.com/src-d/enry/master/benchmarks/histogram/distribution.png)
 
-The histogram represents the number of files for which spent time in language detection was in the range of the time interval indicated in x axis.
+The histogram represents the number of files for which spent time in language
+detection was in the range of the time interval indicated in the x axis.
 
-So reviewing the comparison enry/linguist, you can see the most of the files were detected in less time than linguist does.
+So you can see that most of the files were detected quicker in enry.
 
-We detected some few cases enry turns slower than linguist. This is due to Golang's regexp engine being slower than Ruby's, which uses [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
+We found some few cases where enry turns slower than linguist. This is due to
+Golang's regexp engine being slower than Ruby's, which uses the [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
-You can find scripts and additional information (as software and hardware used, and benchmarks' results per sample file) in [*benchmarks*](benchmarks) directory.
+You can find scripts and additional information (like software and hardware used
+and benchmarks' results per sample file) in [*benchmarks*](benchmarks) directory.
 
-If you want to reproduce the same experiment you can run:
+If you want to reproduce the same benchmarks you can run:
 
     benchmarks/run.sh
 
-from the root's project directory and It runs benchmarks for enry and linguist, parse the output, create csv files and create a histogram (you must have installed [gnuplot](http://gnuplot.info) in your system to get the histogram). It can take too much time, so to run local benchmarks to take a quick look you can run either:
+from the root's project directory and it'll run benchmarks for enry and linguist, parse the output, create csv files and create a histogram (you must have installed [gnuplot](http://gnuplot.info) in your system to get the histogram). 
+
+This can take some time, so to run local benchmarks for a quick check you can either:
 
     make benchmarks
 
-to get time averages for main detection function and strategies for the whole samples set or:
+to get average times for the main detection function and strategies for the whole samples set or:
 
     make benchmarks-samples
 
-if you want see measures by sample file.
+if you want to see measures by sample file.
 
 
 Why Enry?
