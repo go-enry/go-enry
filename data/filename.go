@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 37979b26b04e10868017469e5cc56263b0a39c84
+// Extracted from github/linguist commit: e98728595bc2f3e72b0668d60e31cbe441c48799
 
 var LanguagesByFilename = map[string][]string{
 	".Rprofile":          {"R"},
@@ -15,6 +15,7 @@ var LanguagesByFilename = map[string][]string{
 	".bash_profile":      {"Shell"},
 	".bashrc":            {"Shell"},
 	".clang-format":      {"YAML"},
+	".clang-tidy":        {"YAML"},
 	".classpath":         {"XML"},
 	".cproject":          {"XML"},
 	".cshrc":             {"Shell"},
@@ -132,6 +133,7 @@ var LanguagesByFilename = map[string][]string{
 	"bashrc":             {"Shell"},
 	"build.xml":          {"Ant Build System"},
 	"buildfile":          {"Ruby"},
+	"buildozer.spec":     {"INI"},
 	"click.me":           {"Text"},
 	"composer.lock":      {"JSON"},
 	"configure.ac":       {"M4Sugar"},
@@ -141,6 +143,7 @@ var LanguagesByFilename = map[string][]string{
 	"descrip.mmk":        {"Module Management System"},
 	"descrip.mms":        {"Module Management System"},
 	"expr-dist":          {"R"},
+	"fp-lib-table":       {"KiCad Layout"},
 	"gradlew":            {"Shell"},
 	"gvimrc":             {"Vim script"},
 	"httpd.conf":         {"ApacheConf"},

@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: 37979b26b04e10868017469e5cc56263b0a39c84
+// Extracted from github/linguist commit: e98728595bc2f3e72b0668d60e31cbe441c48799
 
 import "gopkg.in/toqueteos/substring.v1"
 
@@ -303,12 +303,28 @@ var ContentMatchers = map[string]languageMatcher{
 			return []string{"Perl 6"}
 		} else if pm_Perl_Matcher_0.Match(string(i)) {
 			return []string{"Perl"}
+		} else if pm_XPM_Matcher_0.Match(string(i)) {
+			return []string{"XPM"}
 		}
 
 		return nil
 	},
 	".pod": func(i []byte) []string {
 		if pod_Pod_Matcher_0.Match(string(i)) {
+			return []string{"Pod"}
+		}
+
+		return []string{"Perl"}
+	},
+	"Pod": func(i []byte) []string {
+		if Pod_Pod_Matcher_0.Match(string(i)) {
+			return []string{"Pod"}
+		}
+
+		return []string{"Perl"}
+	},
+	"Perl": func(i []byte) []string {
+		if Perl_Pod_Matcher_0.Match(string(i)) {
 			return []string{"Pod"}
 		}
 
@@ -524,7 +540,10 @@ var (
 	pl_Perl6_Matcher_0                     = substring.Regexp(`(?m)^(use v6|(my )?class|module)`)
 	pm_Perl6_Matcher_0                     = substring.Regexp(`(?m)^\s*(?:use\s+v6\s*;|(?:\bmy\s+)?class|module)\b`)
 	pm_Perl_Matcher_0                      = substring.Regexp(`(?m)\buse\s+(?:strict\b|v?5\.)`)
+	pm_XPM_Matcher_0                       = substring.Regexp(`(?m)^\s*\/\* XPM \*\/`)
 	pod_Pod_Matcher_0                      = substring.Regexp(`(?m)^=\w+\b`)
+	Pod_Pod_Matcher_0                      = substring.Regexp(`(?m)^=\w+\b`)
+	Perl_Pod_Matcher_0                     = substring.Regexp(`(?m)^=\w+\b`)
 	pro_Prolog_Matcher_0                   = substring.Regexp(`(?m)^[^#]+:-`)
 	pro_INI_Matcher_0                      = substring.Regexp(`(?m)last_client=`)
 	pro_QMake_Matcher_0                    = substring.Regexp(`(?m)HEADERS`)
