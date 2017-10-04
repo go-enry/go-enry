@@ -24,19 +24,20 @@ Examples
 
 ```go
 lang, safe := enry.GetLanguageByExtension("foo.go")
-fmt.Println(lang)
-// result: Go
+fmt.Println(lang, safe)
+// result: Go true
 
-lang, safe := enry.GetLanguageByContent("foo.m", "<matlab-code>")
-fmt.Println(lang)
-// result: Matlab
+lang, safe := enry.GetLanguageByContent("foo.m", []byte("<matlab-code>"))
+fmt.Println(lang, safe)
+// result: Matlab true
 
-lang, safe := enry.GetLanguageByContent("bar.m", "<objective-c-code>")
-fmt.Println(lang)
-// result: Objective-C
+lang, safe := enry.GetLanguageByContent("bar.m", []byte("<objective-c-code>"))
+fmt.Println(lang, safe)
+// result: Objective-C true
 
 // all strategies together
-lang := enry.GetLanguage("foo.cpp", "<cpp-code>")
+lang := enry.GetLanguage("foo.cpp", []byte("<cpp-code>"))
+// result: C++ true
 ```
 
 Note the returned boolean value "safe" is set either to true, if there is only one possible language detected or, to false otherwise.
@@ -44,13 +45,13 @@ Note the returned boolean value "safe" is set either to true, if there is only o
 To get a list of possible languages for a given file, you can use the plural version of the detecting functions.
 
 ```go
-langs := enry.GetLanguages("foo.h",  "<cpp-code>")
-// result: []string{"C++", "C"}
+langs := enry.GetLanguages("foo.h",  []byte("<cpp-code>"))
+// result: []string{"C", "C++", "Objective-C}
 
-langs := enry.GetLanguagesByExtension("foo.asc", "<content>", nil)
+langs := enry.GetLanguagesByExtension("foo.asc", []byte("<content>"), nil)
 // result: []string{"AGS Script", "AsciiDoc", "Public Key"}
 
-langs := enry.GetLanguagesByFilename("Gemfile", "<content>", []string{})
+langs := enry.GetLanguagesByFilename("Gemfile", []byte("<content>"), []string{})
 // result: []string{"Ruby"}
 ```
 
@@ -62,19 +63,21 @@ You can use enry as a command,
 
 ```bash
 $ enry --help
-enry, A simple (and faster) implementation of github/linguist
-usage: enry <path>
-              enry <path> [--json] [--breakdown]
-              enry [--json] [--breakdown]
+  enry v1.5.0 build: 10-02-2017_14_01_07 commit: 95ef0a6cf3, based on linguist commit: 37979b2
+  enry, A simple (and faster) implementation of github/linguist
+  usage: enry <path>
+         enry [-json] [-breakdown] <path>
+         enry [-json] [-breakdown]
+         enry [-version]
 ```
 
 and it will return an output similar to *linguist*'s output,
 
 ```bash
 $ enry
-11.11%    Gnuplot
-22.22%    Ruby
 55.56%    Shell
+22.22%    Ruby
+11.11%    Gnuplot
 11.11%    Go
 ```
 
@@ -82,9 +85,9 @@ but not only the output, also its flags are the same as *linguist*'s ones,
 
 ```bash
 $ enry --breakdown
-11.11%    Gnuplot
-22.22%    Ruby
 55.56%    Shell
+22.22%    Ruby
+11.11%    Gnuplot
 11.11%    Go
 
 Gnuplot
@@ -117,7 +120,7 @@ Note that even if enry's CLI is compatible with linguist's, its main point is th
 Java bindings
 ------------
 
-Generated Java binidings using a C shared library + JNI are located under [`./java`](https://github.com/src-d/enry/tree/master/java)
+Generated Java binidings using a C shared library + JNI are located under [`java`](java)
 
 Development
 ------------
@@ -134,7 +137,7 @@ We update enry due to changes  in linguist's master branch related to the follow
 
 For the moment we don't have any procedure established to detect changes in the linguist project automatically and regenerate the code. So we are updating the generated code as needed, without any specific criteria.
 
-If you want update *enry* because of changes in linguist, you can run the *go generate* command and do a pull request that only contains the changes in generated files (those files in the subdirectory [data](https://github.com/src-d/enry/tree/master/data)).
+If you want update *enry* because of changes in linguist, you can run the *go generate* command and do a pull request that only contains the changes in generated files (those files in the subdirectory [data](data)).
 
 To run the tests
 
@@ -169,13 +172,13 @@ So reviewing the comparison enry/linguist, you can see the most of the files wer
 
 We detected some few cases enry turns slower than linguist. This is due to Golang's regexp engine being slower than Ruby's, which uses [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
-You can find scripts and additional information (as software and hardware used, and benchmarks' results per sample file) in [*benchmarks*](https://github.com/src-d/enry/tree/master/benchmarks) directory.
+You can find scripts and additional information (as software and hardware used, and benchmarks' results per sample file) in [*benchmarks*](benchmarks) directory.
 
 If you want to reproduce the same experiment you can run:
 
     benchmarks/run.sh
 
-from the root's project directory and It runs benchmarks for enry and linguist, parse the output, create csv files and create a histogram (you must have installed [gnuplot](http://gnuplot.info) in your system to get the histogram). It can take to much time, so to run local benchmarks to take a quick look you can run either:
+from the root's project directory and It runs benchmarks for enry and linguist, parse the output, create csv files and create a histogram (you must have installed [gnuplot](http://gnuplot.info) in your system to get the histogram). It can take too much time, so to run local benchmarks to take a quick look you can run either:
 
     make benchmarks
 
@@ -183,7 +186,7 @@ to get time averages for main detection function and strategies for the whole sa
 
     make benchmarks-samples
 
-if you want see measures by sample file
+if you want see measures by sample file.
 
 
 Why Enry?
