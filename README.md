@@ -16,8 +16,7 @@ To build enry's CLI you must run
 
     make build-cli
 
-this will generate a binary in the project's root directory called `enry`. You can
-then move this binary to anywhere in your `PATH`.
+this will generate a binary in the project's root directory called `enry`. You can then move this binary to anywhere in your `PATH`.
 
 
 Examples
@@ -41,7 +40,7 @@ lang := enry.GetLanguage("foo.cpp", []byte("<cpp-code>"))
 // result: C++ true
 ```
 
-Note the returned boolean value `safe` is set either to `true`, if there is only one possible language detected, or to `false` otherwise.
+Note that the returned boolean value `safe` is set either to `true`, if there is only one possible language detected, or to `false` otherwise.
 
 To get a list of possible languages for a given file, you can use the plural version of the detecting functions.
 
@@ -116,7 +115,7 @@ $ enry --json
 {"Gnuplot":["plot-histogram.gp"],"Go":["parser/main.go"],"Ruby":["linguist-samples.rb","linguist-total.rb"],"Shell":["parse.sh","plot-histogram.sh","run-benchmark.sh","run-slow-benchmark.sh","run.sh"]}
 ```
 
-Note that even if enry's CLI is compatible with linguist's its main point is that, contrary to linguist, **_enry doesn't need a git repository to work!_**
+Note that even if enry's CLI is compatible with linguist's, its main point is that **_enry doesn't need a git repository to work!_**
 
 Java bindings
 ------------
@@ -131,6 +130,7 @@ Development
     go generate
 
 We update enry when changes are done in linguist's master branch on the following files:
+
 * [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)
 * [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb)
 * [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
@@ -172,14 +172,14 @@ Benchmarks
 
 Enry's language detection has been compared with Linguist's one. In order to do that, linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
 
-The following results were obtained:
+We got these results:
 
 ![histogram](https://raw.githubusercontent.com/src-d/enry/master/benchmarks/histogram/distribution.png)
 
 The histogram represents the number of files for which spent time in language
 detection was in the range of the time interval indicated in the x axis.
 
-So you can see that most of the files were detected quickly in enry.
+So you can see that most of the files were detected quicker in enry.
 
 We found some few cases where enry turns slower than linguist. This is due to
 Golang's regexp engine being slower than Ruby's, which uses the [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
