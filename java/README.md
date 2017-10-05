@@ -13,14 +13,14 @@ for other systems just look at maven central's dependency information.
 <dependency>
     <groupId>tech.sourced</groupId>
     <artifactId>enry-java</artifactId>
-    <version>1.0.0</version>
+    <version>${enry_version}</version>
 </dependency>
 ```
 
 ### Scala SBT
 
 ```scala
-libraryDependencies += "tech.sourced" % "enry-java" % "1.0.0"
+libraryDependencies += "tech.sourced" % "enry-java" % enryVersion
 ```
 
 ## Build
