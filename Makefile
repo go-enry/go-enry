@@ -13,8 +13,6 @@ $(MAKEFILE):
 
 # Docsrv: configure the languages whose api-doc can be auto generated
 LANGUAGES = go
-# Docsrv: configure the directory containing the python sources
-PYTHON_MAIN_DIR ?= ./python
 # Docs: do not edit this
 DOCS_REPOSITORY := https://github.com/src-d/docs
 SHARED_PATH ?= $(shell pwd)/.shared
