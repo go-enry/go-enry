@@ -1,6 +1,6 @@
 name := "enry-java"
 organization := "tech.sourced"
-version := "1.5.1"
+version := "1.5.2"
 
 sonatypeProfileName := "tech.sourced"
 
