@@ -6,15 +6,20 @@ COMMANDS = cli/enry
 MAKEFILE = Makefile.main
 CI_REPOSITORY = https://github.com/src-d/ci.git
 CI_FOLDER = .ci
-
-# If you need to build more than one dockerfile, you can do so like this:
-# DOCKERFILES = Dockerfile_filename1:repositoryname1 Dockerfile_filename2:repositoryname2 ...
-
 $(MAKEFILE):
 	@git clone --quiet $(CI_REPOSITORY) $(CI_FOLDER); \
 	cp $(CI_FOLDER)/$(MAKEFILE) .;
-
 -include $(MAKEFILE)
+
+# Docsrv: configure the languages whose api-doc can be auto generated
+LANGUAGES = go
+# Docs: do not edit this
+DOCS_REPOSITORY := https://github.com/src-d/docs
+SHARED_PATH ?= $(shell pwd)/.shared
+DOCS_PATH ?= $(SHARED_PATH)/.docs
+$(DOCS_PATH)/Makefile.inc:
+	git clone --quiet --depth 1 $(DOCS_REPOSITORY) $(DOCS_PATH);
+-include $(DOCS_PATH)/Makefile.inc
 
 LINGUIST_PATH = .linguist
 

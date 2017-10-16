@@ -120,7 +120,7 @@ Note that even if enry's CLI is compatible with linguist's, its main point is th
 Java bindings
 ------------
 
-Generated Java binidings using a C shared library + JNI are located under [`java`](java)
+Generated Java binidings using a C shared library + JNI are located under [`java`](https://github.com/src-d/enry/blob/master/java)
 
 Development
 ------------
@@ -141,7 +141,7 @@ So we update the generated code as needed, without any specific criteria.
 
 If you want to update *enry* because of changes in linguist, you can run the *go
 generate* command and do a pull request that only contains the changes in
-generated files (those files in the subdirectory [data](data)).
+generated files (those files in the subdirectory [data](https://github.com/src-d/enry/blob/master/data)).
 
 To run the tests,
 
@@ -185,7 +185,7 @@ We found some few cases where enry turns slower than linguist. This is due to
 Golang's regexp engine being slower than Ruby's, which uses the [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
 You can find scripts and additional information (like software and hardware used
-and benchmarks' results per sample file) in [*benchmarks*](benchmarks) directory.
+and benchmarks' results per sample file) in [*benchmarks*](https://github.com/src-d/enry/blob/master/benchmarks) directory.
 
 If you want to reproduce the same benchmarks you can run:
 
