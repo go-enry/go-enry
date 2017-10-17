@@ -4,3 +4,4 @@ benchmarks/output
 Makefile.main
 .shared
 .idea
+.docsrv-resources
