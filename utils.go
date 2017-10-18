@@ -40,8 +40,9 @@ func IsConfiguration(path string) bool {
 
 // IsDotFile returns whether or not path has dot as a prefix.
 func IsDotFile(path string) bool {
+	path = filepath.Clean(path)
 	base := filepath.Base(path)
-	return strings.HasPrefix(base, ".") && len(base) > len(".")
+	return strings.HasPrefix(base, ".") && base != "." && base != ".."
 }
 
 // IsVendor returns whether or not path is a vendor path.
