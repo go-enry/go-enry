@@ -82,6 +82,22 @@ func (s *EnryTestSuite) TestIsBinary() {
 	}
 }
 
+func (s *EnryTestSuite) TestIsDotFile() {
+	tests := []struct {
+		name     string
+		path     string
+		expected bool
+	}{
+		{name: "TestIsDotFile_1", path: "foo/bar/./", expected: false},
+		{name: "TestIsDotFile_2", path: "./", expected: false},
+	}
+
+	for _, test := range tests {
+		is := IsDotFile(test.path)
+		assert.Equal(s.T(), test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
+}
+
 func TestFileCountListSort(t *testing.T) {
 	sampleData := FileCountList{{"a", 8}, {"b", 65}, {"c", 20}, {"d", 90}}
 	const ascending = "ASC"
