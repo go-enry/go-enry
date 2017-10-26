@@ -95,9 +95,6 @@ func (s *GeneratorTestSuite) SetupSuite() {
 	if s.cloned {
 		s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
 		assert.NoError(s.T(), err)
-	}
-
-	if s.cloned {
 		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguist)
 		err = cmd.Run()
 		assert.NoError(s.T(), err)
