@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	linguistURL    = "https://github.com/github/linguist.git"
+	linguistURL = "https://github.com/github/linguist.git"
+	linguistClonedEnvVar = "ENRY_TEST_REPO"
 	commit        = "d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68"
 	samplesDir    = "samples"
 	languagesFile = "lib/linguist/languages.yml"
@@ -89,8 +90,8 @@ func TestGeneratorTestSuite(t *testing.T) {
 
 func (s *GeneratorTestSuite) SetupSuite() {
 	var err error
-	s.tmpLinguist = os.Getenv("ENRY_TEST_REPO")
-	s.cloned = len(s.tmpLinguist) == 0
+	s.tmpLinguist = os.Getenv(linguistClonedEnvVar)
+	s.cloned = s.tmpLinguist == ""
 	if s.cloned {
 		s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
 		assert.NoError(s.T(), err)

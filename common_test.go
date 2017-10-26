@@ -15,6 +15,7 @@ import (
 )
 
 const linguistURL = "https://github.com/github/linguist.git"
+const linguistClonedEnvVar = "ENRY_TEST_REPO"
 
 type EnryTestSuite struct {
 	suite.Suite
@@ -29,8 +30,8 @@ func TestEnryTestSuite(t *testing.T) {
 
 func (s *EnryTestSuite) SetupSuite() {
 	var err error
-	s.repoLinguist = os.Getenv("ENRY_TEST_REPO")
-	s.cloned = len(s.repoLinguist) == 0
+	s.repoLinguist = os.Getenv(linguistClonedEnvVar)
+	s.cloned = s.repoLinguist == ""
 	if s.cloned {
 		s.repoLinguist, err = ioutil.TempDir("", "linguist-")
 		assert.NoError(s.T(), err)
