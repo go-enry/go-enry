@@ -15,8 +15,8 @@ matrix:
   fast_finish: true
 
 env:
-  - ONIGUMURA=1
   - ONIGUMURA=0
+  - ONIGUMURA=1
 
 install:
   - rm -rf $GOPATH/src/gopkg.in/src-d
@@ -46,6 +46,8 @@ deploy:
     tags: true
 
 jobs:
+  env:
+    - ONIGUMURA=0    
   include:
     - stage: test
       language: scala
