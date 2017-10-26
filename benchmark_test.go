@@ -23,6 +23,7 @@ var (
 	overcomeLanguages []string
 	samples           []*sample
 	samplesDir        string
+	cloned            bool
 )
 
 func TestMain(m *testing.M) {
@@ -35,7 +36,9 @@ func TestMain(m *testing.M) {
 	if err := cloneLinguist(linguistURL); err != nil {
 		log.Fatal(err)
 	}
-	defer os.RemoveAll(filepath.Dir(samplesDir))
+	if cloned {
+		defer os.RemoveAll(filepath.Dir(samplesDir))
+	}
 
 	var err error
 	samples, err = getSamples(samplesDir)
@@ -47,16 +50,23 @@ func TestMain(m *testing.M) {
 }
 
 func cloneLinguist(linguistURL string) error {
-	repoLinguist, err := ioutil.TempDir("", "linguist-")
-	if err != nil {
-		return err
+	repoLinguist := os.Getenv(linguistClonedEnvVar)
+	cloned = repoLinguist == ""
+	if cloned {
+		var err error
+		repoLinguist, err = ioutil.TempDir("", "linguist-")
+		if err != nil {
+			return err
+		}
 	}
 
 	samplesDir = filepath.Join(repoLinguist, "samples")
 
-	cmd := exec.Command("git", "clone", linguistURL, repoLinguist)
-	if err := cmd.Run(); err != nil {
-		return err
+	if cloned {
+		cmd := exec.Command("git", "clone", linguistURL, repoLinguist)
+		if err := cmd.Run(); err != nil {
+			return err
+		}
 	}
 
 	cwd, err := os.Getwd()
@@ -68,7 +78,7 @@ func cloneLinguist(linguistURL string) error {
 		return err
 	}
 
-	cmd = exec.Command("git", "checkout", data.LinguistCommit)
+	cmd := exec.Command("git", "checkout", data.LinguistCommit)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
