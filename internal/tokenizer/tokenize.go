@@ -43,17 +43,46 @@ var (
 		extractRemainders,
 	}
 
-	reLiteralStringQuotes = regexp.MustCompile(`(?sU)(".*"|'.*')`)
-	reSingleLineComment   = regexp.MustCompile(`(?m)(//|--|#|%|")\s(.*$)`)
-	reMultilineComment    = regexp.MustCompile(`(?sU)(/\*.*\*/|<!--.*-->|\{-.*-\}|\(\*.*\*\)|""".*"""|'''.*''')`)
+	// Differences between golang regexp and onigumura:
+	// 1. no (?s) in onigumura - makes dot match \n
+	// 2. no (?U) in onigumura - ungreedy *
+	// 3. (?m) implies dot matches \n in onigumura
+	// 4. onigumura handles \w differently - impossible, but true
+	//
+	// Workarounds:
+	// 1. (.|\n)
+	// 2. replace * with *?
+	// 3. replace . with [^\n]
+	// 4. replace \w with [0-9A-Za-z_]
+	//
+	// Original golang regexps:
+	//
+	// reLiteralStringQuotes = regexp.MustCompile(`(?sU)(".*"|'.*')`)
+	// reSingleLineComment   = regexp.MustCompile(`(?m)(//|--|#|%|")\s(.*$)`)
+	// reMultilineComment    = regexp.MustCompile(`(?sU)(/\*.*\*/|<!--.*-->|\{-.*-\}|\(\*.*\*\)|""".*"""|'''.*''')`)
+	// reLiteralNumber       = regexp.MustCompile(`(0x[0-9A-Fa-f]([0-9A-Fa-f]|\.)*|\d(\d|\.)*)([uU][lL]{0,2}|([eE][-+]\d*)?[fFlL]*)`)
+	// reShebang             = regexp.MustCompile(`(?m)^#!(?:/\w+)*/(?:(\w+)|\w+(?:\s*\w+=\w+\s*)*\s*(\w+))(?:\s*-\w+\s*)*$`)
+	// rePunctuation         = regexp.MustCompile(`;|\{|\}|\(|\)|\[|\]`)
+	// reSGML                = regexp.MustCompile(`(?sU)(<\/?[^\s<>=\d"']+)(?:\s.*\/?>|>)`)
+	// reSGMLComment         = regexp.MustCompile(`(?sU)(<!--.*-->)`)
+	// reSGMLAttributes      = regexp.MustCompile(`\s+(\w+=)|\s+([^\s>]+)`)
+	// reSGMLLoneAttribute   = regexp.MustCompile(`(\w+)`)
+	// reRegularToken        = regexp.MustCompile(`[\w\.@#\/\*]+`)
+	// reOperators           = regexp.MustCompile(`<<?|\+|\-|\*|\/|%|&&?|\|\|?`)
+	//
+	// These regexps were converted to work in the same way for both engines:
+	//
+	reLiteralStringQuotes = regexp.MustCompile(`("(.|\n)*?"|'(.|\n)*?')`)
+	reSingleLineComment   = regexp.MustCompile(`(?m)(//|--|#|%|")\s([^\n]*$)`)
+	reMultilineComment    = regexp.MustCompile(`(/\*(.|\n)*?\*/|<!--(.|\n)*?-->|\{-(.|\n)*?-\}|\(\*(.|\n)*?\*\)|"""(.|\n)*?"""|'''(.|\n)*?''')`)
 	reLiteralNumber       = regexp.MustCompile(`(0x[0-9A-Fa-f]([0-9A-Fa-f]|\.)*|\d(\d|\.)*)([uU][lL]{0,2}|([eE][-+]\d*)?[fFlL]*)`)
-	reShebang             = regexp.MustCompile(`(?m)^#!(?:/\w+)*/(?:(\w+)|\w+(?:\s*\w+=\w+\s*)*\s*(\w+))(?:\s*-\w+\s*)*$`)
+	reShebang             = regexp.MustCompile(`(?m)^#!(?:/[0-9A-Za-z_]+)*/(?:([0-9A-Za-z_]+)|[0-9A-Za-z_]+(?:\s*[0-9A-Za-z_]+=[0-9A-Za-z_]+\s*)*\s*([0-9A-Za-z_]+))(?:\s*-[0-9A-Za-z_]+\s*)*$`)
 	rePunctuation         = regexp.MustCompile(`;|\{|\}|\(|\)|\[|\]`)
-	reSGML                = regexp.MustCompile(`(?sU)(<\/?[^\s<>=\d"']+)(?:\s.*\/?>|>)`)
-	reSGMLComment         = regexp.MustCompile(`(?sU)(<!--.*-->)`)
-	reSGMLAttributes      = regexp.MustCompile(`\s+(\w+=)|\s+([^\s>]+)`)
-	reSGMLLoneAttribute   = regexp.MustCompile(`(\w+)`)
-	reRegularToken        = regexp.MustCompile(`[\w\.@#\/\*]+`)
+	reSGML                = regexp.MustCompile(`(<\/?[^\s<>=\d"']+)(?:\s(.|\n)*?\/?>|>)`)
+	reSGMLComment         = regexp.MustCompile(`(<!--(.|\n)*?-->)`)
+	reSGMLAttributes      = regexp.MustCompile(`\s+([0-9A-Za-z_]+=)|\s+([^\s>]+)`)
+	reSGMLLoneAttribute   = regexp.MustCompile(`([0-9A-Za-z_]+)`)
+	reRegularToken        = regexp.MustCompile(`[0-9A-Za-z_\.@#\/\*]+`)
 	reOperators           = regexp.MustCompile(`<<?|\+|\-|\*|\/|%|&&?|\|\|?`)
 
 	regexToSkip = []*regexp.Regexp{
