@@ -2,7 +2,7 @@ package data
 
 // CODE GENERATED AUTOMATICALLY WITH gopkg.in/src-d/enry.v1/internal/code-generator
 // THIS FILE SHOULD NOT BE EDITED BY HAND
-// Extracted from github/linguist commit: e98728595bc2f3e72b0668d60e31cbe441c48799
+// Extracted from github/linguist commit: 4cd558c37482e8d2c535d8107f2d11b49afbc5b5
 
 // LanguagesByAlias keeps alias for different languages and use the name of the languages as an alias too.
 // All the keys (alias or not) are written in lower case and the whitespaces has been replaced by underscores.
