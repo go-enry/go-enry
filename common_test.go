@@ -157,6 +157,8 @@ func (s *EnryTestSuite) TestGetLanguagesByModeline() {
 		{name: "TestGetLanguagesByModeline_1", content: []byte(wrongVim), expected: nil},
 		{name: "TestGetLanguagesByModeline_2", content: []byte(rightVim), expected: []string{"Python"}},
 		{name: "TestGetLanguagesByModeline_3", content: []byte(noLangVim), expected: nil},
+		{name: "TestGetLanguagesByModeline_4", content: nil, expected: nil},
+		{name: "TestGetLanguagesByModeline_5", content: []byte{}, expected: nil},
 	}
 
 	for _, test := range tests {
