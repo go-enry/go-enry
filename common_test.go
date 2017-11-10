@@ -157,6 +157,8 @@ func (s *EnryTestSuite) TestGetLanguagesByModeline() {
 		{name: "TestGetLanguagesByModeline_1", content: []byte(wrongVim), expected: nil},
 		{name: "TestGetLanguagesByModeline_2", content: []byte(rightVim), expected: []string{"Python"}},
 		{name: "TestGetLanguagesByModeline_3", content: []byte(noLangVim), expected: nil},
+		{name: "TestGetLanguagesByModeline_4", content: nil, expected: nil},
+		{name: "TestGetLanguagesByModeline_5", content: []byte{}, expected: nil},
 	}
 
 	for _, test := range tests {
@@ -217,7 +219,7 @@ println("The shell script says ",vm.arglist.concat(" "));`
 		{name: "TestGetLanguagesByShebang_3", content: []byte(`#!/usr/bin/env`), expected: nil},
 		{name: "TestGetLanguagesByShebang_4", content: []byte(`#!/usr/bin/python -tt`), expected: []string{"Python"}},
 		{name: "TestGetLanguagesByShebang_5", content: []byte(`#!/usr/bin/env python2.6`), expected: []string{"Python"}},
-		{name: "TestGetLanguagesByShebang_6", content: []byte(`#!/usr/bin/env perl`), expected: []string{"Perl"}},
+		{name: "TestGetLanguagesByShebang_6", content: []byte(`#!/usr/bin/env perl`), expected: []string{"Perl", "Pod"}},
 		{name: "TestGetLanguagesByShebang_7", content: []byte(`#!	/bin/sh`), expected: []string{"Shell"}},
 		{name: "TestGetLanguagesByShebang_8", content: []byte(`#!bash`), expected: []string{"Shell"}},
 		{name: "TestGetLanguagesByShebang_9", content: []byte(multilineExecHack), expected: []string{"Tcl"}},

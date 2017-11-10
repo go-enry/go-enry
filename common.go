@@ -158,6 +158,11 @@ var modelinesFunc = []Strategy{
 
 func getHeaderAndFooter(content []byte) []byte {
 	const searchScope = 5
+
+	if len(content) == 0 {
+		return content
+	}
+
 	if bytes.Count(content, []byte("\n")) < 2*searchScope {
 		return content
 	}
