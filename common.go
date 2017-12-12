@@ -266,6 +266,10 @@ func GetLanguagesByVimModeline(_ string, content []byte, _ []string) []string {
 // GetLanguagesByFilename returns a slice of possible languages for the given filename.
 // It complies with the signature to be a Strategy type.
 func GetLanguagesByFilename(filename string, _ []byte, _ []string) []string {
+	if filename == "" {
+		return nil
+	}
+
 	return data.LanguagesByFilename[filepath.Base(filename)]
 }
 
@@ -385,6 +389,10 @@ func getDotIndexes(filename string) []int {
 // GetLanguagesByContent returns a slice of possible languages for the given content.
 // It complies with the signature to be a Strategy type.
 func GetLanguagesByContent(filename string, content []byte, _ []string) []string {
+	if filename == "" {
+		return nil
+	}
+
 	ext := strings.ToLower(filepath.Ext(filename))
 	fnMatcher, ok := data.ContentMatchers[ext]
 	if !ok {

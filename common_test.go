@@ -78,6 +78,7 @@ func (s *EnryTestSuite) TestGetLanguage() {
 		{name: "TestGetLanguage_2", filename: "foo.m", content: []byte(":- module"), expected: "Mercury"},
 		{name: "TestGetLanguage_3", filename: "foo.m", content: nil, expected: OtherLanguage},
 		{name: "TestGetLanguage_4", filename: "foo.mo", content: []byte{0xDE, 0x12, 0x04, 0x95, 0x00, 0x00, 0x00, 0x00}, expected: OtherLanguage},
+		{name: "TestGetLanguage_5", filename: "", content: nil, expected: OtherLanguage},
 	}
 
 	for _, test := range tests {
@@ -129,11 +130,17 @@ func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
 		{name: "TestGetLanguagesByModelineLinguist_29", filename: filepath.Join(modelinesDir, "ruby11"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByModelineLinguist_30", filename: filepath.Join(modelinesDir, "ruby12"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByModelineLinguist_31", filename: filepath.Join(s.samplesDir, "C/main.c"), expected: nil},
+		{name: "TestGetLanguagesByModelineLinguist_32", filename: "", expected: nil},
 	}
 
 	for _, test := range tests {
-		content, err := ioutil.ReadFile(test.filename)
-		assert.NoError(s.T(), err)
+		var content []byte
+		var err error
+
+		if test.filename != "" {
+			content, err = ioutil.ReadFile(test.filename)
+			assert.NoError(s.T(), err)
+		}
 
 		languages := GetLanguagesByModeline(test.filename, content, test.candidates)
 		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
@@ -183,6 +190,7 @@ func (s *EnryTestSuite) TestGetLanguagesByFilename() {
 		{name: "TestGetLanguagesByFilename_6", filename: "Vagrantfile", expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByFilename_7", filename: "_vimrc", expected: []string{"Vim script"}},
 		{name: "TestGetLanguagesByFilename_8", filename: "pom.xml", expected: []string{"Maven POM"}},
+		{name: "TestGetLanguagesByFilename_9", filename: "", expected: nil},
 	}
 
 	for _, test := range tests {
@@ -244,6 +252,7 @@ func (s *EnryTestSuite) TestGetLanguagesByExtension() {
 		{name: "TestGetLanguagesByExtension_1", filename: "foo.foo", expected: nil},
 		{name: "TestGetLanguagesByExtension_2", filename: "foo.go", expected: []string{"Go"}},
 		{name: "TestGetLanguagesByExtension_3", filename: "foo.go.php", expected: []string{"Hack", "PHP"}},
+		{name: "TestGetLanguagesByExtension_4", filename: "", expected: nil},
 	}
 
 	for _, test := range tests {
@@ -265,11 +274,17 @@ func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
+		{name: "TestGetLanguagesByClassifier_7", filename: "", candidates: []string{"python"}, expected: OtherLanguage},
 	}
 
 	for _, test := range test {
-		content, err := ioutil.ReadFile(test.filename)
-		assert.NoError(s.T(), err)
+		var content []byte
+		var err error
+
+		if test.filename != "" {
+			content, err = ioutil.ReadFile(test.filename)
+			assert.NoError(s.T(), err)
+		}
 
 		languages := GetLanguagesByClassifier(test.filename, content, test.candidates)
 		var language string
@@ -297,7 +312,7 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: DefaultClassifier, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, classifier: DefaultClassifier, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "Python"},
-		{name: "TestGetLanguagesByClassifier_6", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_7", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: OtherLanguage},
 	}
 
 	for _, test := range test {
