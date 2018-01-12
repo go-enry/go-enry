@@ -15,7 +15,7 @@ public class Enry {
      * @param language name of the language, e.g. PHP, HTML, ...
      * @return if it's an auxiliary language
      */
-    public static boolean isAuxiliaryLanguage(String language) {
+    public static synchronized boolean isAuxiliaryLanguage(String language) {
         return toJavaBool(nativeLib.IsAuxiliaryLanguage(toGoString(language)));
     }
 
@@ -27,7 +27,7 @@ public class Enry {
      * @param content  array of bytes with the contents of the file (the code)
      * @return the guessed language
      */
-    public static String getLanguage(String filename, byte[] content) {
+    public static synchronized String getLanguage(String filename, byte[] content) {
         return toJavaString(nativeLib.GetLanguage(
                 toGoString(filename),
                 toGoByteSlice(content)
@@ -43,7 +43,7 @@ public class Enry {
      * @param content  of the file
      * @return guessed result
      */
-    public static Guess getLanguageByContent(String filename, byte[] content) {
+    public static synchronized Guess getLanguageByContent(String filename, byte[] content) {
         GetLanguageByContent_return.ByValue res = nativeLib.GetLanguageByContent(
                 toGoString(filename),
                 toGoByteSlice(content)
@@ -59,7 +59,7 @@ public class Enry {
      * @param content of the file
      * @return guessed result
      */
-    public static Guess getLanguageByEmacsModeline(byte[] content) {
+    public static synchronized Guess getLanguageByEmacsModeline(byte[] content) {
         GetLanguageByEmacsModeline_return.ByValue res = nativeLib.GetLanguageByEmacsModeline(toGoByteSlice(content));
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
@@ -72,7 +72,7 @@ public class Enry {
      * @param filename of the file
      * @return guessed result
      */
-    public static Guess getLanguageByExtension(String filename) {
+    public static synchronized Guess getLanguageByExtension(String filename) {
         GetLanguageByExtension_return.ByValue res = nativeLib.GetLanguageByExtension(toGoString(filename));
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
@@ -85,7 +85,7 @@ public class Enry {
      * @param content of the file
      * @return guessed result
      */
-    public static Guess getLanguageByShebang(byte[] content) {
+    public static synchronized Guess getLanguageByShebang(byte[] content) {
         GetLanguageByShebang_return.ByValue res = nativeLib.GetLanguageByShebang(toGoByteSlice(content));
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
@@ -98,7 +98,7 @@ public class Enry {
      * @param filename of the file
      * @return guessed result
      */
-    public static Guess getLanguageByFilename(String filename) {
+    public static synchronized Guess getLanguageByFilename(String filename) {
         GetLanguageByFilename_return.ByValue res = nativeLib.GetLanguageByFilename(toGoString(filename));
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
@@ -111,7 +111,7 @@ public class Enry {
      * @param content of the file
      * @return guessed result
      */
-    public static Guess getLanguageByModeline(byte[] content) {
+    public static synchronized Guess getLanguageByModeline(byte[] content) {
         GetLanguageByModeline_return.ByValue res = nativeLib.GetLanguageByModeline(toGoByteSlice(content));
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
@@ -124,7 +124,7 @@ public class Enry {
      * @param content of the file
      * @return guessed result
      */
-    public static Guess getLanguageByVimModeline(byte[] content) {
+    public static synchronized Guess getLanguageByVimModeline(byte[] content) {
         GetLanguageByVimModeline_return.ByValue res = nativeLib.GetLanguageByVimModeline(toGoByteSlice(content));
         return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
     }
@@ -135,7 +135,7 @@ public class Enry {
      * @param language to get extensions from
      * @return extensions
      */
-    public static String[] getLanguageExtensions(String language) {
+    public static synchronized String[] getLanguageExtensions(String language) {
         GoSlice result = new GoSlice();
         nativeLib.GetLanguageExtensions(toGoString(language), result);
         return toJavaStringArray(result);
@@ -148,7 +148,7 @@ public class Enry {
      * @param content  of the file
      * @return all possible languages
      */
-    public static String[] getLanguages(String filename, byte[] content) {
+    public static synchronized String[] getLanguages(String filename, byte[] content) {
         GoSlice result = new GoSlice();
         nativeLib.GetLanguages(toGoString(filename), toGoByteSlice(content), result);
         return toJavaStringArray(result);
@@ -161,7 +161,7 @@ public class Enry {
      * @param language of the file
      * @return mime type
      */
-    public static String getMimeType(String path, String language) {
+    public static synchronized String getMimeType(String path, String language) {
         return toJavaString(nativeLib.GetMimeType(toGoString(path), toGoString(language)));
     }
 
@@ -171,7 +171,7 @@ public class Enry {
      * @param content of the file
      * @return whether it's binary or not
      */
-    public static boolean isBinary(byte[] content) {
+    public static synchronized boolean isBinary(byte[] content) {
         return toJavaBool(nativeLib.IsBinary(toGoByteSlice(content)));
     }
 
@@ -181,7 +181,7 @@ public class Enry {
      * @param path of the file or directory
      * @return whether it's config or not
      */
-    public static boolean isConfiguration(String path) {
+    public static synchronized boolean isConfiguration(String path) {
         return toJavaBool(nativeLib.IsConfiguration(toGoString(path)));
     }
 
@@ -193,7 +193,7 @@ public class Enry {
      *             "foo.json".
      * @return whether it's docs or not
      */
-    public static boolean isDocumentation(String path) {
+    public static synchronized boolean isDocumentation(String path) {
         return toJavaBool(nativeLib.IsDocumentation(toGoString(path)));
     }
 
@@ -203,7 +203,7 @@ public class Enry {
      * @param path of the file
      * @return whether it's a dotfile or not
      */
-    public static boolean isDotFile(String path) {
+    public static synchronized boolean isDotFile(String path) {
         return toJavaBool(nativeLib.IsDotFile(toGoString(path)));
     }
 
@@ -213,7 +213,7 @@ public class Enry {
      * @param path of the file
      * @return whether it's an image or not
      */
-    public static boolean isImage(String path) {
+    public static synchronized boolean isImage(String path) {
         return toJavaBool(nativeLib.IsImage(toGoString(path)));
     }
 
@@ -223,7 +223,7 @@ public class Enry {
      * @param path of the file or directory
      * @return whether it's vendor or not
      */
-    public static boolean isVendor(String path) {
+    public static synchronized boolean isVendor(String path) {
         return toJavaBool(nativeLib.IsVendor(toGoString(path)));
     }
 
