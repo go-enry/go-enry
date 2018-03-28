@@ -15,15 +15,15 @@ matrix:
   fast_finish: true
 
 env:
-  - ONIGUMURA=0
-  - ONIGUMURA=1
+  - ONIGURUMA=0
+  - ONIGURUMA=1
 
 install:
   - rm -rf $GOPATH/src/gopkg.in/src-d
   - mkdir -p $GOPATH/src/gopkg.in/src-d
   - ln -s $PWD $GOPATH/src/gopkg.in/src-d/enry.v1
   - cd $GOPATH/src/gopkg.in/src-d/enry.v1
-  - if [ "$ONIGUMURA" == "1" ]; then make onigumura; fi
+  - if [ "$ONIGURUMA" == "1" ]; then make oniguruma; fi
   - go get -v -t ./...
 
 script:
@@ -47,7 +47,7 @@ deploy:
 
 jobs:
   env:
-    - ONIGUMURA=0    
+    - ONIGURUMA=0
   include:
     - stage: test
       language: scala
