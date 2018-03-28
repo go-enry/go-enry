@@ -42,7 +42,7 @@ NATIVE_LIB=./shared/enry.go
 RUBEX_PATCHED := internal/code-generator/generator/heuristics.go internal/tokenizer/tokenize.go common.go
 RUBEX_ORIG := $(RUBEX_PATCHED:=.orig)
 
-.PHONY: revert-onigumura
+.PHONY: revert-oniguruma
 
 $(LINGUIST_PATH):
 	git clone https://github.com/github/linguist.git $@
@@ -73,9 +73,9 @@ $(RUBEX_ORIG): %.orig : %
 	sed -i.orig -e 's/"regexp"/regexp "github.com\/moovweb\/rubex"/g' $<
 	@touch $@
 
-onigumura: $(RUBEX_ORIG)
+oniguruma: $(RUBEX_ORIG)
 
-revert-onigumura:
+revert-oniguruma:
 	@for file in $(RUBEX_PATCHED); do if [ -e "$$file.orig" ]; then mv "$$file.orig" "$$file" && echo mv "$$file.orig" "$$file"; fi; done
 
 build-cli:
