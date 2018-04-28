@@ -1,6 +1,6 @@
 # Package configuration
 PROJECT = enry
-COMMANDS = cli/enry
+COMMANDS = cmd/enry
 
 # Including ci Makefile
 MAKEFILE = Makefile.main
@@ -79,7 +79,7 @@ revert-oniguruma:
 	@for file in $(RUBEX_PATCHED); do if [ -e "$$file.orig" ]; then mv "$$file.orig" "$$file" && echo mv "$$file.orig" "$$file"; fi; done
 
 build-cli:
-	go build -o enry -ldflags "$(LOCAL_LDFLAGS)" cli/enry/main.go
+	go build -o enry -ldflags "$(LOCAL_LDFLAGS)" cmd/enry/main.go
 
 linux-shared: $(LINUX_SHARED_LIB)
 
