@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -30,8 +31,9 @@ func main() {
 	showVersion := flag.Bool("version", false, "Show the enry version information")
 	onlyProg := flag.Bool("prog", false, "Only show programming file types in output")
 	countMode := flag.String("mode", "file", "the method used to count file size. Available options are: file, line and byte")
-
+	limitKB := flag.Int64("limit", 16*1024, "Analyse first N KB of the file (-1 means no limit)")
 	flag.Parse()
+	limit := (*limitKB) * 1024
 
 	if *showVersion {
 		fmt.Println(version)
@@ -49,7 +51,7 @@ func main() {
 	}
 
 	if fileInfo.Mode().IsRegular() {
-		err = printFileAnalysis(root)
+		err = printFileAnalysis(root, limit)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -97,7 +99,7 @@ func main() {
 		language, ok := enry.GetLanguageByExtension(path)
 		if !ok {
 			if language, ok = enry.GetLanguageByFilename(path); !ok {
-				content, err := ioutil.ReadFile(path)
+				content, err := readFile(path, limit)
 				if err != nil {
 					log.Println(err)
 					return nil
@@ -123,21 +125,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var buff bytes.Buffer
+	var buf bytes.Buffer
 	switch {
 	case *jsonFlag && !*breakdownFlag:
-		printJson(out, &buff)
+		printJson(out, &buf)
 	case *jsonFlag && *breakdownFlag:
-		printBreakDown(out, &buff)
+		printBreakDown(out, &buf)
 	case *breakdownFlag:
-		printPercents(out, &buff, *countMode)
-		buff.WriteByte('\n')
-		printBreakDown(out, &buff)
+		printPercents(out, &buf, *countMode)
+		buf.WriteByte('\n')
+		printBreakDown(out, &buf)
 	default:
-		printPercents(out, &buff, *countMode)
+		printPercents(out, &buf, *countMode)
 	}
 
-	fmt.Print(buff.String())
+	fmt.Print(buf.String())
 }
 
 func usage() {
@@ -165,10 +167,8 @@ func printBreakDown(out map[string][]string, buff *bytes.Buffer) {
 	}
 }
 
-func printJson(out map[string][]string, buff *bytes.Buffer) {
-	data, _ := json.Marshal(out)
-	buff.Write(data)
-	buff.WriteByte('\n')
+func printJson(out map[string][]string, buf *bytes.Buffer) {
+	json.NewEncoder(buf).Encode(out)
 }
 
 // filelistError represents a failed operation that took place across multiple files.
@@ -193,10 +193,12 @@ func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string
 	}
 
 	// Reduce the list of files to a quantity of file type.
-	var total float64
-	fileValues := make(map[string]float64)
-	keys := []string{}
-	var unreadableFiles filelistError
+	var (
+		total           float64
+		keys            []string
+		unreadableFiles filelistError
+		fileValues      = make(map[string]float64)
+	)
 	for fType, files := range fSummary {
 		val, err := reducer(files)
 		if err != nil {
@@ -231,12 +233,7 @@ func lineCountValues(files []string) (float64, filelistError) {
 	var filesErr filelistError
 	var t float64
 	for _, fName := range files {
-		content, err := ioutil.ReadFile(fName)
-		if err != nil {
-			filesErr = append(filesErr, fName)
-			continue
-		}
-		l, _ := getLines(content)
+		l, _ := getLines(fName, nil)
 		t += float64(l)
 	}
 	return t, filesErr
@@ -262,16 +259,26 @@ func byteCountValues(files []string) (float64, filelistError) {
 	return t, filesErr
 }
 
-func printFileAnalysis(fName string) error {
-	content, err := ioutil.ReadFile(fName)
+func printFileAnalysis(file string, limit int64) error {
+	data, err := readFile(file, limit)
 	if err != nil {
 		return err
 	}
 
-	totalLines, nonBlank := getLines(content)
-	fileType := getFileType(fName, content)
-	language := enry.GetLanguage(fName, content)
-	mimeType := enry.GetMimeType(fName, language)
+	isSample := limit > 0 && len(data) == int(limit)
+
+	full := data
+	if isSample {
+		// communicate to getLines that we don't have full contents
+		full = nil
+	}
+
+	totalLines, nonBlank := getLines(file, full)
+
+	// functions below can work on a sample
+	fileType := getFileType(file, data)
+	language := enry.GetLanguage(file, data)
+	mimeType := enry.GetMimeType(file, language)
 
 	fmt.Printf(
 		`%s: %d lines (%d sloc)
@@ -279,30 +286,75 @@ func printFileAnalysis(fName string) error {
   mime_type: %s
   language:  %s
 `,
-		filepath.Base(fName), totalLines, nonBlank, fileType, mimeType, language,
+		filepath.Base(file), totalLines, nonBlank, fileType, mimeType, language,
 	)
 	return nil
 }
 
-func getLines(b []byte) (total int, nonBlank int) {
-	scanner := bufio.NewScanner(bytes.NewReader(b))
-	lineCt := 0
-	blankCt := 0
+func readFile(path string, limit int64) ([]byte, error) {
+	if limit <= 0 {
+		return ioutil.ReadFile(path)
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	st, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	size := st.Size()
+	if limit > 0 && size > limit {
+		size = limit
+	}
+	buf := bytes.NewBuffer(nil)
+	buf.Grow(int(size))
+	_, err = io.Copy(buf, io.LimitReader(f, limit))
+	return buf.Bytes(), err
+}
 
-	for scanner.Scan() {
-		lineCt++
-		line := bytes.TrimSpace(scanner.Bytes())
-		if len(line) == 0 {
-			blankCt++
+func getLines(file string, content []byte) (total, blank int) {
+	var r io.Reader
+	if content != nil {
+		r = bytes.NewReader(content)
+	} else {
+		// file not loaded to memory - stream it
+		f, err := os.Open(file)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
+		r = f
+	}
+	br := bufio.NewReader(r)
+	lastBlank := true
+	empty := true
+	for {
+		data, prefix, err := br.ReadLine()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			fmt.Println(err)
+			break
+		}
+		if prefix {
+			continue
+		}
+		empty = false
+		total++
+		lastBlank = len(data) == 0
+		if lastBlank {
+			blank++
 		}
 	}
-	// Scanner doesn't catch the case of last byte newline.
-	if len(b) > 0 && b[len(b)-1] == '\n' {
-		lineCt++
-		blankCt++
+	if !empty && lastBlank {
+		total++
+		blank++
 	}
-
-	return lineCt, lineCt - blankCt
+	nonBlank := total - blank
+	return total, nonBlank
 }
 
 func getFileType(file string, content []byte) string {
