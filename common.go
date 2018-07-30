@@ -115,6 +115,8 @@ func GetLanguageBySpecificClassifier(content []byte, candidates []string, classi
 
 // GetLanguages applies a sequence of strategies based on the given filename and content
 // to find out the most probably languages to return.
+// At least one of arguments should be set. If content is missing, language detection will be based on the filename.
+// The function won't read the file, given an empty content.
 func GetLanguages(filename string, content []byte) []string {
 	if IsBinary(content) {
 		return nil
