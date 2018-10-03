@@ -92,6 +92,24 @@ func (s *EnryTestSuite) TestIsImage() {
 	}
 }
 
+func (s *EnryTestSuite) TestGetMimeType() {
+	tests := []struct {
+		name     string
+		path     string
+		lang     string
+		expected string
+	}{
+		{name: "TestGetMimeType_1", path: "text.txt", lang: "", expected: "text/plain"},
+		{name: "TestGetMimeType_2", path: "file.go", lang: "Go", expected: "text/x-go"},
+		{name: "TestGetMimeType_3", path: "image.png", lang: "", expected: "image/png"},
+	}
+
+	for _, test := range tests {
+		is := GetMimeType(test.path, test.lang)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
+}
+
 func (s *EnryTestSuite) TestIsConfiguration() {
 	tests := []struct {
 		name     string
