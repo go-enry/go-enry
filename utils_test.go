@@ -73,6 +73,25 @@ func (s *EnryTestSuite) TestIsDocumentation() {
 	}
 }
 
+func (s *EnryTestSuite) TestIsImage() {
+	tests := []struct {
+		name     string
+		path     string
+		expected bool
+	}{
+		{name: "TestIsImage_1", path: "invalid.txt", expected: false},
+		{name: "TestIsImage_2", path: "image.png", expected: true},
+		{name: "TestIsImage_3", path: "image.jpg", expected: true},
+		{name: "TestIsImage_4", path: "image.jpeg", expected: true},
+		{name: "TestIsImage_5", path: "image.gif", expected: true},
+	}
+
+	for _, test := range tests {
+		is := IsImage(test.path)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
+}
+
 func (s *EnryTestSuite) TestIsConfiguration() {
 	tests := []struct {
 		name     string
