@@ -9,6 +9,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func (s *EnryTestSuite) TestIsAuxiliaryLanguage() {
+	type testType struct {
+		name     string
+		lang     string
+		expected bool
+	}
+
+	tests := []testType{
+		{name: "TestIsAuxiliaryLanguage_Invalid", lang: "invalid", expected: false},
+	}
+	for k := range auxiliaryLanguages {
+		t := testType{
+			name:     fmt.Sprintf("TestIsAuxiliaryLanguage_%s", k),
+			lang:     k,
+			expected: true,
+		}
+		tests = append(tests, t)
+	}
+
+	for _, test := range tests {
+		is := IsAuxiliaryLanguage(test.lang)
+		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
+}
+
 func (s *EnryTestSuite) TestIsVendor() {
 	tests := []struct {
 		name     string
