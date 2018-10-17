@@ -2,7 +2,6 @@ language: go
 
 go:
   - 1.9.x
-  - tip
 
 addons:
   apt:
@@ -10,8 +9,6 @@ addons:
       - libonig-dev
 
 matrix:
-  allow_failures:
-    - go: tip
   fast_finish: true
 
 env:
