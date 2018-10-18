@@ -18,6 +18,7 @@ $(JAR): $(RESOURCES_DIR) $(JNAERATOR_JAR)
 		-package tech.sourced.enry.nativelib \
 		-library enry \
 		$(HEADER_FILE) \
+		-I/usr/lib/gcc/x86_64-linux-gnu/4.8/include \
 		-o $(JARS_DIR) \
 		-mode StandaloneJar \
 		-runtime JNA;
