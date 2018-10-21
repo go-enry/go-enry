@@ -19,6 +19,7 @@ $(JAR): $(RESOURCES_DIR) $(JNAERATOR_JAR)
 		-library enry \
 		$(HEADER_FILE) \
 		-I/usr/lib/gcc/x86_64-linux-gnu/4.8/include \
+		-D__GNUC__=4 \
 		-o $(JARS_DIR) \
 		-mode StandaloneJar \
 		-runtime JNA;
