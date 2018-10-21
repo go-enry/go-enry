@@ -2,6 +2,9 @@ name := "enry-java"
 organization := "tech.sourced"
 version := "1.6.6"
 
+git.useGitDescribe := true
+enablePlugins(GitVersioning)
+
 sonatypeProfileName := "tech.sourced"
 
 // pom settings for sonatype
