@@ -15,9 +15,7 @@ addons:
 env:
   global:
     - GO_VERSION='1.10.x'
-  matrix:
     - ONIGURUMA=0
-    - ONIGURUMA=1
 
 stages:
   - name: test
@@ -26,7 +24,8 @@ stages:
 
 jobs:
   include:
-    - name: 'golang unitTests'
+    - &golang-unit-tests
+      name: 'golang unitTests'
       stage: test
       install:
         - if [ "$ONIGURUMA" == "1" ]; then tags="$tags oniguruma"; fi; go get -v -t --tags "$tags" ./...
@@ -34,6 +33,10 @@ jobs:
         - make test-coverage
       after_success:
         - bash <(curl -s https://codecov.io/bash)
+
+    - <<: *golang-unit-tests
+      name: 'golang unitTests, ONIGURUMA=1'
+      env: ONIGURUMA=1
 
     - name: 'java unitTests'
       stage: test
