@@ -35,6 +35,7 @@ pgpSecretRing := baseDirectory.value / "project" / ".gnupg" / "secring.gpg"
 pgpPublicRing := baseDirectory.value / "project" / ".gnupg" / "pubring.gpg"
 pgpPassphrase := Some(SONATYPE_PASSPHRASE.toArray)
 
+libraryDependencies += "com.nativelibs4java" % "jnaerator-runtime" % "0.12"
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test
 
 unmanagedBase := baseDirectory.value / "lib"
