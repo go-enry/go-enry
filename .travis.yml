@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - '1.10'
+  - '1.10.x'
 
 addons:
   apt:
@@ -13,7 +13,7 @@ matrix:
 
 env:
   global:
-    - GO_VERSION='1.10'
+    - GO_VERSION='1.10.x'
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
@@ -53,7 +53,8 @@ jobs:
       jdk: oraclejdk8
 
       install:
-        - GIMME_OUTPUT=$(gimme $GO_VERSION | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
+        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
+        - go version
         - export GOPATH=$HOME/gopath
         - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
         - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
@@ -121,7 +122,8 @@ jobs:
       jdk: oraclejdk8
 
       install:
-        - GIMME_OUTPUT=$(gimme $GO_VERSION | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
+        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
+        - go version
         - export GOPATH=$HOME/gopath
         - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
         - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
