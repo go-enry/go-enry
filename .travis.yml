@@ -21,6 +21,8 @@ stages:
   - name: test
   - name: release
     if: tag IS present
+  - name: publish
+    if: tag IS present
 
 jobs:
   include:
@@ -101,7 +103,7 @@ jobs:
         skip_cleanup: true
 
     - name: 'java: publish to maven'
-      stage: release
+      stage: publish
       language: scala
       jdk: oraclejdk8
       install:
