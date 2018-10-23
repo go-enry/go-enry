@@ -92,7 +92,7 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y --no-install-recommends clang g++ gcc gcc-multilib libc6-dev libc6-dev-i386 mingw-w64 patch xz-utils
         - cd ${HOME}
-        - curl -sSL ${OSXCROSS_URL} | tar -C ${HOME} -xzf -
+        - curl -sfSL ${OSXCROSS_URL} | tar -C ${HOME} -xzf -
         - cd $GOPATH/src/gopkg.in/src-d/enry.v1
       script: make darwin-shared
       deploy:
@@ -113,9 +113,9 @@ jobs:
       before_script:
         - cd java
         - make
-        - curl -o ./shared/linux-x86-64/libenry.so -sL "https://github.com/$TRAVIS_REPO_SLUG/releases/download/$TRAVIS_TAG/libenry.so" || travis_terminate 1
+        - curl -o ./shared/linux-x86-64/libenry.so -sfL "https://github.com/$TRAVIS_REPO_SLUG/releases/download/$TRAVIS_TAG/libenry.so" || travis_terminate 1
         - mkdir -p ./shared/darwin
-        - curl -o ./shared/darwin/libenry.dylib -sL "https://github.com/$TRAVIS_REPO_SLUG/releases/download/$TRAVIS_TAG/libenry.dylib" || travis_terminate 1
+        - curl -o ./shared/darwin/libenry.dylib -sfL "https://github.com/$TRAVIS_REPO_SLUG/releases/download/$TRAVIS_TAG/libenry.dylib" || travis_terminate 1
         - openssl aes-256-cbc -K $encrypted_a0e1c69dbbc7_key -iv $encrypted_a0e1c69dbbc7_iv -in key.asc.enc -out key.asc -d
         - gpg --no-default-keyring --primary-keyring ./project/.gnupg/pubring.gpg --secret-keyring ./project/.gnupg/secring.gpg --keyring ./project/.gnupg/pubring.gpg --fingerprint --import key.asc
       script:
