@@ -28,6 +28,7 @@ jobs:
       name: 'golang unitTests'
       stage: test
       install:
+        - gimme version
         - if [ "$ONIGURUMA" == "1" ]; then tags="$tags oniguruma"; fi; go get -v -t --tags "$tags" ./...
       script:
         - make test-coverage
@@ -103,7 +104,6 @@ jobs:
       jdk: oraclejdk8
       install:
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
-        - go version
         - go version
         - go get -v gopkg.in/src-d/enry.v1/...
       before_script:
