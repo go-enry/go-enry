@@ -1,5 +1,7 @@
-language: go
+sudo: false
+dist: trusty
 
+language: go
 go:
   - '1.10.x'
 
@@ -53,6 +55,7 @@ jobs:
       jdk: oraclejdk8
 
       install:
+        - gimme version
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
         - go version
         - export GOPATH=$HOME/gopath
