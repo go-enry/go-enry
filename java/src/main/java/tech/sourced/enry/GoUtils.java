@@ -3,13 +3,14 @@ package tech.sourced.enry;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import tech.sourced.enry.nativelib.GoSlice;
-import tech.sourced.enry.nativelib.GoString;
+import tech.sourced.enry.nativelib._GoString_;
+import com.ochafik.lang.jnaerator.runtime.NativeSize;
 
 import java.io.UnsupportedEncodingException;
 
 class GoUtils {
 
-    static GoString.ByValue toGoString(String str) {
+    static _GoString_.ByValue toGoString(String str) {
         byte[] bytes;
         try {
             bytes = str.getBytes("utf-8");
@@ -26,19 +27,19 @@ class GoUtils {
             ptr = ptrFromBytes(bytes);
         }
 
-        GoString.ByValue val = new GoString.ByValue();
-        val.n = length;
+        _GoString_.ByValue val = new _GoString_.ByValue();
+        val.n = new NativeSize(length);
         val.p = ptr;
         return val;
     }
 
-    static String toJavaString(GoString str) {
-        if (str.n == 0) {
+    static String toJavaString(_GoString_ str) {
+        if (str.n.intValue() == 0) {
             return "";
         }
 
-        byte[] bytes = new byte[(int) str.n];
-        str.p.read(0, bytes, 0, (int) str.n);
+        byte[] bytes = new byte[(int) str.n.intValue()];
+        str.p.read(0, bytes, 0, (int) str.n.intValue());
         try {
             return new String(bytes, "utf-8");
         } catch (UnsupportedEncodingException e) {

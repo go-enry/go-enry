@@ -1,8 +1,9 @@
-language: go
+sudo: false
+dist: trusty
 
+language: go
 go:
-  - 1.9.x
-  - tip
+  - '1.10.x'
 
 addons:
   apt:
@@ -10,13 +11,14 @@ addons:
       - libonig-dev
 
 matrix:
-  allow_failures:
-    - go: tip
   fast_finish: true
 
 env:
-  - ONIGURUMA=0
-  - ONIGURUMA=1
+  global:
+    - GO_VERSION='1.10.x'
+  matrix:
+    - ONIGURUMA=0
+    - ONIGURUMA=1
 
 install:
   - go version
@@ -53,7 +55,9 @@ jobs:
       jdk: oraclejdk8
 
       install:
-        - GIMME_OUTPUT=$(gimme 1.9 | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
+        - gimme version
+        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
+        - go version
         - export GOPATH=$HOME/gopath
         - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
         - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
@@ -121,7 +125,8 @@ jobs:
       jdk: oraclejdk8
 
       install:
-        - GIMME_OUTPUT=$(gimme 1.9 | tee -a $HOME/.bashrc) && eval "$GIMME_OUTPUT"
+        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
+        - go version
         - export GOPATH=$HOME/gopath
         - mkdir -p $GOPATH/src/gopkg.in/src-d/enry.v1
         - rsync -az ${TRAVIS_BUILD_DIR}/ $GOPATH/src/gopkg.in/src-d/enry.v1
