@@ -58,6 +58,8 @@ jobs:
 
     - name: 'linux packages'
       stage: release
+      install:
+        - go get -v -t ./...
       script: make packages
       deploy:
         provider: releases
