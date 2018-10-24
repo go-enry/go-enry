@@ -77,7 +77,7 @@ jobs:
         - go get -v -t ./...
       script: make linux-shared
       deploy:
-        provider: release
+        provider: releases
         api_key:
           secure: $GITHUB_TOKEN
         file:
