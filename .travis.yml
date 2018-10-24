@@ -68,6 +68,7 @@ jobs:
         file_glob: true
         file: build/*.tar.gz
         skip_cleanup: true
+        tags: true
 
     - name: 'linux shared lib'
       stage: release
@@ -81,6 +82,7 @@ jobs:
         file:
           - ./.shared/linux-x86-64/libenry.so
         skip_cleanup: true
+        tags: true
 
     - name: 'macOS shared lib'
       stage: release
@@ -103,6 +105,7 @@ jobs:
           secure: $GITHUB_TOKEN
         file: ./.shared/darwin/libenry.dylib
         skip_cleanup: true
+        tags: true
 
     - name: 'java: publish to maven'
       stage: publish
@@ -137,3 +140,4 @@ jobs:
         file_glob: true
         file: ./target/enry-java*.jar
         skip_cleanup: true
+        tags: true
