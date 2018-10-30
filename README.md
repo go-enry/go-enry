@@ -146,7 +146,7 @@ Note that even if enry's CLI is compatible with linguist's, its main point is th
 Java bindings
 ------------
 
-Generated Java binidings using a C shared library + JNI are located under [`java`](https://github.com/src-d/enry/blob/master/java)
+Generated Java bindings using a C-shared library and JNI are located under [`java`](https://github.com/src-d/enry/blob/master/java)
 
 Development
 ------------
@@ -196,7 +196,7 @@ rest in [heuristics.rb](https://github.com/github/linguist/blob/master/lib/lingu
 Benchmarks
 ------------
 
-Enry's language detection has been compared with Linguist's one. In order to do that, linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
+Enry's language detection has been compared with Linguist's one. In order to do that, Linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
 
 We got these results:
 
