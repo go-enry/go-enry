@@ -18,6 +18,9 @@ To build enry's CLI you must run
 
 this will generate a binary in the project's root directory called `enry`. You can then move this binary to anywhere in your `PATH`.
 
+This project is now part of [source{d} Engine](https://sourced.tech/engine),
+which provides the simplest way to get started with a single command.
+Visit [sourced.tech/engine](https://sourced.tech/engine) for more information.
 
 ### Faster regexp engine (optional)
 
