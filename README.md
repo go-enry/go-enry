@@ -217,13 +217,27 @@ Golang's regexp engine being slower than Ruby's, which uses the [oniguruma](http
 You can find scripts and additional information (like software and hardware used
 and benchmarks' results per sample file) in [*benchmarks*](https://github.com/src-d/enry/blob/master/benchmarks) directory.
 
-If you want to reproduce the same benchmarks you can run:
 
-    benchmarks/run.sh
+### Benchmark Dependencies
+As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
+ - Ruby (e.g using [`rbenv`](https://github.com/rbenv/rbenv)), [`bundler`](https://bundler.io/) installed
+ - Docker
+ - [native dependencies](https://github.com/github/linguist/#dependencies) installed
+ - Build the gem `cd .linguist && bundle install && rake build_gem && cd -`
+ - Install it `gem install --no-rdoc --no-ri --local .linguist/github-linguist-*.gem`
 
-from the root's project directory and it'll run benchmarks for enry and linguist, parse the output, create csv files and create a histogram (you must have installed [gnuplot](http://gnuplot.info) in your system to get the histogram).
 
-This can take some time, so to run local benchmarks for a quick check you can either:
+### How to reproduce current results
+
+If you want to reproduce the same benchmarks as reported above:
+ - Make sure all [dependencies](#benchmark-dependencies) are installed
+ - Install [gnuplot](http://gnuplot.info) (in order to plot the histogram)
+ - Run `$ benchmarks/run.sh`
+
+It will run the benchmarks for enry and linguist, parse the output, create csv files and plot the histogram. This takes some time.
+
+### Quick
+To run quicker benchmarks you can either:
 
     make benchmarks
 
@@ -231,7 +245,7 @@ to get average times for the main detection function and strategies for the whol
 
     make benchmarks-samples
 
-if you want to see measures by sample file.
+if you want to see measures per sample file.
 
 
 Why Enry?
