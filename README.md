@@ -232,7 +232,7 @@ As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
 If you want to reproduce the same benchmarks as reported above:
  - Make sure all [dependencies](#benchmark-dependencies) are installed
  - Install [gnuplot](http://gnuplot.info) (in order to plot the histogram)
- - Run `$ benchmarks/run.sh`
+ - Run `ENRY_TEST_REPO=.linguist benchmarks/run.sh` (takes ~15h)
 
 It will run the benchmarks for enry and linguist, parse the output, create csv files and plot the histogram. This takes some time.
 
