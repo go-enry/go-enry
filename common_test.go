@@ -24,7 +24,7 @@ type EnryTestSuite struct {
 	cloned       bool
 }
 
-func TestEnryTestSuite(t *testing.T) {
+func Test_EnryTestSuite(t *testing.T) {
 	suite.Run(t, new(EnryTestSuite))
 }
 

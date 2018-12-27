@@ -5,3 +5,5 @@ Makefile.main
 .shared
 .idea
 .docsrv-resources
+build/
+java/lib/

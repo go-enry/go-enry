@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *EnryTestSuite) TestIsAuxiliaryLanguage() {
+func TestIsAuxiliaryLanguage(t *testing.T) {
 	type testType struct {
 		name     string
 		lang     string
@@ -30,11 +30,12 @@ func (s *EnryTestSuite) TestIsAuxiliaryLanguage() {
 
 	for _, test := range tests {
 		is := IsAuxiliaryLanguage(test.lang)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected,
+			fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestIsVendor() {
+func TestIsVendor(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -53,11 +54,11 @@ func (s *EnryTestSuite) TestIsVendor() {
 
 	for _, test := range tests {
 		is := IsVendor(test.path)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestIsDocumentation() {
+func TestIsDocumentation(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -69,11 +70,11 @@ func (s *EnryTestSuite) TestIsDocumentation() {
 
 	for _, test := range tests {
 		is := IsDocumentation(test.path)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestIsImage() {
+func TestIsImage(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -88,11 +89,11 @@ func (s *EnryTestSuite) TestIsImage() {
 
 	for _, test := range tests {
 		is := IsImage(test.path)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestGetMimeType() {
+func TestGetMimeType(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -106,11 +107,11 @@ func (s *EnryTestSuite) TestGetMimeType() {
 
 	for _, test := range tests {
 		is := GetMimeType(test.path, test.lang)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestIsConfiguration() {
+func TestIsConfiguration(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -123,11 +124,11 @@ func (s *EnryTestSuite) TestIsConfiguration() {
 
 	for _, test := range tests {
 		is := IsConfiguration(test.path)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestIsBinary() {
+func TestIsBinary(t *testing.T) {
 	tests := []struct {
 		name     string
 		data     []byte
@@ -140,11 +141,11 @@ func (s *EnryTestSuite) TestIsBinary() {
 
 	for _, test := range tests {
 		is := IsBinary(test.data)
-		assert.Equal(s.T(), is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 
-func (s *EnryTestSuite) TestIsDotFile() {
+func TestIsDotFile(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -156,7 +157,7 @@ func (s *EnryTestSuite) TestIsDotFile() {
 
 	for _, test := range tests {
 		is := IsDotFile(test.path)
-		assert.Equal(s.T(), test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+		assert.Equal(t, test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
 

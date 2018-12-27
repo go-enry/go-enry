@@ -14,7 +14,7 @@ go get gopkg.in/src-d/enry.v1/...
 
 To build enry's CLI you must run
 
-    make build-cli
+    make build
 
 this will generate a binary in the project's root directory called `enry`. You can then move this binary to anywhere in your `PATH`.
 
@@ -195,6 +195,7 @@ expression](https://github.com/github/linguist/blob/master/lib/linguist/heuristi
 for `*.sql` files right. This expression doesn't comply with the pattern for the
 rest in [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb).
 
+`enry` [CLI tool](#cli) does not require a full Git repository to be present in filesystem in order to report languages.
 
 Benchmarks
 ------------
@@ -203,7 +204,7 @@ Enry's language detection has been compared with Linguist's one. In order to do 
 
 We got these results:
 
-![histogram](https://raw.githubusercontent.com/src-d/enry/master/benchmarks/histogram/distribution.png)
+![histogram](benchmarks/histogram/distribution.png)
 
 The histogram represents the number of files for which spent time in language
 detection was in the range of the time interval indicated in the x axis.
