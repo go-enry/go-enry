@@ -1,9 +1,9 @@
 # Hardware and software used to run benchmarks
 
-Dell XPS 9360
-Linux 4.11.6-3-ARCH #1 SMP PREEMPT Thu Jun 22 12:21:46 CEST 2017 x86_64
-go version go1.8.3 linux/amd64
-ruby 2.4.1p111 (2017-03-22 revision 58053) [x86_64-linux]
+MacBookPro13,1
+Darwin Kernel Version 16.7.0: Tue Jan 30 11:27:06 PST 2018; root:xnu-3789.73.11~1/RELEASE_X86_64 x86_64 i386
+go version go1.10.3 darwin/amd64
+ruby 2.4.1p111 (2017-03-22 revision 58053) [x86_64-darwin16]
 
-github/linguist/samples commit: d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68
-
+github/linguist v7.1.3 commit: e761f9b013e5b61161481fcb898b59721ee40e3d
+src-d/enry v1.6.7 commit: 3d356c70ae322f41048f74d01c5e8572f5898d34

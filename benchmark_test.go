@@ -2,6 +2,7 @@ package enry
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -110,11 +111,9 @@ func getSamples(dir string) ([]*sample, error) {
 			filename: path,
 			content:  content,
 		}
-
 		samples = append(samples, s)
 		return nil
 	})
-
 	return samples, err
 }
 
@@ -157,17 +156,7 @@ func BenchmarkStrategiesTotal(b *testing.B) {
 		b.SkipNow()
 	}
 
-	benchmarks := []struct {
-		name       string
-		strategy   Strategy
-		candidates []string
-	}{
-		{name: "GetLanguagesByModeline()_TOTAL", strategy: GetLanguagesByModeline},
-		{name: "GetLanguagesByFilename()_TOTAL", strategy: GetLanguagesByFilename},
-		{name: "GetLanguagesByShebang()_TOTAL", strategy: GetLanguagesByShebang},
-		{name: "GetLanguagesByExtension()_TOTAL", strategy: GetLanguagesByExtension},
-		{name: "GetLanguagesByContent()_TOTAL", strategy: GetLanguagesByContent},
-	}
+	benchmarks := benchmarkForAllStrategies("TOTAL")
 
 	var o []string
 	for _, benchmark := range benchmarks {
@@ -222,17 +211,7 @@ func BenchmarkStrategiesPerSample(b *testing.B) {
 		b.SkipNow()
 	}
 
-	benchmarks := []struct {
-		name       string
-		strategy   Strategy
-		candidates []string
-	}{
-		{name: "GetLanguagesByModeline()_SAMPLE_", strategy: GetLanguagesByModeline},
-		{name: "GetLanguagesByFilename()_SAMPLE_", strategy: GetLanguagesByFilename},
-		{name: "GetLanguagesByShebang()_SAMPLE_", strategy: GetLanguagesByShebang},
-		{name: "GetLanguagesByExtension()_SAMPLE_", strategy: GetLanguagesByExtension},
-		{name: "GetLanguagesByContent()_SAMPLE_", strategy: GetLanguagesByContent},
-	}
+	benchmarks := benchmarkForAllStrategies("SAMPLE")
 
 	var o []string
 	for _, benchmark := range benchmarks {
@@ -245,5 +224,21 @@ func BenchmarkStrategiesPerSample(b *testing.B) {
 				overcomeLanguages = o
 			})
 		}
+	}
+}
+
+type strategyName struct {
+	name       string
+	strategy   Strategy
+	candidates []string
+}
+
+func benchmarkForAllStrategies(class string) []strategyName {
+	return []strategyName{
+		{name: fmt.Sprintf("GetLanguagesByModeline()_%s_", class), strategy: GetLanguagesByModeline},
+		{name: fmt.Sprintf("GetLanguagesByFilename()_%s_", class), strategy: GetLanguagesByFilename},
+		{name: fmt.Sprintf("GetLanguagesByShebang()_%s_", class), strategy: GetLanguagesByShebang},
+		{name: fmt.Sprintf("GetLanguagesByExtension()_%s_", class), strategy: GetLanguagesByExtension},
+		{name: fmt.Sprintf("GetLanguagesByContent()_%s_", class), strategy: GetLanguagesByContent},
 	}
 }
