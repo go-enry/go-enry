@@ -158,12 +158,12 @@ func usage() {
 
 func printBreakDown(out map[string][]string, buff *bytes.Buffer) {
 	for name, language := range out {
-		writeStringLn(name, buff)
+		fmt.Fprintln(buff, name)
 		for _, file := range language {
-			writeStringLn(file, buff)
+			fmt.Fprintln(buff, file)
 		}
 
-		writeStringLn("", buff)
+		fmt.Fprintln(buff)
 	}
 }
 
@@ -377,9 +377,4 @@ func getFileType(file string, content []byte) string {
 	default:
 		return "Text"
 	}
-}
-
-func writeStringLn(s string, buff *bytes.Buffer) {
-	buff.WriteString(s)
-	buff.WriteByte('\n')
 }
