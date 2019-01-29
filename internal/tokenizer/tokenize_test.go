@@ -102,7 +102,10 @@ func TestTokenize(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			before := string(test.content)
 			tokens := Tokenize(test.content)
+			after := string(test.content)
+			assert.Equal(t, before, after, "the input slice was modified")
 			assert.Equal(t, len(test.expected), len(tokens), fmt.Sprintf("token' slice length = %v, want %v", len(test.expected), len(tokens)))
 			for i, expectedToken := range test.expected {
 				assert.Equal(t, expectedToken, tokens[i], fmt.Sprintf("token = %v, want %v", tokens[i], expectedToken))
