@@ -11,9 +11,9 @@ import (
 
 const byteLimit = 100000
 
-// Tokenize returns classification tokens from content. The tokens returned
-// should match what the Linguist library returns. At most the first 100KB of
-// content are tokenized.
+// Tokenize returns language-agnostic lexical tokens from content. The tokens
+// returned should match what the Linguist library returns. At most the first
+// 100KB of content are tokenized.
 func Tokenize(content []byte) []string {
 	if len(content) > byteLimit {
 		content = content[:byteLimit]
