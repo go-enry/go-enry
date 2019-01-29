@@ -13,6 +13,10 @@ func Tokenize(content []byte) []string {
 		content = content[:byteLimit]
 	}
 
+	// Copy the input so that changes wrought by the tokenization steps do not
+	// modify the caller's copy of the input. See #196.
+	content = append([]byte(nil), content...)
+
 	tokens := make([][]byte, 0, 50)
 	for _, extract := range extractTokens {
 		var extractedTokens [][]byte
