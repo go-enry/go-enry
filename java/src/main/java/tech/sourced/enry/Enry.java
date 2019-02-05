@@ -10,16 +10,6 @@ public class Enry {
     private static final EnryLibrary nativeLib = EnryLibrary.INSTANCE;
 
     /**
-     * Returns whether the given language is auxiliary or not.
-     *
-     * @param language name of the language, e.g. PHP, HTML, ...
-     * @return if it's an auxiliary language
-     */
-    public static synchronized boolean isAuxiliaryLanguage(String language) {
-        return toJavaBool(nativeLib.IsAuxiliaryLanguage(toGoString(language)));
-    }
-
-    /**
      * Returns the language of the given file based on the filename and its
      * contents.
      *

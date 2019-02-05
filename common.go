@@ -26,6 +26,7 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByClassifier,
 }
 
+// DefaultClassifier is a naive Bayes classifier based on Linguist samples.
 var DefaultClassifier Classifier = &classifier{
 	languagesLogProbabilities: data.LanguagesLogProbabilities,
 	tokensLogProbabilities:    data.TokensLogProbabilities,

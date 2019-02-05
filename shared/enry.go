@@ -93,12 +93,7 @@ func GetLanguagesByVimModeline(filename string, content []byte, candidates []str
 
 //export GetMimeType
 func GetMimeType(path string, language string) string {
-	return enry.GetMimeType(path, language)
-}
-
-//export IsAuxiliaryLanguage
-func IsAuxiliaryLanguage(lang string) bool {
-	return enry.IsAuxiliaryLanguage(lang)
+	return enry.GetMIMEType(path, language)
 }
 
 //export IsBinary

@@ -278,7 +278,7 @@ func printFileAnalysis(file string, limit int64, isJSON bool) error {
 	// functions below can work on a sample
 	fileType := getFileType(file, data)
 	language := enry.GetLanguage(file, data)
-	mimeType := enry.GetMimeType(file, language)
+	mimeType := enry.GetMIMEType(file, language)
 
 	if isJSON {
 		return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{

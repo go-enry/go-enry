@@ -28,7 +28,7 @@ $(RESOURCES_DIR): os-shared-lib
 	cp -R $(RESOURCES_SRC) $(RESOURCES_DIR)
 
 $(JNAERATOR_JAR): $(RESOURCES_DIR)
-	mkdir $(JNAERATOR_DIR) && \
+	mkdir -p $(JNAERATOR_DIR) && \
 	wget $(JNAERATOR_JAR_URL) -O $(JNAERATOR_JAR)
 
 os-shared-lib:

@@ -3,37 +3,10 @@ package enry
 import (
 	"bytes"
 	"fmt"
-	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestIsAuxiliaryLanguage(t *testing.T) {
-	type testType struct {
-		name     string
-		lang     string
-		expected bool
-	}
-
-	tests := []testType{
-		{name: "TestIsAuxiliaryLanguage_Invalid", lang: "invalid", expected: false},
-	}
-	for k := range auxiliaryLanguages {
-		t := testType{
-			name:     fmt.Sprintf("TestIsAuxiliaryLanguage_%s", k),
-			lang:     k,
-			expected: true,
-		}
-		tests = append(tests, t)
-	}
-
-	for _, test := range tests {
-		is := IsAuxiliaryLanguage(test.lang)
-		assert.Equal(t, is, test.expected,
-			fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
-	}
-}
 
 func TestIsVendor(t *testing.T) {
 	tests := []struct {
@@ -106,7 +79,7 @@ func TestGetMimeType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		is := GetMimeType(test.path, test.lang)
+		is := GetMIMEType(test.path, test.lang)
 		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
@@ -158,45 +131,5 @@ func TestIsDotFile(t *testing.T) {
 	for _, test := range tests {
 		is := IsDotFile(test.path)
 		assert.Equal(t, test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
-	}
-}
-
-func TestFileCountListSort(t *testing.T) {
-	sampleData := FileCountList{{"a", 8}, {"b", 65}, {"c", 20}, {"d", 90}}
-	const ascending = "ASC"
-	const descending = "DESC"
-
-	tests := []struct {
-		name         string
-		data         FileCountList
-		order        string
-		expectedData FileCountList
-	}{
-		{
-			name:         "ascending order",
-			data:         sampleData,
-			order:        ascending,
-			expectedData: FileCountList{{"a", 8}, {"c", 20}, {"b", 65}, {"d", 90}},
-		},
-		{
-			name:         "descending order",
-			data:         sampleData,
-			order:        descending,
-			expectedData: FileCountList{{"d", 90}, {"b", 65}, {"c", 20}, {"a", 8}},
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if test.order == descending {
-				sort.Sort(sort.Reverse(test.data))
-			} else {
-				sort.Sort(test.data)
-			}
-
-			for i := 0; i < len(test.data); i++ {
-				assert.Equal(t, test.data[i], test.expectedData[i], fmt.Sprintf("%v: FileCount at position %d = %v, expected: %v", test.name, i, test.data[i], test.expectedData[i]))
-			}
-		})
 	}
 }

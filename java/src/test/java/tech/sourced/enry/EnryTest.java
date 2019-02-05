@@ -7,12 +7,6 @@ import static org.junit.Assert.*;
 public class EnryTest {
 
     @Test
-    public void isAuxiliaryLanguage() {
-        assertTrue(Enry.isAuxiliaryLanguage("HTML"));
-        assertFalse(Enry.isAuxiliaryLanguage("Go"));
-    }
-
-    @Test
     public void getLanguage() {
         String code = "<?php $foo = bar();";
         assertEquals("PHP", Enry.getLanguage("foobar.php", code.getBytes()));
