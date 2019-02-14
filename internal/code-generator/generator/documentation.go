@@ -2,13 +2,14 @@ package generator
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v2"
-	"io"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
-// Documentation reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
-func Documentation(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
+// Documentation generates regex matchers in Go for documentation files/dirs.
+// It is of generator.File type.
+func Documentation(fileToParse, _, outFile, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {
 		return err
@@ -20,13 +21,10 @@ func Documentation(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit 
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeDocumentationTemplate(buf, regexpList, tmplPath, tmplName, commit); err != nil {
+	err = executeTemplate(buf, tmplName, tmplPath, commit, nil, regexpList)
+	if err != nil {
 		return err
 	}
 
-	return formatedWrite(outPath, buf.Bytes())
-}
-
-func executeDocumentationTemplate(out io.Writer, regexpList []string, tmplPath, tmplName, commit string) error {
-	return executeTemplate(out, tmplName, tmplPath, commit, nil, regexpList)
+	return formatedWrite(outFile, buf.Bytes())
 }

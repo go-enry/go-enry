@@ -2,12 +2,14 @@ package generator
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
-// Vendor reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
+// Vendor generates regex matchers in Go for vendoring files/dirs.
+// It is of generator.File type.
 func Vendor(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {

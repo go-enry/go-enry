@@ -20,7 +20,7 @@ const (
 	extensionsTmpl     = "extension.go.tmpl"
 
 	// content.go generation
-	heuristicsRuby  = ".linguist/lib/linguist/heuristics.rb"
+	heuristicsYAML  = ".linguist/lib/linguist/heuristics.yml"
 	contentFile     = "data/content.go"
 	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
 	contentTmpl     = "content.go.tmpl"
@@ -93,7 +93,7 @@ func main() {
 
 	fileList := []*generatorFiles{
 		{generator.Extensions, languagesYAML, "", extensionsFile, extensionsTmplPath, extensionsTmpl, commit},
-		{generator.Heuristics, heuristicsRuby, "", contentFile, contentTmplPath, contentTmpl, commit},
+		{generator.GenHeuristics, heuristicsYAML, "", contentFile, contentTmplPath, contentTmpl, commit},
 		{generator.Vendor, vendorYAML, "", vendorFile, vendorTmplPath, vendorTmpl, commit},
 		{generator.Documentation, documentationYAML, "", documentationFile, documentationTmplPath, documentationTmpl, commit},
 		{generator.Types, languagesYAML, "", typeFile, typeTmplPath, typeTmpl, commit},

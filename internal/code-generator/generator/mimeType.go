@@ -2,11 +2,14 @@ package generator
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
+// MimeType generates a map in Go with language name -> MIME string.
+// It is of generator.File type.
 func MimeType(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
 	data, err := ioutil.ReadFile(fileToParse)
 	if err != nil {

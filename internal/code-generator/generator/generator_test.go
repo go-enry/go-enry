@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,7 +16,7 @@ import (
 const (
 	linguistURL          = "https://github.com/github/linguist.git"
 	linguistClonedEnvVar = "ENRY_TEST_REPO"
-	commit               = "d5c8db3fb91963c4b2762ca2ea2ff7cfac109f68"
+	commit               = "e4560984058b4726010ca4b8f03ed9d0f8f464db"
 	samplesDir           = "samples"
 	languagesFile        = "lib/linguist/languages.yml"
 
@@ -28,7 +29,7 @@ const (
 	extensionTestTmplName = "extension.go.tmpl"
 
 	// Heuristics test
-	heuristicsTestFile  = "lib/linguist/heuristics.rb"
+	heuristicsTestFile  = "lib/linguist/heuristics.yml"
 	contentGold         = testDir + "/content.gold"
 	contentTestTmplPath = assetsDir + "/content.go.tmpl"
 	contentTestTmplName = "content.go.tmpl"
@@ -85,13 +86,27 @@ type GeneratorTestSuite struct {
 	suite.Suite
 	tmpLinguist string
 	cloned      bool
+	testCases   []testCase
 }
 
-func TestGeneratorTestSuite(t *testing.T) {
+type testCase struct {
+	name        string
+	fileToParse string
+	samplesDir  string
+	tmplPath    string
+	tmplName    string
+	commit      string
+	generate    File
+	wantOut     string
+}
+
+var updateGold = flag.Bool("update_gold", false, "Update golden test files")
+
+func Test_GeneratorTestSuite(t *testing.T) {
 	suite.Run(t, new(GeneratorTestSuite))
 }
 
-func (s *GeneratorTestSuite) SetupSuite() {
+func (s *GeneratorTestSuite) maybeCloneLinguist() {
 	var err error
 	s.tmpLinguist = os.Getenv(linguistClonedEnvVar)
 	s.cloned = s.tmpLinguist == ""
@@ -101,40 +116,25 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguist)
 		err = cmd.Run()
 		assert.NoError(s.T(), err)
-	}
 
-	cwd, err := os.Getwd()
-	assert.NoError(s.T(), err)
+		cwd, err := os.Getwd()
+		assert.NoError(s.T(), err)
 
-	err = os.Chdir(s.tmpLinguist)
-	assert.NoError(s.T(), err)
+		err = os.Chdir(s.tmpLinguist)
+		assert.NoError(s.T(), err)
 
-	cmd := exec.Command("git", "checkout", commit)
-	err = cmd.Run()
-	assert.NoError(s.T(), err)
+		cmd = exec.Command("git", "checkout", commit)
+		err = cmd.Run()
+		assert.NoError(s.T(), err)
 
-	err = os.Chdir(cwd)
-	assert.NoError(s.T(), err)
-}
-
-func (s *GeneratorTestSuite) TearDownSuite() {
-	if s.cloned {
-		err := os.RemoveAll(s.tmpLinguist)
+		err = os.Chdir(cwd)
 		assert.NoError(s.T(), err)
 	}
 }
 
-func (s *GeneratorTestSuite) TestGenerationFiles() {
-	tests := []struct {
-		name        string
-		fileToParse string
-		samplesDir  string
-		tmplPath    string
-		tmplName    string
-		commit      string
-		generate    File
-		wantOut     string
-	}{
+func (s *GeneratorTestSuite) SetupSuite() {
+	s.maybeCloneLinguist()
+	s.testCases = []testCase{
 		{
 			name:        "Extensions()",
 			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
@@ -152,7 +152,7 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 			tmplPath:    contentTestTmplPath,
 			tmplName:    contentTestTmplName,
 			commit:      commit,
-			generate:    Heuristics,
+			generate:    GenHeuristics,
 			wantOut:     contentGold,
 		},
 		{
@@ -244,8 +244,35 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 			wantOut:     mimeTypeGold,
 		},
 	}
+}
 
-	for _, test := range tests {
+func (s *GeneratorTestSuite) TearDownSuite() {
+	if s.cloned {
+		err := os.RemoveAll(s.tmpLinguist)
+		if err != nil {
+			s.T().Logf("Failed to clean up %s after the test.\n", s.tmpLinguist)
+		}
+	}
+}
+
+// TestUpdateGeneratorTestSuiteGold is a Gold results generation automation.
+// It should only be enabled&run manually on every new Linguist version
+// to update *.gold files.
+func (s *GeneratorTestSuite) TestUpdateGeneratorTestSuiteGold() {
+	if !*updateGold {
+		s.T().Skip()
+	}
+	s.T().Logf("Generating new *.gold test files")
+	for _, test := range s.testCases {
+		dst := test.wantOut
+		s.T().Logf("Generating %s from %s\n", dst, test.fileToParse)
+		err := test.generate(test.fileToParse, test.samplesDir, dst, test.tmplPath, test.tmplName, test.commit)
+		assert.NoError(s.T(), err)
+	}
+}
+
+func (s *GeneratorTestSuite) TestGenerationFiles() {
+	for _, test := range s.testCases {
 		gold, err := ioutil.ReadFile(test.wantOut)
 		assert.NoError(s.T(), err)
 

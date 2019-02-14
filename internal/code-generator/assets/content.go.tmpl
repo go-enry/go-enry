@@ -1,33 +1,51 @@
 package data
 
-import "gopkg.in/toqueteos/substring.v1"
+import (
+	"regexp"
 
-type languageMatcher func ([]byte) []string
+	"gopkg.in/src-d/enry.v1/data/rule"
+)
 
-var ContentMatchers = map[string]languageMatcher{
-	{{ range $index, $disambiguator := . -}}
-	{{ printf "%q" $disambiguator.Extension }}: func(i []byte) []string {
-		{{ range $i, $language := $disambiguator.Languages -}}
-
-		{{- if not (avoidLanguage $language) }}
-		{{- if gt (len $language.Heuristics) 0 }}
-		{{- if gt $i 0 }} else {{ end -}} 
-		if {{- range $j, $heuristic := $language.Heuristics }} {{ $heuristic.Name }}.Match(string(i)) 
-		{{- if lt $j (len $language.LogicRelations) }} {{index $language.LogicRelations $j}} {{- end -}} {{ end }} {
-			return []string{ {{- printf "%q" $language.Language -}} }
-		}
-
-		{{- end -}}
-		{{- end -}}
-		{{- end}}
-
-		return {{ returnLanguages $disambiguator.Languages | returnStringSlice }}
-	},
+var ContentHeuristics = map[string]*Heuristics{
+	{{ range $ext, $rules := . -}}
+		{{ printf "%q" $ext }}: &Heuristics{
+			{{ range $rule := $rules -}}
+				{{template "Rule" $rule}}
+			{{ end -}}
+		},
 	{{ end -}}
 }
 
-var (
-    {{ range $index, $heuristic := getAllHeuristics . -}}
-    {{ $heuristic.Name }} = substring.Regexp(`{{ $heuristic.Regexp }}`)
-    {{ end -}}
-)
+{{ define "Rule" -}}
+	{{ if eq .Op "And" -}}
+		rule.And(
+			{{ template "Languages" .Langs -}}
+			{{ range $rule := .Rules -}}
+				{{template "Rule" $rule}}
+			{{ end -}}
+		),
+	{{- else if eq .Op "Or" -}}
+		rule.Or(
+			{{ template "Languages" .Langs -}}
+			regexp.MustCompile(`{{ .Pattern }}`),
+		),
+	{{- else if eq .Op "Not" -}}
+		rule.Not(
+			{{ template "Languages" .Langs -}}
+			regexp.MustCompile(`{{ .Pattern }}`),
+		),
+	{{- else if eq .Op "Always" -}}
+		rule.Always(
+			{{ template "Languages" .Langs -}}
+		),
+	{{ end -}}
+{{ end -}}
+
+
+{{define "Languages" -}}
+	{{with . -}}
+		rule.MatchingLanguages( {{range .}} {{printf "\"%s\"" .}}, {{end}} ),
+	{{ else -}}
+		rule.MatchingLanguages(""),
+	{{end -}}
+{{end}}

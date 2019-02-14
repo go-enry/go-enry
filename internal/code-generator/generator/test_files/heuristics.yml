@@ -1,0 +1,40 @@
+# Tests care about number and order of heuristics in this fixture
+disambiguations:
+
+- extensions: ['.h', '.hh']
+  rules:
+  - language: Objective-C
+    pattern: 'objc'
+  - language: C++
+    named_pattern: cpp
+
+- extensions: ['.f']
+  rules:
+  - language: Forth
+    pattern:  #as in .md
+      - 'f'
+      - 'f1'
+  - language: Filebench WML
+    pattern: 'f2'
+  - language: Fortran
+    named_pattern: fortran
+
+- extensions: ['.ms']
+  rules:
+  - language: Roff
+    pattern: 'rp'
+  - language: Unix Assembly
+    and:
+      - negative_pattern: 'np'
+      - pattern: 'p'
+  - language: MAXScript
+
+- extensions: ['.mod']
+  rules:
+  - language: [Linux Kernel Module, AMPL]
+
+named_patterns:
+  cpp:
+  - 'regex1'
+  - 'regex2'
+  fortran: 'regex3'

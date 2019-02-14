@@ -1,3 +1,5 @@
+// Package generator provides facilities to generate Go code for the
+// package data in enry from YAML files describing supported languages in Linguist.
 package generator
 
 import (
@@ -9,7 +11,10 @@ import (
 	"text/template"
 )
 
-// File is the function's type that generate source file from a file to be parsed, linguist's samples dir and a template.
+// File is a common type for all generator functions.
+// It generates Go source code file based on template in tmplPath,
+// by parsing the data in fileToParse and linguist's samplesDir
+// saving results to an outFile.
 type File func(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error
 
 func formatedWrite(outPath string, source []byte) error {
@@ -28,16 +33,14 @@ func executeTemplate(w io.Writer, name, path, commit string, fmap template.FuncM
 		return commit
 	}
 
-	buf := bytes.NewBuffer(nil)
-
 	const headerTmpl = "header.go.tmpl"
-
 	headerPath := filepath.Join(filepath.Dir(path), headerTmpl)
 
 	h := template.Must(template.New(headerTmpl).Funcs(template.FuncMap{
 		"getCommit": getCommit,
 	}).ParseFiles(headerPath))
 
+	buf := bytes.NewBuffer(nil)
 	if err := h.Execute(buf, data); err != nil {
 		return err
 	}

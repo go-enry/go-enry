@@ -46,6 +46,11 @@ clean: clean-linguist clean-shared
 code-generate: $(LINGUIST_PATH)
 	mkdir -p data && \
 	go run internal/code-generator/main.go
+	ENRY_TEST_REPO="$${PWD}/.linguist" go test  -v \
+		-run Test_GeneratorTestSuite \
+		./internal/code-generator/generator \
+		-testify.m TestUpdateGeneratorTestSuiteGold \
+		-update_gold
 
 benchmarks: $(LINGUIST_PATH)
 	go test -run=NONE -bench=. && \

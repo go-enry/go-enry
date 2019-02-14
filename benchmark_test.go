@@ -28,9 +28,6 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	var exitCode int
-	defer os.Exit(exitCode)
-
 	flag.BoolVar(&slow, "slow", false, "run benchmarks per sample for strategies too")
 	flag.Parse()
 
@@ -47,7 +44,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	exitCode = m.Run()
+	os.Exit(m.Run())
 }
 
 func cloneLinguist(linguistURL string) error {

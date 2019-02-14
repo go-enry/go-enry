@@ -154,14 +154,17 @@ Generated Java bindings using a C-shared library and JNI are located under [`jav
 Development
 ------------
 
-*enry* re-uses parts of original [linguist](https://github.com/github/linguist) to generate internal data structures. In order to update to the latest upstream and generate the necessary code you must run:
+*enry* re-uses parts of original [linguist](https://github.com/github/linguist) to generate internal data structures. In order to update to the latest upstream and generate all the necessary code you must run:
 
+    git clone https://github.com/github/linguist.git .linguist
+    # update commit in generator_test.go (to re-generate .gold fixtures)
+    # https://github.com/src-d/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
     go generate
 
 We update enry when changes are done in linguist's master branch on the following files:
 
 * [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)
-* [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb)
+* [heuristics.yml](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.yml)
 * [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
 * [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
 
@@ -183,17 +186,11 @@ Divergences from linguist
 Using [linguist/samples](https://github.com/github/linguist/tree/master/samples)
 as a set for the tests, the following issues were found:
 
-* With [hello.ms](https://github.com/github/linguist/blob/master/samples/Unix%20Assembly/hello.ms) we can't detect the language (Unix Assembly) because we don't have a matcher in contentMatchers (content.go) for Unix Assembly. Linguist uses this [regexp](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L300) in its code,
+* [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine
 
-    `elsif /(?<!\S)\.(include|globa?l)\s/.match(data) || /(?<!\/\*)(\A|\n)\s*\.[A-Za-z][_A-Za-z0-9]*:/.match(data.gsub(/"([^\\"]|\\.)*"|'([^\\']|\\.)*'|\\\s*(?:--.*)?\n/, ""))`
+* As of (Linguist v5.3.2)[https://github.com/github/linguist/releases/tag/v5.3.2] it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry stil uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. Tracked under https://github.com/src-d/enry/issues/193
 
-    which we can't port.
-
-* All files for the SQL language fall to the classifier because we don't parse
-this [disambiguator
-expression](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb#L433)
-for `*.sql` files right. This expression doesn't comply with the pattern for the
-rest in [heuristics.rb](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.rb).
+* Bayesian classifier cann't distinguish "SQL" vs "PLpgSQL". Tracked under https://github.com/src-d/enry/issues/194
 
 `enry` [CLI tool](#cli) does not require a full Git repository to be present in filesystem in order to report languages.
 
@@ -232,7 +229,7 @@ As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
 If you want to reproduce the same benchmarks as reported above:
  - Make sure all [dependencies](#benchmark-dependencies) are installed
  - Install [gnuplot](http://gnuplot.info) (in order to plot the histogram)
- - Run `ENRY_TEST_REPO=.linguist benchmarks/run.sh` (takes ~15h)
+ - Run `ENRY_TEST_REPO="$PWD/.linguist" benchmarks/run.sh` (takes ~15h)
 
 It will run the benchmarks for enry and linguist, parse the output, create csv files and plot the histogram. This takes some time.
 

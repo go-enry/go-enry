@@ -2,10 +2,11 @@ package generator
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Aliases reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
@@ -21,10 +22,10 @@ func Aliases(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string
 	}
 
 	orderedLangList := getAlphabeticalOrderedKeys(languages)
-	languagesByAlias := buildAliasLanguageMap(languages, orderedLangList)
+	languageByAlias := buildAliasLanguageMap(languages, orderedLangList)
 
 	buf := &bytes.Buffer{}
-	if err := executeAliasesTemplate(buf, languagesByAlias, tmplPath, tmplName, commit); err != nil {
+	if err := executeAliasesTemplate(buf, languageByAlias, tmplPath, tmplName, commit); err != nil {
 		return err
 	}
 
@@ -52,6 +53,6 @@ func convertToAliasKey(s string) (key string) {
 	return
 }
 
-func executeAliasesTemplate(out io.Writer, languagesByAlias map[string]string, aliasesTmplPath, aliasesTmpl, commit string) error {
-	return executeTemplate(out, aliasesTmpl, aliasesTmplPath, commit, nil, languagesByAlias)
+func executeAliasesTemplate(out io.Writer, languageByAlias map[string]string, aliasesTmplPath, aliasesTmpl, commit string) error {
+	return executeTemplate(out, aliasesTmpl, aliasesTmplPath, commit, nil, languageByAlias)
 }
