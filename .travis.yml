@@ -2,20 +2,24 @@ sudo: false
 dist: trusty
 
 language: go
-go:
-  - '1.10.x'
-
 go_import_path: gopkg.in/src-d/enry.v1
+
+go:
+  - '1.11.x'
+  - '1.10.x'
+env:
+  global:
+    - GO_VERSION_FOR_JVM='1.11.x'
+  matrix:
+    - ONIGURUMA=0
+    - ONIGURUMA=1
+matrix:
+  fast_finish: true
 
 addons:
   apt:
     packages:
       - libonig-dev
-
-env:
-  global:
-    - GO_VERSION='1.10.x'
-    - ONIGURUMA=0
 
 stages:
   - name: test
@@ -24,24 +28,17 @@ stages:
   - name: publish
     if: tag IS present
 
+stage: test
+install:
+  - if [[ -n "$ONIGURUMA" ]]; then tags="$tags oniguruma"; fi; go get -v -t --tags "$tags" ./...
+script:
+  - make test-coverage
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 jobs:
   include:
-    - &golang-unit-tests
-      name: 'golang unitTests'
-      stage: test
-      install:
-        - gimme version
-        - if [ "$ONIGURUMA" == "1" ]; then tags="$tags oniguruma"; fi; go get -v -t --tags "$tags" ./...
-      script:
-        - make test-coverage
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
-
-    - <<: *golang-unit-tests
-      name: 'golang unitTests, ONIGURUMA=1'
-      env: ONIGURUMA=1
-
-    - name: 'java unitTests'
+    - name: 'java unit-tests'
       stage: test
       language: scala
       jdk: oraclejdk8
@@ -53,8 +50,7 @@ jobs:
         - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
         - cd ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
       install:
-        - gimme version
-        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
+        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
         - echo $PWD; echo $GOPATH
         - go get -v ./...
@@ -67,6 +63,7 @@ jobs:
     - name: 'linux packages'
       stage: release
       install:
+        - go version
         - go get -v -t ./...
       script: make packages
       deploy:
@@ -82,6 +79,7 @@ jobs:
     - name: 'linux shared lib'
       stage: release
       install:
+        - go version
         - go get -v -t ./...
       script: make linux-shared
       deploy:
@@ -102,6 +100,7 @@ jobs:
         - OSXCROSS_URL="https://github.com/bblfsh/client-scala/releases/download/v1.5.2/${OSXCROSS_PACKAGE}"
         - PATH="/$HOME/osxcross/bin:$PATH"
       install:
+        - go version
         - go get -v -t ./...
         - sudo apt-get update
         - sudo apt-get install -y --no-install-recommends clang g++ gcc gcc-multilib libc6-dev libc6-dev-i386 mingw-w64 patch xz-utils
@@ -123,7 +122,7 @@ jobs:
       language: scala
       jdk: oraclejdk8
       install:
-        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION bash)"
+        - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
         - go get -v gopkg.in/src-d/enry.v1/...
       before_script:
