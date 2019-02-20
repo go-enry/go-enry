@@ -121,10 +121,17 @@ jobs:
       stage: publish
       language: scala
       jdk: oraclejdk8
+      before_install:
+        # mimics exact behavior of 'go_import_path' for non-go build image
+        - export GOPATH=${TRAVIS_HOME}/gopath
+        - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
+        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
+        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
+        - cd ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
       install:
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
-        - go get -v gopkg.in/src-d/enry.v1/...
+        - go get -v -t ./...
       before_script:
         - cd java
         - make
