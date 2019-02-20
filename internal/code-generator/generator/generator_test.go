@@ -2,7 +2,6 @@ package generator
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -283,6 +282,6 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 		assert.NoError(s.T(), err)
 		out, err := ioutil.ReadFile(outPath.Name())
 		assert.NoError(s.T(), err)
-		assert.EqualValues(s.T(), gold, out, fmt.Sprintf("%v: %v, expected: %v", test.name, string(out), string(gold)))
+		assert.Equal(s.T(), string(gold), string(out))
 	}
 }
