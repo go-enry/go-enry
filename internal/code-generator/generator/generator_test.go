@@ -290,9 +290,9 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 	}
 }
 
-// normalizeSpaces returns a copy of str with whitespaces normalizeds.
+// normalizeSpaces returns a copy of str with whitespaces normalized.
 // We use this to compare generated source as gofmt format may change.
-// E.g for changines beteween Go 1.10 and 1.11 see
+// E.g for changes between Go 1.10 and 1.11 see
 // https://go-review.googlesource.com/c/go/+/122295/
 func normalizeSpaces(str string) string {
 	return strings.Join(strings.Fields(str), " ")
