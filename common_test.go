@@ -101,9 +101,10 @@ func (s *EnryTestSuite) TestGetLanguage() {
 		expected string
 		safe     bool
 	}{
+		{name: "TestGetLanguage_0", filename: "foo.h", content: []byte{}, expected: "C"},
 		{name: "TestGetLanguage_1", filename: "foo.py", content: []byte{}, expected: "Python"},
 		{name: "TestGetLanguage_2", filename: "foo.m", content: []byte(":- module"), expected: "Mercury"},
-		{name: "TestGetLanguage_3", filename: "foo.m", content: nil, expected: OtherLanguage},
+		{name: "TestGetLanguage_3", filename: "foo.m", content: nil, expected: "MATLAB"},
 		{name: "TestGetLanguage_4", filename: "foo.mo", content: []byte{0xDE, 0x12, 0x04, 0x95, 0x00, 0x00, 0x00, 0x00}, expected: OtherLanguage},
 		{name: "TestGetLanguage_5", filename: "", content: nil, expected: OtherLanguage},
 	}
@@ -276,6 +277,7 @@ func (s *EnryTestSuite) TestGetLanguagesByExtension() {
 		candidates []string
 		expected   []string
 	}{
+		{name: "TestGetLanguagesByExtension_0", filename: "foo.h", expected: []string{"C", "C++", "Objective-C"}},
 		{name: "TestGetLanguagesByExtension_1", filename: "foo.foo", expected: nil},
 		{name: "TestGetLanguagesByExtension_2", filename: "foo.go", expected: []string{"Go"}},
 		{name: "TestGetLanguagesByExtension_3", filename: "foo.go.php", expected: []string{"Hack", "PHP"}},
@@ -301,7 +303,7 @@ func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
-		{name: "TestGetLanguagesByClassifier_7", filename: "", candidates: []string{"python"}, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_7", filename: "", candidates: []string{"python"}, expected: "Python"},
 	}
 
 	for _, test := range test {
@@ -339,7 +341,7 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: DefaultClassifier, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, classifier: DefaultClassifier, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "Python"},
-		{name: "TestGetLanguagesByClassifier_7", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_7", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: "XML"},
 	}
 
 	for _, test := range test {

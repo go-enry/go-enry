@@ -6,4 +6,5 @@ Makefile.main
 .idea
 .docsrv-resources
 build/
+vendor/
 java/lib/
