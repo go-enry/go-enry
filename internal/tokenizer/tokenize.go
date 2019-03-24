@@ -1,6 +1,5 @@
-// Package tokenizer implements file tokenization used by the enry content
-// classifier. This package is an implementation detail of enry and should not
-// be imported by other packages.
+// +build !flex
+
 package tokenizer
 
 import (
@@ -8,8 +7,6 @@ import (
 
 	"gopkg.in/src-d/enry.v1/regex"
 )
-
-const byteLimit = 100000
 
 // Tokenize returns language-agnostic lexical tokens from content. The tokens
 // returned should match what the Linguist library returns. At most the first

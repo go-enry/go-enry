@@ -91,7 +91,7 @@ var (
 		"-", "|", "+", "&&", "<", "<", "-", "!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">",
 		"'", ",", ">", "=", ">", "=", "=", ">", "=", ">", ":", ">", "=", ">"}
 
-	tests = []struct {
+	Tests = []struct {
 		name     string
 		content  []byte
 		expected []string
@@ -101,10 +101,10 @@ var (
 )
 
 func TestTokenize(t *testing.T) {
-	for _, test := range tests {
+	for _, test := range Tests {
 		t.Run(test.name, func(t *testing.T) {
 			before := string(test.content)
-			tokens := TokenizeFlex(test.content)
+			tokens := Tokenize(test.content)
 			after := string(test.content)
 			require.Equal(t, before, after, "the input slice was modified")
 			require.Equal(t, len(test.expected), len(tokens), fmt.Sprintf("token' slice length = %v, want %v", len(test.expected), len(tokens)))
@@ -118,35 +118,17 @@ func TestTokenize(t *testing.T) {
 func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		for _, test := range tests {
+		for _, test := range Tests {
 			test.content = append([]byte(nil), test.content...)
 		}
 	}
 }
 
-func BenchmarkTokenizerGo(b *testing.B) {
+func BenchmarkTokenizer(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		for _, test := range tests {
+		for _, test := range Tests {
 			Tokenize(test.content)
-		}
-	}
-}
-
-func BenchmarkTokenizerC(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		for _, test := range tests {
-			TokenizeC(test.content)
-		}
-	}
-}
-
-func BenchmarkTokenizerFlex(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		for _, test := range tests {
-			TokenizeFlex(test.content)
 		}
 	}
 }

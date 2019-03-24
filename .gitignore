@@ -8,3 +8,4 @@ Makefile.main
 build/
 vendor/
 java/lib/
+.vscode/
