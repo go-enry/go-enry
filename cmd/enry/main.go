@@ -29,7 +29,7 @@ func main() {
 	breakdownFlag := flag.Bool("breakdown", false, "")
 	jsonFlag := flag.Bool("json", false, "")
 	showVersion := flag.Bool("version", false, "Show the enry version information")
-	onlyProg := flag.Bool("prog", false, "Only show programming file types in output")
+	allLangs := flag.Bool("all", false, "Show not only the files with programming languages (default) but all languages instead")
 	countMode := flag.String("mode", "file", "the method used to count file size. Available options are: file, line and byte")
 	limitKB := flag.Int64("limit", 16*1024, "Analyse first N KB of the file (-1 means no limit)")
 	flag.Parse()
@@ -96,24 +96,25 @@ func main() {
 			return nil
 		}
 
-		language, ok := enry.GetLanguageByExtension(path)
-		if !ok {
-			if language, ok = enry.GetLanguageByFilename(path); !ok {
-				content, err := readFile(path, limit)
-				if err != nil {
-					log.Println(err)
-					return nil
-				}
-
-				language = enry.GetLanguage(filepath.Base(path), content)
-				if language == enry.OtherLanguage {
-					return nil
-				}
-			}
+		//TODO(bzz): provide API that mimics lingust CLI output for
+		// running ByExtension & ByFilename
+		// reading the file, if that did not work
+		// GetLanguage([]Strategy)
+		content, err := readFile(path, limit)
+		if err != nil {
+			log.Println(err)
+			return nil
 		}
 
-		// If we are displaying only prog. and language is not prog. skip it.
-		if *onlyProg && enry.GetLanguageType(language) != enry.Programming {
+		language := enry.GetLanguage(filepath.Base(path), content)
+		if language == enry.OtherLanguage {
+			return nil
+		}
+
+		// If we are displaying only prog, skip it
+		if !*allLangs &&
+			enry.GetLanguageType(language) != enry.Programming &&
+			enry.GetLanguageType(language) != enry.Markup {
 			return nil
 		}
 
