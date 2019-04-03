@@ -85,6 +85,7 @@ func main() {
 
 		if enry.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
 			enry.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
+			//TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
 			if f.IsDir() {
 				return filepath.SkipDir
 			}
@@ -105,13 +106,15 @@ func main() {
 			log.Println(err)
 			return nil
 		}
+		//TODO(bzz): skip enry.IsGeneratedContent() after https://github.com/src-d/enry/issues/213
 
 		language := enry.GetLanguage(filepath.Base(path), content)
 		if language == enry.OtherLanguage {
 			return nil
 		}
 
-		// If we are displaying only prog, skip it
+		// If we are not asked to display all, do as
+		// https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/blob_helper.rb#L382
 		if !*allLangs &&
 			enry.GetLanguageType(language) != enry.Programming &&
 			enry.GetLanguageType(language) != enry.Markup {
