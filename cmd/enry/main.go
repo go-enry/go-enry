@@ -30,7 +30,7 @@ func main() {
 	jsonFlag := flag.Bool("json", false, "")
 	showVersion := flag.Bool("version", false, "Show the enry version information")
 	allLangs := flag.Bool("all", false, "Show not only the files with programming languages (default) but all languages instead")
-	countMode := flag.String("mode", "file", "the method used to count file size. Available options are: file, line and byte")
+	countMode := flag.String("mode", "byte", "the method used to count file size. Available options are: file, line and byte")
 	limitKB := flag.Int64("limit", 16*1024, "Analyse first N KB of the file (-1 means no limit)")
 	flag.Parse()
 	limit := (*limitKB) * 1024
@@ -136,11 +136,11 @@ func main() {
 	case *jsonFlag && *breakdownFlag:
 		printBreakDown(out, &buf)
 	case *breakdownFlag:
-		printPercents(out, &buf, *countMode)
+		printPercents(root, out, &buf, *countMode)
 		buf.WriteByte('\n')
 		printBreakDown(out, &buf)
 	default:
-		printPercents(out, &buf, *countMode)
+		printPercents(root, out, &buf, *countMode)
 	}
 
 	fmt.Print(buf.String())
@@ -182,9 +182,9 @@ func (e filelistError) Error() string {
 	return fmt.Sprintf("Could not process the following files:\n%s", strings.Join(e, "\n"))
 }
 
-func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string) {
+func printPercents(root string, fSummary map[string][]string, buff *bytes.Buffer, mode string) {
 	// Select the way we quantify 'amount' of code.
-	var reducer func([]string) (float64, filelistError)
+	var reducer func(string, []string) (float64, filelistError)
 	switch mode {
 	case "file":
 		reducer = fileCountValues
@@ -204,7 +204,8 @@ func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string
 		fileValues      = make(map[string]float64)
 	)
 	for fType, files := range fSummary {
-		val, err := reducer(files)
+		//FIXME(bzz): all files here have relative paths
+		val, err := reducer(root, files)
 		if err != nil {
 			unreadableFiles = append(unreadableFiles, err...)
 		}
@@ -229,25 +230,25 @@ func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string
 	}
 }
 
-func fileCountValues(files []string) (float64, filelistError) {
+func fileCountValues(_ string, files []string) (float64, filelistError) {
 	return float64(len(files)), nil
 }
 
-func lineCountValues(files []string) (float64, filelistError) {
+func lineCountValues(root string, files []string) (float64, filelistError) {
 	var filesErr filelistError
 	var t float64
 	for _, fName := range files {
-		l, _ := getLines(fName, nil)
+		l, _ := getLines(filepath.Join(root, fName), nil)
 		t += float64(l)
 	}
 	return t, filesErr
 }
 
-func byteCountValues(files []string) (float64, filelistError) {
+func byteCountValues(root string, files []string) (float64, filelistError) {
 	var filesErr filelistError
 	var t float64
 	for _, fName := range files {
-		f, err := os.Open(fName)
+		f, err := os.Open(filepath.Join(root, fName))
 		if err != nil {
 			filesErr = append(filesErr, fName)
 			continue
