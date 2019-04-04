@@ -279,6 +279,7 @@ func printFileAnalysis(file string, limit int64, isJSON bool) error {
 	fileType := getFileType(file, data)
 	language := enry.GetLanguage(file, data)
 	mimeType := enry.GetMIMEType(file, language)
+	vendored := enry.IsVendor(file)
 
 	if isJSON {
 		return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
@@ -288,6 +289,7 @@ func printFileAnalysis(file string, limit int64, isJSON bool) error {
 			"type":        fileType,
 			"mime":        mimeType,
 			"language":    language,
+			"vendored":    vendored,
 		})
 	}
 
@@ -296,8 +298,9 @@ func printFileAnalysis(file string, limit int64, isJSON bool) error {
   type:      %s
   mime_type: %s
   language:  %s
+  vendored:  %t
 `,
-		filepath.Base(file), totalLines, nonBlank, fileType, mimeType, language,
+		filepath.Base(file), totalLines, nonBlank, fileType, mimeType, language, vendored,
 	)
 	return nil
 }
