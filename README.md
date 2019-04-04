@@ -9,7 +9,7 @@ Installation
 The recommended way to install enry is
 
 ```
-go get gopkg.in/src-d/enry.v1/...
+go get gopkg.in/src-d/enry.v1/cmd/enry
 ```
 
 To build enry's CLI you must run
