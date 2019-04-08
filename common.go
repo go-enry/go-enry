@@ -391,7 +391,7 @@ func getDotIndexes(filename string) []int {
 }
 
 // GetLanguagesByContent returns a slice of languages for the given content.
-// It is a Strategy that uses a content-based regexp heuristics and a filename extension.
+// It is a Strategy that uses content-based regexp heuristics and a filename extension.
 func GetLanguagesByContent(filename string, content []byte, _ []string) []string {
 	if filename == "" {
 		return nil

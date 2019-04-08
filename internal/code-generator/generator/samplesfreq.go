@@ -53,12 +53,11 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 
 	for _, langDir := range langDirs {
 		if !langDir.IsDir() {
-			log.Println(err)
 			continue
 		}
 
 		lang := langDir.Name()
-		samples, err := getSamplesFrom(filepath.Join(samplesDir, lang))
+		samples, err := readSamples(filepath.Join(samplesDir, lang))
 		if err != nil {
 			log.Println(err)
 		}
@@ -92,14 +91,14 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 	}, nil
 }
 
-func getSamplesFrom(samplesLangDir string) ([]string, error) {
+func readSamples(samplesLangDir string) ([]string, error) {
 	const samplesLangFilesDir = "filenames"
-	var samples []string
 	sampleFiles, err := ioutil.ReadDir(samplesLangDir)
 	if err != nil {
 		return nil, err
 	}
 
+	var samples []string
 	for _, sampleFile := range sampleFiles {
 		filename := filepath.Join(samplesLangDir, sampleFile.Name())
 		if sampleFile.Mode().IsRegular() {
@@ -108,7 +107,7 @@ func getSamplesFrom(samplesLangDir string) ([]string, error) {
 		}
 
 		if sampleFile.IsDir() && sampleFile.Name() == samplesLangFilesDir {
-			subSamples, err := getSubSamplesFrom(filename)
+			subSamples, err := readSubSamples(filename)
 			if err != nil {
 				return nil, err
 			}
@@ -121,7 +120,7 @@ func getSamplesFrom(samplesLangDir string) ([]string, error) {
 	return samples, nil
 }
 
-func getSubSamplesFrom(path string) ([]string, error) {
+func readSubSamples(path string) ([]string, error) {
 	subSamples := []string{}
 	entries, err := ioutil.ReadDir(path)
 	if err != nil {
