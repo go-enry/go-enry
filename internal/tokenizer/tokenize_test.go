@@ -132,9 +132,3 @@ func BenchmarkTokenizer(b *testing.B) {
 		}
 	}
 }
-
-//TODO(bzz): introduce tokenizer benchmark suit
-// baseline - just read the files
-// RE2
-// oniguruma
-// cgo to flex-based impl

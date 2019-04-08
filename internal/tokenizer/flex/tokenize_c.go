@@ -9,24 +9,15 @@ package flex
 import "C"
 import "unsafe"
 
-// TokenizeC is only calling a C-flex based tokenizer from linguist
-func TokenizeC(content []byte) []string {
-	cs := C.CBytes(content)
-	defer C.free(unsafe.Pointer(cs))
-	// C.tokenizer_extract_tokens((*C.char)(cs))
-	return nil
-}
-
 const maxTokenLen = 32
 
 
 // TokenizeFlex implements tokenizer by calling Flex generated code from linguist in C
+// This is a transliteration from C https://github.com/github/linguist/blob/master/ext/linguist/linguist.c#L12
 func TokenizeFlex(content []byte) []string {
 	var buf C.YY_BUFFER_STATE
 	var scanner C.yyscan_t
 	var extra C.struct_tokenizer_extra
-	// var scanner *C.yyscan_t = (*C.yyscan_t)(C.malloc(C.sizeof_yyscan_t))
-	// var extra *C.struct_tokenizer_extra = (*C.struct_tokenizer_extra)(C.malloc(C.sizeof_struct_tokenizer_extra))
 	var _len C.ulong
 	var r C.int
 
@@ -50,7 +41,6 @@ func TokenizeFlex(content []byte) []string {
 			_len = C.strlen(extra.token)
 			if (_len <= maxTokenLen) {
 				ary = append(ary, C.GoStringN(extra.token, (C.int)(_len)))
-				//rb_ary_push(ary, rb_str_new(extra.token, len))
 			}
 			C.free(unsafe.Pointer(extra.token))
 			break
@@ -59,9 +49,6 @@ func TokenizeFlex(content []byte) []string {
 			if (_len <= maxTokenLen) {
 				s := "SHEBANG#!" + C.GoStringN(extra.token, (C.int)(_len))
 				ary = append(ary, s)
-				//s = rb_str_new2("SHEBANG#!");
-				//rb_str_cat(s, extra.token, len);
-				//rb_ary_push(ary, s);
 			}
 			C.free(unsafe.Pointer(extra.token))
 			break
@@ -70,9 +57,6 @@ func TokenizeFlex(content []byte) []string {
 			if (_len <= maxTokenLen) {
 				s := C.GoStringN(extra.token, (C.int)(_len)) + ">"
 				ary = append(ary, s)
-				//s = rb_str_new(extra.token, len);
-				//rb_str_cat2(s, ">");
-				//rb_ary_push(ary, s);
 			}
 			C.free(unsafe.Pointer(extra.token))
 			break
@@ -84,8 +68,6 @@ func TokenizeFlex(content []byte) []string {
 
 	C.linguist_yy_delete_buffer(buf, scanner)
 	C.linguist_yylex_destroy(scanner)
-	// C.free(unsafe.Pointer(extra))
-	// C.free(unsafe.Pointer(scanner))
 
 	return ary
 }
