@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gopkg.in/src-d/enry.v1/data"
+	"github.com/src-d/enry/data"
 )
 
 type sample struct {

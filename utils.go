@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/src-d/enry.v1/data"
+	"github.com/src-d/enry/data"
 )
 
 const binSniffLen = 8000

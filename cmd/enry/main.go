@@ -14,8 +14,8 @@ import (
 	"sort"
 	"strings"
 
-	"gopkg.in/src-d/enry.v1"
-	"gopkg.in/src-d/enry.v1/data"
+	"github.com/src-d/enry"
+	"github.com/src-d/enry/data"
 )
 
 var (

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gopkg.in/src-d/enry.v1/data"
+	"github.com/src-d/enry/data"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

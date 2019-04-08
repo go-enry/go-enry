@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/src-d/enry.v1/data/rule"
+	"github.com/src-d/enry/data/rule"
 )
 
 var testContentHeuristics = map[string]*Heuristics{

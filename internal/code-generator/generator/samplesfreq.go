@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"text/template"
 
-	"gopkg.in/src-d/enry.v1/internal/tokenizer"
+	"github.com/src-d/enry/internal/tokenizer"
 )
 
 type samplesFrequencies struct {

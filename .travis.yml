@@ -1,7 +1,7 @@
 dist: trusty
 
 language: go
-go_import_path: gopkg.in/src-d/enry.v1
+go_import_path: github.com/src-d/enry
 
 go:
   - '1.11.6' # specific versions until https://github.com/golang/go/issues/31293
@@ -51,10 +51,10 @@ jobs:
         - export CGO_ENABLED=1
         # mimics exact behavior of 'go_import_path' for non-go build image
         - export GOPATH=${TRAVIS_HOME}/gopath
-        - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
-        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - cd ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
+        - mkdir -p ${GOPATH}/src/github.com/src-d/enry
+        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
+        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
+        - cd ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
       install:
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
@@ -112,7 +112,7 @@ jobs:
         - sudo apt-get install -y --no-install-recommends clang g++ gcc gcc-multilib libc6-dev libc6-dev-i386 mingw-w64 patch xz-utils
         - cd ${HOME}
         - curl -sfSL ${OSXCROSS_URL} | tar -C ${HOME} -xzf -
-        - cd $GOPATH/src/gopkg.in/src-d/enry.v1
+        - cd $GOPATH/src/github.com/src-d/enry
       script: make darwin-shared
       deploy:
         provider: releases
@@ -131,10 +131,10 @@ jobs:
         - export CGO_ENABLED=1
         # mimics exact behavior of 'go_import_path' for non-go build image
         - export GOPATH=${TRAVIS_HOME}/gopath
-        - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
-        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - cd ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
+        - mkdir -p ${GOPATH}/src/github.com/src-d/enry
+        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
+        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
+        - cd ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
       install:
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
