@@ -4,12 +4,12 @@ language: go
 go_import_path: github.com/src-d/enry
 
 go:
-  - '1.11.6' # specific versions until https://github.com/golang/go/issues/31293
-  - '1.12.1'
+  - '1.12.x'
+  - '1.11.x'
 env:
   global:
-    - GO_VERSION_FOR_JVM='1.11.1'
-    - CGO_ENABLED=0
+    - GO_VERSION_FOR_JVM='1.11.x'
+    - GO111MODULE=on
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
@@ -32,10 +32,9 @@ stage: test
 install:
   - >
     if [[ "${ONIGURUMA}" -gt 0 ]]; then
-      export tags="${tags} oniguruma";
+      export GO_TAGS='oniguruma';
       export CGO_ENABLED=1;
     fi;
-  - go get -v -t -tags "${tags}" ./...
 script:
   - make test-coverage
 after_success:
@@ -59,7 +58,6 @@ jobs:
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
         - echo $PWD; echo $GOPATH
-        - go get -v ./...
       before_script:
         - cd java
         - make
@@ -70,7 +68,6 @@ jobs:
       stage: release
       install:
         - go version
-        - go get -v -t ./...
       script: make packages
       deploy:
         provider: releases
@@ -86,7 +83,6 @@ jobs:
       stage: release
       install:
         - go version
-        - go get -v -t ./...
       script: make linux-shared
       deploy:
         provider: releases
@@ -107,7 +103,6 @@ jobs:
         - PATH="/$HOME/osxcross/bin:$PATH"
       install:
         - go version
-        - go get -v -t ./...
         - sudo apt-get update
         - sudo apt-get install -y --no-install-recommends clang g++ gcc gcc-multilib libc6-dev libc6-dev-i386 mingw-w64 patch xz-utils
         - cd ${HOME}
@@ -138,7 +133,6 @@ jobs:
       install:
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
-        - go get -v -t ./...
       before_script:
         - cd java
         - make
