@@ -190,7 +190,7 @@ as a set for the tests, the following issues were found:
 
 * [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine
 
-* As of (Linguist v5.3.2)[https://github.com/github/linguist/releases/tag/v5.3.2] it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry stil uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
+* As of (Linguist v5.3.2)[https://github.com/github/linguist/releases/tag/v5.3.2] it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
 * Bayesian classifier can't distinguish "SQL" from "PLpgSQL. See [#194](https://github.com/src-d/enry/issues/194).
 
