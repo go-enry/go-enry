@@ -30,7 +30,7 @@ stages:
 
 stage: test
 install:
-  - if [[ -n "$ONIGURUMA" ]]; then tags="$tags oniguruma"; fi; go get -v -t --tags "$tags" ./...
+  - if [[ "${ONIGURUMA}" -gt 0 ]]; then export tags="${tags} oniguruma"; fi; go get -v -t -tags "${tags}" ./...
 script:
   - make test-coverage
 after_success:
