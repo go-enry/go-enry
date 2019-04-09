@@ -26,7 +26,7 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByClassifier,
 }
 
-// DefaultClassifier is a naive Bayes classifier based on Linguist samples.
+// DefaultClassifier is a Naive Bayes classifier trained on Linguist samples.
 var DefaultClassifier Classifier = &classifier{
 	languagesLogProbabilities: data.LanguagesLogProbabilities,
 	tokensLogProbabilities:    data.TokensLogProbabilities,
@@ -390,8 +390,8 @@ func getDotIndexes(filename string) []int {
 	return dots
 }
 
-// GetLanguagesByContent returns a slice of possible languages for the given content.
-// It complies with the signature to be a Strategy type.
+// GetLanguagesByContent returns a slice of languages for the given content.
+// It is a Strategy that uses content-based regexp heuristics and a filename extension.
 func GetLanguagesByContent(filename string, content []byte, _ []string) []string {
 	if filename == "" {
 		return nil

@@ -29,8 +29,8 @@ func main() {
 	breakdownFlag := flag.Bool("breakdown", false, "")
 	jsonFlag := flag.Bool("json", false, "")
 	showVersion := flag.Bool("version", false, "Show the enry version information")
-	onlyProg := flag.Bool("prog", false, "Only show programming file types in output")
-	countMode := flag.String("mode", "file", "the method used to count file size. Available options are: file, line and byte")
+	allLangs := flag.Bool("all", false, "Show all files, including those identifed as non-programming languages")
+	countMode := flag.String("mode", "byte", "the method used to count file size. Available options are: file, line and byte")
 	limitKB := flag.Int64("limit", 16*1024, "Analyse first N KB of the file (-1 means no limit)")
 	flag.Parse()
 	limit := (*limitKB) * 1024
@@ -85,6 +85,7 @@ func main() {
 
 		if enry.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
 			enry.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
+			// TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
 			if f.IsDir() {
 				return filepath.SkipDir
 			}
@@ -96,24 +97,27 @@ func main() {
 			return nil
 		}
 
-		language, ok := enry.GetLanguageByExtension(path)
-		if !ok {
-			if language, ok = enry.GetLanguageByFilename(path); !ok {
-				content, err := readFile(path, limit)
-				if err != nil {
-					log.Println(err)
-					return nil
-				}
+		// TODO(bzz): provide API that mimics lingust CLI output for
+		// - running ByExtension & ByFilename
+		// - reading the file, if that did not work
+		// - GetLanguage([]Strategy)
+		content, err := readFile(path, limit)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		// TODO(bzz): skip enry.IsGeneratedContent() as well, after https://github.com/src-d/enry/issues/213
 
-				language = enry.GetLanguage(filepath.Base(path), content)
-				if language == enry.OtherLanguage {
-					return nil
-				}
-			}
+		language := enry.GetLanguage(filepath.Base(path), content)
+		if language == enry.OtherLanguage {
+			return nil
 		}
 
-		// If we are displaying only prog. and language is not prog. skip it.
-		if *onlyProg && enry.GetLanguageType(language) != enry.Programming {
+		// If we are not asked to display all, do as
+		// https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/blob_helper.rb#L382
+		if !*allLangs &&
+			enry.GetLanguageType(language) != enry.Programming &&
+			enry.GetLanguageType(language) != enry.Markup {
 			return nil
 		}
 
@@ -132,11 +136,11 @@ func main() {
 	case *jsonFlag && *breakdownFlag:
 		printBreakDown(out, &buf)
 	case *breakdownFlag:
-		printPercents(out, &buf, *countMode)
+		printPercents(root, out, &buf, *countMode)
 		buf.WriteByte('\n')
 		printBreakDown(out, &buf)
 	default:
-		printPercents(out, &buf, *countMode)
+		printPercents(root, out, &buf, *countMode)
 	}
 
 	fmt.Print(buf.String())
@@ -178,9 +182,9 @@ func (e filelistError) Error() string {
 	return fmt.Sprintf("Could not process the following files:\n%s", strings.Join(e, "\n"))
 }
 
-func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string) {
+func printPercents(root string, fSummary map[string][]string, buff *bytes.Buffer, mode string) {
 	// Select the way we quantify 'amount' of code.
-	var reducer func([]string) (float64, filelistError)
+	reducer := fileCountValues
 	switch mode {
 	case "file":
 		reducer = fileCountValues
@@ -188,8 +192,6 @@ func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string
 		reducer = lineCountValues
 	case "byte":
 		reducer = byteCountValues
-	default:
-		reducer = fileCountValues
 	}
 
 	// Reduce the list of files to a quantity of file type.
@@ -200,7 +202,7 @@ func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string
 		fileValues      = make(map[string]float64)
 	)
 	for fType, files := range fSummary {
-		val, err := reducer(files)
+		val, err := reducer(root, files)
 		if err != nil {
 			unreadableFiles = append(unreadableFiles, err...)
 		}
@@ -225,25 +227,25 @@ func printPercents(fSummary map[string][]string, buff *bytes.Buffer, mode string
 	}
 }
 
-func fileCountValues(files []string) (float64, filelistError) {
+func fileCountValues(_ string, files []string) (float64, filelistError) {
 	return float64(len(files)), nil
 }
 
-func lineCountValues(files []string) (float64, filelistError) {
+func lineCountValues(root string, files []string) (float64, filelistError) {
 	var filesErr filelistError
 	var t float64
 	for _, fName := range files {
-		l, _ := getLines(fName, nil)
+		l, _ := getLines(filepath.Join(root, fName), nil)
 		t += float64(l)
 	}
 	return t, filesErr
 }
 
-func byteCountValues(files []string) (float64, filelistError) {
+func byteCountValues(root string, files []string) (float64, filelistError) {
 	var filesErr filelistError
 	var t float64
 	for _, fName := range files {
-		f, err := os.Open(fName)
+		f, err := os.Open(filepath.Join(root, fName))
 		if err != nil {
 			filesErr = append(filesErr, fName)
 			continue

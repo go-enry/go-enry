@@ -1,4 +1,4 @@
-# enry [![GoDoc](https://godoc.org/gopkg.in/src-d/enry.v1?status.svg)](https://godoc.org/gopkg.in/src-d/enry.v1) [![Build Status](https://travis-ci.org/src-d/enry.svg?branch=master)](https://travis-ci.org/src-d/enry) [![codecov](https://codecov.io/gh/src-d/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/src-d/enry)
+# enry [![GoDoc](https://godoc.org/gopkg.in/src-d/enry.v1?status.svg)](https://godoc.org/gopkg.in/src-d/enry.v1) [![Build Status](https://travis-ci.com/src-d/enry.svg?branch=master)](https://travis-ci.com/src-d/enry) [![codecov](https://codecov.io/gh/src-d/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/src-d/enry)
 
 File programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
 
@@ -183,16 +183,28 @@ To run the tests,
 Divergences from linguist
 ------------
 
+`enry` [CLI tool](#cli) does *not* require a full Git repository to be present in the filesystem in order to report languages.
+
 Using [linguist/samples](https://github.com/github/linguist/tree/master/samples)
 as a set for the tests, the following issues were found:
 
 * [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine
 
-* As of (Linguist v5.3.2)[https://github.com/github/linguist/releases/tag/v5.3.2] it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry stil uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. Tracked under https://github.com/src-d/enry/issues/193
+* As of (Linguist v5.3.2)[https://github.com/github/linguist/releases/tag/v5.3.2] it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
-* Bayesian classifier cann't distinguish "SQL" vs "PLpgSQL". Tracked under https://github.com/src-d/enry/issues/194
+* Bayesian classifier can't distinguish "SQL" from "PLpgSQL. See [#194](https://github.com/src-d/enry/issues/194).
 
-`enry` [CLI tool](#cli) does not require a full Git repository to be present in filesystem in order to report languages.
+* Detection of [generated files](https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/generated.rb#L53) is not supported yet.
+ (Thus they are not excluded from CLI output). See [#213](https://github.com/src-d/enry/issues/213).
+
+* XML detection strategy is not implemented. See [#192](https://github.com/src-d/enry/issues/192).
+
+* Overriding languages and types though `.gitattributes` is not yet supported. See [#18](https://github.com/src-d/enry/issues/18).
+
+* `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as linguist does
+
+In all the cases above that have an issue number - we plan to update enry to match Linguist behaviour.
+
 
 Benchmarks
 ------------
