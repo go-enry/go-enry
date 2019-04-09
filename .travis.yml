@@ -9,7 +9,8 @@ go:
   - '1.12.1'
 env:
   global:
-    - GO_VERSION_FOR_JVM='1.11.'
+    - GO_VERSION_FOR_JVM='1.11.1'
+    - CGO_ENABLED=0
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
@@ -30,7 +31,7 @@ stages:
 
 stage: test
 install:
-  - if [[ "${ONIGURUMA}" -gt 0 ]]; then export tags="${tags} oniguruma"; fi; go get -v -t -tags "${tags}" ./...
+  - if [[ "${ONIGURUMA}" -gt 0 ]]; then export tags="${tags} oniguruma"; CGO_ENABLED=1; fi; go get -v -t -tags "${tags}" ./...
 script:
   - make test-coverage
 after_success:
@@ -43,6 +44,7 @@ jobs:
       language: scala
       jdk: oraclejdk8
       before_install:
+        - CGO_ENABLED=1
         # mimics exact behavior of 'go_import_path' for non-go build image
         - export GOPATH=${TRAVIS_HOME}/gopath
         - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
@@ -122,6 +124,7 @@ jobs:
       language: scala
       jdk: oraclejdk8
       before_install:
+        - CGO_ENABLED=1
         # mimics exact behavior of 'go_import_path' for non-go build image
         - export GOPATH=${TRAVIS_HOME}/gopath
         - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
