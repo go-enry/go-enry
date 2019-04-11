@@ -76,7 +76,7 @@ $(DARWIN_SHARED_LIB):
 
 $(LINUX_SHARED_LIB):
 	mkdir -p $(LINUX_DIR) && \
-	GOOS=linux GOARCH=amd64 go build -buildmode=c-shared -o $(LINUX_SHARED_LIB) $(NATIVE_LIB) && \
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=c-shared -o $(LINUX_SHARED_LIB) $(NATIVE_LIB) && \
 	mv $(LINUX_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
 
 .PHONY: benchmarks benchmarks-samples benchmarks-slow
