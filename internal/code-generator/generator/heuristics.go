@@ -51,7 +51,7 @@ func loadHeuristics(yaml *Heuristics) (map[string][]*LanguagePattern, error) {
 		// unroll to a single map
 		for _, ext := range disambiguation.Extensions {
 			if _, ok := patterns[ext]; ok {
-				return nil, fmt.Errorf("cannt add extension '%s', it already exists for %q", ext, patterns[ext])
+				return nil, fmt.Errorf("cannot add extension '%s', it already exists for %+v", ext, patterns[ext])
 			}
 			patterns[ext] = rules
 		}

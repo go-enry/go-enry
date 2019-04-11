@@ -1,15 +1,15 @@
-sudo: false
 dist: trusty
 
 language: go
 go_import_path: gopkg.in/src-d/enry.v1
 
 go:
-  - '1.11.x'
-  - '1.10.x'
+  - '1.11.6' # specific versions until https://github.com/golang/go/issues/31293
+  - '1.12.1'
 env:
   global:
-    - GO_VERSION_FOR_JVM='1.11.x'
+    - GO_VERSION_FOR_JVM='1.11.1'
+    - CGO_ENABLED=0
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
@@ -30,7 +30,12 @@ stages:
 
 stage: test
 install:
-  - if [[ -n "$ONIGURUMA" ]]; then tags="$tags oniguruma"; fi; go get -v -t --tags "$tags" ./...
+  - >
+    if [[ "${ONIGURUMA}" -gt 0 ]]; then
+      export tags="${tags} oniguruma";
+      export CGO_ENABLED=1;
+    fi;
+  - go get -v -t -tags "${tags}" ./...
 script:
   - make test-coverage
 after_success:
@@ -43,6 +48,7 @@ jobs:
       language: scala
       jdk: oraclejdk8
       before_install:
+        - export CGO_ENABLED=1
         # mimics exact behavior of 'go_import_path' for non-go build image
         - export GOPATH=${TRAVIS_HOME}/gopath
         - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
@@ -122,6 +128,7 @@ jobs:
       language: scala
       jdk: oraclejdk8
       before_install:
+        - export CGO_ENABLED=1
         # mimics exact behavior of 'go_import_path' for non-go build image
         - export GOPATH=${TRAVIS_HOME}/gopath
         - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
