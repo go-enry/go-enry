@@ -5,11 +5,11 @@ language: go
 go_import_path: gopkg.in/src-d/enry.v1
 
 go:
-  - '1.11.x'
-  - '1.10.x'
+  - '1.11.6'
+  - '1.12.1'
 env:
   global:
-    - GO_VERSION_FOR_JVM='1.11.x'
+    - GO_VERSION_FOR_JVM='1.11.'
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
