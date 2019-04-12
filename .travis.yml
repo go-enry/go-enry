@@ -9,6 +9,7 @@ go:
 env:
   global:
     - GO_VERSION_FOR_JVM='1.11.x'
+    - CGO_ENABLED=0
     - GO111MODULE=on
   matrix:
     - ONIGURUMA=0
@@ -32,8 +33,8 @@ stage: test
 install:
   - >
     if [[ "${ONIGURUMA}" -gt 0 ]]; then
-      export GO_TAGS='oniguruma';
       export CGO_ENABLED=1;
+      export GO_TAGS='oniguruma';
     fi;
 script:
   - make test-coverage
@@ -46,18 +47,10 @@ jobs:
       stage: test
       language: scala
       jdk: oraclejdk8
-      before_install:
-        - export CGO_ENABLED=1
-        # mimics exact behavior of 'go_import_path' for non-go build image
-        - export GOPATH=${TRAVIS_HOME}/gopath
-        - mkdir -p ${GOPATH}/src/github.com/src-d/enry
-        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
-        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
-        - cd ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
       install:
+        - export CGO_ENABLED=1
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
-        - echo $PWD; echo $GOPATH
       before_script:
         - cd java
         - make
@@ -96,7 +89,6 @@ jobs:
 
     - name: 'macOS shared lib'
       stage: release
-      sudo: true
       env:
         - OSXCROSS_PACKAGE="osxcross_3034f7149716d815bc473d0a7b35d17e4cf175aa.tar.gz"
         - OSXCROSS_URL="https://github.com/bblfsh/client-scala/releases/download/v1.5.2/${OSXCROSS_PACKAGE}"
@@ -122,15 +114,8 @@ jobs:
       stage: publish
       language: scala
       jdk: oraclejdk8
-      before_install:
-        - export CGO_ENABLED=1
-        # mimics exact behavior of 'go_import_path' for non-go build image
-        - export GOPATH=${TRAVIS_HOME}/gopath
-        - mkdir -p ${GOPATH}/src/github.com/src-d/enry
-        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
-        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
-        - cd ${TRAVIS_HOME}/gopath/src/github.com/src-d/enry
       install:
+        - export CGO_ENABLED=1
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
       before_script:
