@@ -14,6 +14,10 @@ developers += Developer("abeaumont",
                         "Alfredo Beaumont",
                         "alfredo@sourced.tech",
                         url("https://github.com/abeaumont"))
+developers += Developer("bzz",
+                        "Alexander Bezzubov",
+                        "alex@sourced.tech",
+                        url("https://github.com/bzz"))
 licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 pomIncludeRepository := (_ => false)
 

@@ -1,7 +1,6 @@
 dist: trusty
 
 language: go
-go_import_path: github.com/src-d/enry
 
 go:
   - '1.12.x'
