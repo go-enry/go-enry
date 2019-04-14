@@ -1,4 +1,4 @@
-module github.com/src-d/enry
+module github.com/src-d/enry/v2
 
 go 1.12
 

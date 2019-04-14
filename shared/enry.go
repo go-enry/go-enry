@@ -4,7 +4,7 @@
 package main
 
 import "C"
-import "github.com/src-d/enry"
+import "github.com/src-d/enry/v2"
 
 //export GetLanguage
 func GetLanguage(filename string, content []byte) string {

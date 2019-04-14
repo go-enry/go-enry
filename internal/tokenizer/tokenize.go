@@ -6,7 +6,7 @@ package tokenizer
 import (
 	"bytes"
 
-	"github.com/src-d/enry/regex"
+	"github.com/src-d/enry/v2/regex"
 )
 
 const byteLimit = 100000

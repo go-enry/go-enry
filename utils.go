@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/src-d/enry/data"
+	"github.com/src-d/enry/v2/data"
 )
 
 const binSniffLen = 8000

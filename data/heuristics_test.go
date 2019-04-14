@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/src-d/enry/v2/data/rule"
 	"github.com/stretchr/testify/assert"
-	"github.com/src-d/enry/data/rule"
 )
 
 var testContentHeuristics = map[string]*Heuristics{

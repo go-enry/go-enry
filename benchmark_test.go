@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/src-d/enry/data"
+	"github.com/src-d/enry/v2/data"
 )
 
 type sample struct {

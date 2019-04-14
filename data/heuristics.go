@@ -1,6 +1,6 @@
 package data
 
-import "github.com/src-d/enry/data/rule"
+import "github.com/src-d/enry/v2/data/rule"
 
 // Heuristics implements a rule-based content matching engine.
 
