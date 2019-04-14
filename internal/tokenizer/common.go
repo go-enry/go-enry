@@ -3,4 +3,5 @@
 // be imported by other packages.
 package tokenizer
 
-const byteLimit = 100000
+// ByteLimit defines the maximum prefix of an input text that will be tokenized.
+const ByteLimit = 100000

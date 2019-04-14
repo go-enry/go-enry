@@ -119,7 +119,10 @@ func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		for _, test := range Tests {
-			test.content = append([]byte(nil), test.content...)
+			if len(test.content) > ByteLimit {
+				test.content = test.content[:ByteLimit]
+			}
+			_ = append([]byte(nil), test.content...)
 		}
 	}
 }
