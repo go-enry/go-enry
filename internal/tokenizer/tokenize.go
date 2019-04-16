@@ -8,9 +8,11 @@ import (
 	"gopkg.in/src-d/enry.v1/regex"
 )
 
-// Tokenize returns lexical tokens from content. The tokens returned should match what
-// the Linguist library returns (but they are not, until https://github.com/src-d/enry/issues/193).
-// At most the first ByteLimit bytes of content are tokenized.
+// Tokenize returns lexical tokens from content. The tokens returned match what
+// the Linguist library returns. At most the first ByteLimit bytes of content are tokenized.
+//
+// BUG: Until https://github.com/src-d/enry/issues/193 is resolved, there are some
+// differences between this function and the Linguist output.
 func Tokenize(content []byte) []string {
 	if len(content) > ByteLimit {
 		content = content[:ByteLimit]
