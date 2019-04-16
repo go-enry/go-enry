@@ -91,7 +91,7 @@ var (
 		"-", "|", "+", "&&", "<", "<", "-", "!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">",
 		"'", ",", ">", "=", ">", "=", "=", ">", "=", ">", ":", ">", "=", ">"}
 
-	Tests = []struct {
+	tests = []struct {
 		name     string
 		content  []byte
 		expected []string
@@ -101,7 +101,7 @@ var (
 )
 
 func TestTokenize(t *testing.T) {
-	for _, test := range Tests {
+	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			before := string(test.content)
 			tokens := Tokenize(test.content)
@@ -118,7 +118,7 @@ func TestTokenize(t *testing.T) {
 func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		for _, test := range Tests {
+		for _, test := range tests {
 			if len(test.content) > ByteLimit {
 				test.content = test.content[:ByteLimit]
 			}
@@ -130,7 +130,7 @@ func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
 func BenchmarkTokenizer(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		for _, test := range Tests {
+		for _, test := range tests {
 			Tokenize(test.content)
 		}
 	}
