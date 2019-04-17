@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -89,27 +90,48 @@ var (
 		"XHTML", "sample", "file", "type", "#example", "background", "color", "yellow", "id", "Just", "a", "simple", "XHTML", "test", "page.",
 		"-", "|", "+", "&&", "<", "<", "-", "!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">",
 		"'", ",", ">", "=", ">", "=", "=", ">", "=", ">", ":", ">", "=", ">"}
-)
 
-func TestTokenize(t *testing.T) {
-	tests := []struct {
+	tests = []struct {
 		name     string
 		content  []byte
 		expected []string
 	}{
 		{name: "content", content: []byte(testContent), expected: tokensFromTestContent},
 	}
+)
 
+func TestTokenize(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			before := string(test.content)
 			tokens := Tokenize(test.content)
 			after := string(test.content)
-			assert.Equal(t, before, after, "the input slice was modified")
-			assert.Equal(t, len(test.expected), len(tokens), fmt.Sprintf("token' slice length = %v, want %v", len(test.expected), len(tokens)))
+			require.Equal(t, before, after, "the input slice was modified")
+			require.Equal(t, len(test.expected), len(tokens), fmt.Sprintf("token' slice length = %v, want %v", len(test.expected), len(tokens)))
 			for i, expectedToken := range test.expected {
 				assert.Equal(t, expectedToken, tokens[i], fmt.Sprintf("token = %v, want %v", tokens[i], expectedToken))
 			}
 		})
+	}
+}
+
+func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		for _, test := range tests {
+			if len(test.content) > ByteLimit {
+				test.content = test.content[:ByteLimit]
+			}
+			_ = append([]byte(nil), test.content...)
+		}
+	}
+}
+
+func BenchmarkTokenizer(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		for _, test := range tests {
+			Tokenize(test.content)
+		}
 	}
 }

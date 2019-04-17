@@ -1,6 +1,5 @@
-// Package tokenizer implements file tokenization used by the enry content
-// classifier. This package is an implementation detail of enry and should not
-// be imported by other packages.
+// +build !flex
+
 package tokenizer
 
 import (
@@ -9,14 +8,14 @@ import (
 	"gopkg.in/src-d/enry.v1/regex"
 )
 
-const byteLimit = 100000
-
-// Tokenize returns language-agnostic lexical tokens from content. The tokens
-// returned should match what the Linguist library returns. At most the first
-// 100KB of content are tokenized.
+// Tokenize returns lexical tokens from content. The tokens returned match what
+// the Linguist library returns. At most the first ByteLimit bytes of content are tokenized.
+//
+// BUG: Until https://github.com/src-d/enry/issues/193 is resolved, there are some
+// differences between this function and the Linguist output.
 func Tokenize(content []byte) []string {
-	if len(content) > byteLimit {
-		content = content[:byteLimit]
+	if len(content) > ByteLimit {
+		content = content[:ByteLimit]
 	}
 
 	// Copy the input so that changes wrought by the tokenization steps do not
