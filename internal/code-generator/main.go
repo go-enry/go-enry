@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"gopkg.in/src-d/enry.v1/internal/code-generator/generator"
+	"github.com/src-d/enry/v2/internal/code-generator/generator"
 )
 
 const (

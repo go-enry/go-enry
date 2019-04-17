@@ -1,15 +1,15 @@
 dist: trusty
 
 language: go
-go_import_path: gopkg.in/src-d/enry.v1
 
 go:
-  - '1.11.6' # specific versions until https://github.com/golang/go/issues/31293
-  - '1.12.1'
+  - '1.12.x'
+  - '1.11.x'
 env:
   global:
-    - GO_VERSION_FOR_JVM='1.11.1'
+    - GO_VERSION_FOR_JVM='1.11.x'
     - CGO_ENABLED=0
+    - GO111MODULE=on
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
@@ -32,10 +32,9 @@ stage: test
 install:
   - >
     if [[ "${ONIGURUMA}" -gt 0 ]]; then
-      export tags="${tags} oniguruma";
       export CGO_ENABLED=1;
+      export GO_TAGS='oniguruma';
     fi;
-  - go get -v -t -tags "${tags}" ./...
 script:
   - make test-coverage
 after_success:
@@ -47,19 +46,10 @@ jobs:
       stage: test
       language: scala
       jdk: oraclejdk8
-      before_install:
-        - export CGO_ENABLED=1
-        # mimics exact behavior of 'go_import_path' for non-go build image
-        - export GOPATH=${TRAVIS_HOME}/gopath
-        - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
-        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - cd ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
       install:
+        - export CGO_ENABLED=1
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
-        - echo $PWD; echo $GOPATH
-        - go get -v ./...
       before_script:
         - cd java
         - make
@@ -70,7 +60,6 @@ jobs:
       stage: release
       install:
         - go version
-        - go get -v -t ./...
       script: make packages
       deploy:
         provider: releases
@@ -86,7 +75,6 @@ jobs:
       stage: release
       install:
         - go version
-        - go get -v -t ./...
       script: make linux-shared
       deploy:
         provider: releases
@@ -100,19 +88,17 @@ jobs:
 
     - name: 'macOS shared lib'
       stage: release
-      sudo: true
       env:
         - OSXCROSS_PACKAGE="osxcross_3034f7149716d815bc473d0a7b35d17e4cf175aa.tar.gz"
         - OSXCROSS_URL="https://github.com/bblfsh/client-scala/releases/download/v1.5.2/${OSXCROSS_PACKAGE}"
         - PATH="/$HOME/osxcross/bin:$PATH"
       install:
         - go version
-        - go get -v -t ./...
         - sudo apt-get update
         - sudo apt-get install -y --no-install-recommends clang g++ gcc gcc-multilib libc6-dev libc6-dev-i386 mingw-w64 patch xz-utils
         - cd ${HOME}
         - curl -sfSL ${OSXCROSS_URL} | tar -C ${HOME} -xzf -
-        - cd $GOPATH/src/gopkg.in/src-d/enry.v1
+        - cd $GOPATH/src/github.com/src-d/enry
       script: make darwin-shared
       deploy:
         provider: releases
@@ -127,18 +113,10 @@ jobs:
       stage: publish
       language: scala
       jdk: oraclejdk8
-      before_install:
-        - export CGO_ENABLED=1
-        # mimics exact behavior of 'go_import_path' for non-go build image
-        - export GOPATH=${TRAVIS_HOME}/gopath
-        - mkdir -p ${GOPATH}/src/gopkg.in/src-d/enry.v1
-        - tar -Pczf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_BUILD_DIR} . && tar -Pxzf ${TRAVIS_TMPDIR}/src_archive.tar.gz -C ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - export TRAVIS_BUILD_DIR=${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
-        - cd ${TRAVIS_HOME}/gopath/src/gopkg.in/src-d/enry.v1
       install:
+        - export CGO_ENABLED=1
         - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | GIMME_GO_VERSION=$GO_VERSION_FOR_JVM bash)"
         - go version
-        - go get -v -t ./...
       before_script:
         - cd java
         - make

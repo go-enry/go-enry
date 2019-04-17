@@ -5,7 +5,7 @@ package tokenizer
 import (
 	"bytes"
 
-	"gopkg.in/src-d/enry.v1/regex"
+	"github.com/src-d/enry/v2/regex"
 )
 
 // Tokenize returns lexical tokens from content. The tokens returned match what

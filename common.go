@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/src-d/enry.v1/data"
-	"gopkg.in/src-d/enry.v1/regex"
+	"github.com/src-d/enry/v2/data"
+	"github.com/src-d/enry/v2/regex"
 )
 
 // OtherLanguage is used as a zero value when a function can not return a specific language.
