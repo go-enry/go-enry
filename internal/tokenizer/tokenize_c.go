@@ -2,7 +2,7 @@
 
 package tokenizer
 
-import "gopkg.in/src-d/enry.v1/internal/tokenizer/flex"
+import "github.com/src-d/enry/v2/internal/tokenizer/flex"
 
 // Tokenize returns lexical tokens from content. The tokens returned match what
 // the Linguist library returns. At most the first ByteLimit bytes of content are tokenized.
