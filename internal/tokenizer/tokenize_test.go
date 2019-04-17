@@ -115,6 +115,13 @@ func TestTokenize(t *testing.T) {
 	}
 }
 
+func TestTokenizerLatin1AsUtf8(t *testing.T) {
+	content := []byte("th\xe5 filling") // `th� filling`
+	t.Logf("%v - %q", content, string(content))
+	tokens := Tokenize(content)
+	require.Equal(t, 3, len(tokens))
+}
+
 func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
