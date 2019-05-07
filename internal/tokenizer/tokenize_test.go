@@ -119,7 +119,39 @@ func TestTokenizerLatin1AsUtf8(t *testing.T) {
 	content := []byte("th\xe5 filling") // `th� filling`
 	t.Logf("%v - %q", content, string(content))
 	tokens := Tokenize(content)
+	for i, token := range tokens {
+		t.Logf("token %d, %s", i+1, token)
+	}
 	require.Equal(t, 3, len(tokens))
+}
+
+func TestRegexpOnInvalidUtf8(t *testing.T) {
+	origContent := []struct {
+		bytes  []byte
+		tokens []string
+	}{
+		{[]byte("th\xe0 filling"), []string{"th", "filling"}},   // `th� filling`
+		{[]byte("th\u0100 filling"), []string{"th", "filling"}}, // `thĀ filling`
+		{[]byte("привет, как дела?"), []string{}},               // empty, no ASCII tokens
+	}
+	re := reRegularToken
+
+	for _, content := range origContent {
+		t.Run("", func(t *testing.T) {
+			t.Logf("%v - %q", content, string(content.bytes))
+
+			tokens := re.FindAll(content.bytes, -1)
+			require.Equal(t, len(content.tokens), len(tokens))
+
+			newContent := re.ReplaceAll(content.bytes, []byte(` `))
+			t.Logf("content:%q, tokens:[", newContent)
+			for i, token := range tokens {
+				t.Logf("\t%q,", string(token))
+				require.Equal(t, content.tokens[i], string(token))
+			}
+			t.Logf(" ]\n")
+		})
+	}
 }
 
 func BenchmarkTokenizer_BaselineCopy(b *testing.B) {
