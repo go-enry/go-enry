@@ -9,7 +9,7 @@ import (
 type EnryRegexp = *rubex.Regexp
 
 func MustCompile(str string) EnryRegexp {
-	return rubex.MustCompile(str)
+	return rubex.MustCompileASCII(str)
 }
 
 func QuoteMeta(s string) string {
