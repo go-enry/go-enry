@@ -1,7 +1,5 @@
 dist: trusty
-
 language: go
-
 go:
   - '1.12.x'
   - '1.11.x'
@@ -10,16 +8,12 @@ env:
     - GO_VERSION_FOR_JVM='1.11.x'
     - CGO_ENABLED=0
     - GO111MODULE=on
+    - ONIGURUMA_VERSION='6.9.1'
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
 matrix:
   fast_finish: true
-
-addons:
-  apt:
-    packages:
-      - libonig-dev
 
 stages:
   - name: test
@@ -32,8 +26,14 @@ stage: test
 install:
   - >
     if [[ "${ONIGURUMA}" -gt 0 ]]; then
-      export CGO_ENABLED=1;
-      export GO_TAGS='oniguruma';
+      export CGO_ENABLED=1
+      export GO_TAGS='oniguruma'
+      # install oniguruma manually as trusty has only ancient 5.x
+      sudo apt-get install -y dpkg # dpkg >= 1.17.5ubuntu5.8 fixes https://bugs.launchpad.net/ubuntu/+source/dpkg/+bug/1730627
+      wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
+      sudo dpkg -i "libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
+      wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
+      sudo dpkg -i "libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
     fi;
 script:
   - make test-coverage
