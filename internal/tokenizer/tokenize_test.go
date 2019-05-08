@@ -127,23 +127,23 @@ func TestTokenizerLatin1AsUtf8(t *testing.T) {
 
 func TestRegexpOnInvalidUtf8(t *testing.T) {
 	origContent := []struct {
-		bytes  []byte
+		text   string
 		tokens []string
 	}{
-		{[]byte("th\xe0 filling"), []string{"th", "filling"}},   // `th� filling`
-		{[]byte("th\u0100 filling"), []string{"th", "filling"}}, // `thĀ filling`
-		{[]byte("привет, как дела?"), []string{}},               // empty, no ASCII tokens
+		{"th\xe0 filling", []string{"th", "filling"}},   // `th� filling`
+		{"th\u0100 filling", []string{"th", "filling"}}, // `thĀ filling`
+		{"привет, как дела?", []string{}},               // empty, no ASCII tokens
 	}
 	re := reRegularToken
 
 	for _, content := range origContent {
 		t.Run("", func(t *testing.T) {
-			t.Logf("%v - %q", content, string(content.bytes))
-
-			tokens := re.FindAll(content.bytes, -1)
+			t.Logf("%v - %q", content, content.text)
+			input := []byte(content.text)
+			tokens := re.FindAll(input, -1)
 			require.Equal(t, len(content.tokens), len(tokens))
 
-			newContent := re.ReplaceAll(content.bytes, []byte(` `))
+			newContent := re.ReplaceAll(input, []byte(` `))
 			t.Logf("content:%q, tokens:[", newContent)
 			for i, token := range tokens {
 				t.Logf("\t%q,", string(token))
