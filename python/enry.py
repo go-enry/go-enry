@@ -4,6 +4,8 @@ Python library calling enry Go implementation trough cFFI (API, out-of-line) and
 
 from _c_enry import ffi, lib
 
+## Helpers
+
 
 def go_str_to_py(go_str):
     str_len = go_str.n
@@ -17,6 +19,13 @@ def py_str_to_go(py_str):
     c_str = ffi.new("char[]", str_bytes)
     go_str = ffi.new("_GoString_ *", [c_str, len(str_bytes)])
     return go_str[0]
+
+
+def go_bool_to_py(go_bool):
+    return go_bool == 1
+
+
+## API
 
 
 def language_by_extension(filename: str) -> str:
@@ -33,11 +42,19 @@ def language_by_filename(filename: str) -> str:
     return lang
 
 
-## Test
+def is_vendor(filename: str) -> bool:
+    fName = py_str_to_go(filename)
+    guess = lib.IsVendor(fName)
+    return go_bool_to_py(guess)
+
+
+## Tests
 
 
 def main():
-    files = ["Parse.hs", "some.cpp", "and.go", "type.h", ".bashrc"]
+    files = [
+        "Parse.hs", "some.cpp", "and.go", "type.h", ".bashrc", ".gitignore"
+    ]
 
     print("strategy: extension")
     for filename in files:
@@ -48,6 +65,11 @@ def main():
     for filename in files:
         lang = language_by_filename(filename)
         print("file: {:10s} language: '{}'".format(filename, lang))
+
+    print("\ncheck: is vendor?")
+    for filename in files:
+        vendor = is_vendor(filename)
+        print("file: {:10s} vendor: '{}'".format(filename, vendor))
 
 
 if __name__ == "__main__":
