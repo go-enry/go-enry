@@ -23,7 +23,7 @@ $ python enry.py
 ## TODOs
  - [ ] try ABI mode, to aviod dependency on C compiler on install (+perf test?)
  - [ ] ready `libenry.h` and generate `ffibuilder.cdef` content
+ - [ ] helpers for sending/recieving Go slices to C
  - [ ] cover the rest of enry API
  - [ ] add `setup.py`
  - [ ] build/release automation on CI (publish on pypi)
- - 
