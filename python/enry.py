@@ -26,13 +26,27 @@ def language_by_extension(filename: str) -> str:
     return lang
 
 
+def language_by_filename(filename: str) -> str:
+    fName = py_str_to_go(filename)
+    guess = lib.GetLanguageByFilename(fName)
+    lang = go_str_to_py(guess.r0)
+    return lang
+
+
 ## Test
 
 
 def main():
-    files = ["Parse.hs", "some.cpp", "and.go", "type.h"]
+    files = ["Parse.hs", "some.cpp", "and.go", "type.h", ".bashrc"]
+
+    print("strategy: extension")
     for filename in files:
         lang = language_by_extension(filename)
+        print("file: {:10s} language: '{}'".format(filename, lang))
+
+    print("\nstrategy: filename")
+    for filename in files:
+        lang = language_by_filename(filename)
         print("file: {:10s} language: '{}'".format(filename, lang))
 
 

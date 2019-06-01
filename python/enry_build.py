@@ -15,6 +15,14 @@ struct GetLanguageByExtension_return {
 };
 
 extern struct GetLanguageByExtension_return GetLanguageByExtension(GoString p0);
+
+/* Return type for GetLanguageByFilename */
+struct GetLanguageByFilename_return {
+	GoString r0; /* language */
+	GoUint8 r1; /* safe */
+};
+
+extern struct GetLanguageByFilename_return GetLanguageByFilename(GoString p0);
 """)
 
 # set_source() gives the name of the python extension module to
