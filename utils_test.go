@@ -133,3 +133,19 @@ func TestIsDotFile(t *testing.T) {
 		assert.Equal(t, test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
+
+func TestGetColor(t *testing.T) {
+	tests := []struct {
+		name     string
+		language string
+		expected string
+	}{
+		{name: "TestGetColor_1", language: "Go", expected: "#00ADD8"},
+		{name: "TestGetColor_2", language: "SomeRandom", expected: "#cccccc"},
+	}
+
+	for _, test := range tests {
+		color := GetColor(test.language)
+		assert.Equal(t, test.expected, color, fmt.Sprintf("%v: is = %v, expected: %v", test.name, color, test.expected))
+	}
+}

@@ -80,6 +80,11 @@ const (
 	mimeTypeGold         = testDir + "/mimeType.gold"
 	mimeTypeTestTmplPath = assetsDir + "/mimeType.go.tmpl"
 	mimeTypeTestTmplName = "mimeType.go.tmpl"
+
+	// colors test
+	colorsGold         = testDir + "/colors.gold"
+	colorsTestTmplPath = assetsDir + "/colors.go.tmpl"
+	colorsTestTmplName = "colors.go.tmpl"
 )
 
 type GeneratorTestSuite struct {
@@ -242,6 +247,16 @@ func (s *GeneratorTestSuite) SetupSuite() {
 			commit:      commit,
 			generate:    MimeType,
 			wantOut:     mimeTypeGold,
+		},
+		{
+			name:        "Colors()",
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			samplesDir:  "",
+			tmplPath:    colorsTestTmplPath,
+			tmplName:    colorsTestTmplName,
+			commit:      commit,
+			generate:    Colors,
+			wantOut:     colorsGold,
 		},
 	}
 }
