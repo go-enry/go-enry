@@ -1,0 +1,7 @@
+package data
+
+var LanguagesColor = map[string]string{
+  {{range $language, $color := . -}}
+  "{{$language}}": "{{$color -}}",
+  {{end -}}
+}

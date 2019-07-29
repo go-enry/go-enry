@@ -217,4 +217,13 @@ public class Enry {
         return toJavaBool(nativeLib.IsVendor(toGoString(path)));
     }
 
+    /**
+     * Returns a color code for given language.
+     *
+     * @param language of the file
+     * @return color code
+     */
+    public static synchronized String getColor(String language) {
+        return toJavaString(nativeLib.GetColor(toGoString(language)));
+    }
 }

@@ -161,6 +161,14 @@ public class EnryTest {
         assertFalse(Enry.isImage("nope.go"));
     }
 
+    @Test
+    public void getColor() {
+        assertEquals(
+                "#00ADD8",
+                Enry.getColor("Go")
+        );
+    }
+
     void assertGuess(String language, boolean safe, Guess guess) {
         assertEquals(language, guess.language);
         assertEquals(safe, guess.safe);

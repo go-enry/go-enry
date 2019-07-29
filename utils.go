@@ -73,3 +73,12 @@ func IsBinary(data []byte) bool {
 
 	return true
 }
+
+// GetColor returns a HTML color code of a given language.
+func GetColor(language string) string {
+	if color, ok := data.LanguagesColor[language]; ok {
+		return color
+	}
+
+	return "#cccccc"
+}
