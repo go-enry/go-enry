@@ -161,13 +161,15 @@ Generated Python bindings using a C shared library and cffi are not available ye
 Divergences from linguist
 ------------
 
-The `enry` library is based on the data from `github/linguist` version **v7.2.0**.
+The `enry` library is based on the data from `github/linguist` version **v7.5.1**.
 
 As opposed to linguist, `enry` [CLI tool](#cli) does *not* require a full Git repository in the filesystem in order to report languages.
 
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from linguist:
 
 * [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine.
+
+* [Heuristics for ".rno" extension](https://github.com/github/linguist/blob/3a1bd3c3d3e741a8aaec4704f782e06f5cd2a00d/lib/linguist/heuristics.yml#L365) in RUNOFF could not be parsed, due to unsupported lookahead in RE2 regexp engine.
 
 * As of [Linguist v5.3.2](https://github.com/github/linguist/releases/tag/v5.3.2) it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
