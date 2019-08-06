@@ -319,6 +319,12 @@ func getInterpreter(data []byte) (interpreter string) {
 		interpreter = interpreter[:strings.Index(interpreter, `.`)]
 	}
 
+	// If osascript is called with argument -l it could be different language so do not relay on it
+	// To match linguist behaviour, see ref https://github.com/github/linguist/blob/d95bae794576ab0ef2fcb41a39eb61ea5302c5b5/lib/linguist/shebang.rb#L63
+	if interpreter == "osascript" && bytes.Contains(line, []byte("-l")) {
+		interpreter = ""
+	}
+
 	return
 }
 
