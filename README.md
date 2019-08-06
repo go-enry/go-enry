@@ -2,51 +2,34 @@
 
 File programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
 
+* [Installation](#installation)
+* [Examples](#examples)
+* [CLI](#cli)
+* [Java bindings](#java-bindings)
+* [Python bindings](#python-bindings)
+* [Divergences from linguist](#divergences-from-linguist)
+* [Benchmarks](#benchmarks)
+* [Why Enry?](#why-enry)
+* [Development](#development)
+    * [Sync with github/linguist upstream](#sync-with-githublinguist-upstream)
+* [Misc](#misc)
+    * [Benchmark](#benchmark)
+    * [Faster regexp engine (optional)](#faster-regexp-engine-optional)
+* [License](#license)
 
 Installation
 ------------
 
-The recommended way to install enry is
+The recommended way to install enry is to either [download a release](https://github.com/src-d/enry/releases) or
 
 ```
 go get github.com/src-d/enry/cmd/enry
 ```
 
-To build enry's CLI you must run
-
-    make build
-
-this will generate a binary in the project's root directory called `enry`. You can then move this binary to anywhere in your `PATH`.
-
 This project is now part of [source{d} Engine](https://sourced.tech/engine),
 which provides the simplest way to get started with a single command.
 Visit [sourced.tech/engine](https://sourced.tech/engine) for more information.
 
-### Faster regexp engine (optional)
-
-[Oniguruma](https://github.com/kkos/oniguruma) is CRuby's regular expression engine.
-It is very fast and performs better than the one built into Go runtime. *enry* supports swapping
-between those two engines thanks to [rubex](https://github.com/moovweb/rubex) project.
-The typical overall speedup from using Oniguruma is 1.5-2x. However, it requires CGo and the external shared library.
-On macOS with brew, it is
-
-```
-brew install oniguruma
-```
-
-On Ubuntu, it is
-
-```
-sudo apt install libonig-dev
-```
-
-To build enry with Oniguruma regexps use the `oniguruma` build tag
-
-```
-go get -v -t --tags oniguruma ./...
-```
-
-and then rebuild the project.
 
 Examples
 ------------
@@ -92,105 +75,101 @@ You can use enry as a command,
 
 ```bash
 $ enry --help
-  enry v1.5.0 build: 10-02-2017_14_01_07 commit: 95ef0a6cf3, based on linguist commit: 37979b2
-  enry, A simple (and faster) implementation of github/linguist
-  usage: enry <path>
-         enry [-json] [-breakdown] <path>
-         enry [-json] [-breakdown]
-         enry [-version]
+enry v2.0.0 build: 05-08-2019_20_40_35 commit: 6ccf0b6, based on linguist commit: e456098
+enry, A simple (and faster) implementation of github/linguist
+usage: enry [-mode=(file|line|byte)] [-prog] <path>
+        enry [-mode=(file|line|byte)] [-prog] [-json] [-breakdown] <path>
+        enry [-mode=(file|line|byte)] [-prog] [-json] [-breakdown]
+        enry [-version]
 ```
 
-and it'll return an output similar to *linguist*'s output,
+and on repository root, it'll return an output similar to *linguist*'s output,
 
 ```bash
 $ enry
-55.56%    Shell
-22.22%    Ruby
-11.11%    Gnuplot
-11.11%    Go
+97.71%	Go
+1.60%	C
+0.31%	Shell
+0.22%	Java
+0.07%	Ruby
+0.05%	Makefile
+0.04%	Scala
+0.01%	Gnuplot
 ```
 
 but not only the output; its flags are also the same as *linguist*'s ones,
 
 ```bash
 $ enry --breakdown
-55.56%    Shell
-22.22%    Ruby
-11.11%    Gnuplot
-11.11%    Go
+97.71%	Go
+1.60%	C
+0.31%	Shell
+0.22%	Java
+0.07%	Ruby
+0.05%	Makefile
+0.04%	Scala
+0.01%	Gnuplot
 
-Gnuplot
-plot-histogram.gp
+Scala
+java/build.sbt
+java/project/plugins.sbt
 
-Ruby
-linguist-samples.rb
-linguist-total.rb
+Java
+java/src/main/java/tech/sourced/enry/Enry.java
+java/src/main/java/tech/sourced/enry/GoUtils.java
+java/src/main/java/tech/sourced/enry/Guess.java
+java/src/test/java/tech/sourced/enry/EnryTest.java
 
-Shell
-parse.sh
-plot-histogram.sh
-run-benchmark.sh
-run-slow-benchmark.sh
-run.sh
+Makefile
+Makefile
+java/Makefile
 
 Go
-parser/main.go
+benchmark_test.go
 ```
 
 even the JSON flag,
 
 ```bash
-$ enry --json
-{"Gnuplot":["plot-histogram.gp"],"Go":["parser/main.go"],"Ruby":["linguist-samples.rb","linguist-total.rb"],"Shell":["parse.sh","plot-histogram.sh","run-benchmark.sh","run-slow-benchmark.sh","run.sh"]}
+$ enry --json | jq .
+{
+  "C": [
+    "internal/tokenizer/flex/lex.linguist_yy.c",
+    "internal/tokenizer/flex/lex.linguist_yy.h",
+    "internal/tokenizer/flex/linguist.h",
+    "python/_c_enry.c",
+    "python/enry.c"
+  ],
+  "Gnuplot": [
+    "benchmarks/plot-histogram.gp"
+  ],
+  "Go": [
+    "benchmark_test.go",
 ```
 
-Note that even if enry's CLI is compatible with linguist's, its main point is that **_enry doesn't need a git repository to work!_**
+Note that enry's CLI **_doesn't need a git repository to work_**, which is intentionally different from the linguist.
 
-Java bindings
-------------
+## Java bindings
 
-Generated Java bindings using a C-shared library and JNI are located under [`java`](https://github.com/src-d/enry/blob/master/java)
 
-Development
-------------
+Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/src-d/enry/blob/master/java) and published on Maven at [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux.
 
-*enry* re-uses parts of original [linguist](https://github.com/github/linguist) to generate internal data structures. In order to update to the latest upstream and generate all the necessary code you must run:
 
-    git clone https://github.com/github/linguist.git .linguist
-    # update commit in generator_test.go (to re-generate .gold fixtures)
-    # https://github.com/src-d/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
-    go generate
-
-We update enry when changes are done in linguist's master branch on the following files:
-
-* [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)
-* [heuristics.yml](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.yml)
-* [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
-* [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
-
-Currently we don't have any procedure established to automatically detect changes in the linguist project and regenerate the code.
-So we update the generated code as needed, without any specific criteria.
-
-If you want to update *enry* because of changes in linguist, you can run the *go
-generate* command and do a pull request that only contains the changes in
-generated files (those files in the subdirectory [data](https://github.com/src-d/enry/blob/master/data)).
-
-To run the tests,
-
-    make test
-
+## Python bindings
+Generated Python bindings using a C shared library and cffi are not available yet and are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
 
 Divergences from linguist
 ------------
 
-`enry` [CLI tool](#cli) does *not* require a full Git repository to be present in the filesystem in order to report languages.
+The `enry` library is based on the data from `github/linguist` version **v7.2.0**.
 
-Using [linguist/samples](https://github.com/github/linguist/tree/master/samples)
-as a set for the tests, the following issues were found:
+As opposed to linguist, `enry` [CLI tool](#cli) does *not* require a full Git repository in the filesystem in order to report languages.
 
-* [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine
+Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from linguist:
 
-* As of (Linguist v5.3.2)[https://github.com/github/linguist/releases/tag/v5.3.2] it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
+* [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine.
+
+* As of [Linguist v5.3.2](https://github.com/github/linguist/releases/tag/v5.3.2) it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
 * Bayesian classifier can't distinguish "SQL" from "PLpgSQL. See [#194](https://github.com/src-d/enry/issues/194).
 
@@ -203,7 +182,7 @@ as a set for the tests, the following issues were found:
 
 * `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as linguist does
 
-In all the cases above that have an issue number - we plan to update enry to match Linguist behaviour.
+In all the cases above that have an issue number - we plan to update enry to match Linguist behavior.
 
 
 Benchmarks
@@ -215,19 +194,75 @@ We got these results:
 
 ![histogram](benchmarks/histogram/distribution.png)
 
-The histogram represents the number of files for which spent time in language
-detection was in the range of the time interval indicated in the x axis.
+The histogram shows the number of files detected (y-axis) per time interval bucket (x-axis). As one can see, most of the files were detected faster by enry.
 
-So you can see that most of the files were detected quicker in enry.
+We found few cases where enry turns slower than linguist due to
+Go regexp engine being slower than Ruby's, based on [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
-We found some few cases where enry turns slower than linguist. This is due to
-Golang's regexp engine being slower than Ruby's, which uses the [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
-
-You can find scripts and additional information (like software and hardware used
-and benchmarks' results per sample file) in [*benchmarks*](https://github.com/src-d/enry/blob/master/benchmarks) directory.
+See (instructions)[#faster-regexp-engine-optional] for running enry with oniguruma.
 
 
-### Benchmark Dependencies
+Why Enry?
+------------
+
+In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the origin of people based on their accent.
+
+"Enry Iggins" is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/?ref_=tt_cl_t1), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor during the first half of the movie.
+
+## Development
+
+To build enry's CLI run:
+
+    make build
+
+this will generate a binary in the project's root directory called `enry`.
+
+To run the tests:
+
+    make test
+
+
+### Sync with github/linguist upstream
+
+*enry* re-uses parts of the original [github/linguist](https://github.com/github/linguist) to generate internal data structures.
+In order to update to the latest release of linguist do:
+
+```bash
+$ git clone https://github.com/github/linguist.git .linguist
+$ cd .linguist; git checkout <release-tag>; cd ..
+
+# put the new release's commit sha in the generator_test.go (to re-generate .gold test fixtures)
+# https://github.com/src-d/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
+
+$ make code-generate
+```
+
+To stay in sync, enry needs to be updated when a new release of the linguist includes changes to any of the following files:
+
+* [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)
+* [heuristics.yml](https://github.com/github/linguist/blob/master/lib/linguist/heuristics.yml)
+* [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
+* [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
+
+There is no automation for detecting the changes in the linguist project, so this process above has to be done manually from time to time.
+
+When submitting a pull request syncing up to a new release, please make sure it only contains the changes in
+the generated files (in [data](https://github.com/src-d/enry/blob/master/data) subdirectory).
+
+Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](##divergences-from-linguist) is very much appreciated as it simplifies the maintenance (review/release notes/etc).
+
+
+
+## Misc
+
+<details>
+
+### Benchmark
+
+All benchmark scripts are in [*benchmarks*](https://github.com/src-d/enry/blob/master/benchmarks) directory.
+
+
+#### Dependencies
 As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
  - Ruby (e.g using [`rbenv`](https://github.com/rbenv/rbenv)), [`bundler`](https://bundler.io/) installed
  - Docker
@@ -236,16 +271,7 @@ As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
  - Install it `gem install --no-rdoc --no-ri --local .linguist/github-linguist-*.gem`
 
 
-### How to reproduce current results
-
-If you want to reproduce the same benchmarks as reported above:
- - Make sure all [dependencies](#benchmark-dependencies) are installed
- - Install [gnuplot](http://gnuplot.info) (in order to plot the histogram)
- - Run `ENRY_TEST_REPO="$PWD/.linguist" benchmarks/run.sh` (takes ~15h)
-
-It will run the benchmarks for enry and linguist, parse the output, create csv files and plot the histogram. This takes some time.
-
-### Quick
+#### Quick benchmark
 To run quicker benchmarks you can either:
 
     make benchmarks
@@ -257,12 +283,41 @@ to get average times for the main detection function and strategies for the whol
 if you want to see measures per sample file.
 
 
-Why Enry?
-------------
+#### Full benchmark
+If you want to reproduce the same benchmarks as reported above:
+ - Make sure all [dependencies](#benchmark-dependencies) are installed
+ - Install [gnuplot](http://gnuplot.info) (in order to plot the histogram)
+ - Run `ENRY_TEST_REPO="$PWD/.linguist" benchmarks/run.sh` (takes ~15h)
 
-In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the origin of people based on their accent.
+It will run the benchmarks for enry and linguist, parse the output, create csv files and plot the histogram.
 
-`Enry Iggins` is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/?ref_=tt_cl_t1), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor during the first half of the movie.
+### Faster regexp engine (optional)
+
+[Oniguruma](https://github.com/kkos/oniguruma) is CRuby's regular expression engine.
+It is very fast and performs better than the one built into Go runtime. *enry* supports swapping
+between those two engines thanks to [rubex](https://github.com/moovweb/rubex) project.
+The typical overall speedup from using Oniguruma is 1.5-2x. However, it requires CGo and the external shared library.
+On macOS with [Homebrew](https://brew.sh/), it is:
+
+```
+brew install oniguruma
+```
+
+On Ubuntu, it is
+
+```
+sudo apt install libonig-dev
+```
+
+To build enry with Oniguruma regexps use the `oniguruma` build tag
+
+```
+go get -v -t --tags oniguruma ./...
+```
+
+and then rebuild the project.
+
+</details>
 
 
 License
