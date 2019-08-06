@@ -152,22 +152,20 @@ Note that enry's CLI **_doesn't need a git repository to work_**, which is inten
 ## Java bindings
 
 
-Generated Java bindings using a C-shared library and JNI are available under [`java`](https://github.com/src-d/enry/blob/master/java) and published on Maven at [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux.
+Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/src-d/enry/blob/master/java) and published on Maven at [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux.
 
 
 ## Python bindings
-
-Generated Python bindings using a C-shared library and cffi are not available yet and are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
-
+Generated Python bindings using a C shared library and cffi are not available yet and are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
 
 Divergences from linguist
 ------------
 
-`enry` library is based on the data from `github/linguist` version **v7.2.0**.
+The `enry` library is based on the data from `github/linguist` version **v7.2.0**.
 
 As opposed to linguist, `enry` [CLI tool](#cli) does *not* require a full Git repository in the filesystem in order to report languages.
 
-Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) next enry results are different from the linguist:
+Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from linguist:
 
 * [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine.
 
@@ -209,8 +207,7 @@ Why Enry?
 
 In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the origin of people based on their accent.
 
-`Enry Iggins` is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/?ref_=tt_cl_t1), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor during the first half of the movie.
-
+"Enry Iggins" is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/?ref_=tt_cl_t1), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor during the first half of the movie.
 
 ## Development
 
@@ -230,12 +227,15 @@ To run the tests:
 *enry* re-uses parts of the original [github/linguist](https://github.com/github/linguist) to generate internal data structures.
 In order to update to the latest release of linguist do:
 
-    git clone https://github.com/github/linguist.git .linguist
+```bash
+$ git clone https://github.com/github/linguist.git .linguist
+$ cd .linguist; git checkout <release-tag>; cd ..
 
-    # put the new release's commit sha in the generator_test.go (to re-generate .gold test fixtures)
-    # https://github.com/src-d/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
+# put the new release's commit sha in the generator_test.go (to re-generate .gold test fixtures)
+# https://github.com/src-d/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
 
-    make code-generate
+$ make code-generate
+```
 
 To stay in sync, enry needs to be updated when a new release of the linguist includes changes to any of the following files:
 
@@ -297,7 +297,7 @@ It will run the benchmarks for enry and linguist, parse the output, create csv f
 It is very fast and performs better than the one built into Go runtime. *enry* supports swapping
 between those two engines thanks to [rubex](https://github.com/moovweb/rubex) project.
 The typical overall speedup from using Oniguruma is 1.5-2x. However, it requires CGo and the external shared library.
-On macOS with brew, it is
+On macOS with [Homebrew](https://brew.sh/), it is:
 
 ```
 brew install oniguruma
