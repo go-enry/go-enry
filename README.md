@@ -20,10 +20,11 @@ File programming language detector and toolbox to ignore binary or vendored file
 Installation
 ------------
 
-The recommended way to install enry is to either [download a release](https://github.com/src-d/enry/releases) or
+The recommended way to install the `enry` command-line tool is to either
+[download a release](https://github.com/src-d/enry/releases) or run:
 
 ```
-go get github.com/src-d/enry/cmd/enry
+(cd /tmp; go get github.com/src-d/enry/v2/cmd/enry)
 ```
 
 This project is now part of [source{d} Engine](https://sourced.tech/engine),
@@ -32,9 +33,22 @@ Visit [sourced.tech/engine](https://sourced.tech/engine) for more information.
 
 
 Examples
-------------
+--------
+
+If you are working in a [Go module](https://github.com/golang/go/wiki/Modules),
+import `enry` to the module by running:
 
 ```go
+go get github.com/src-d/enry/v2
+```
+
+The rest of the examples will assume you have either done this or fetched the
+library into your `GOPATH`.
+
+```go
+// The examples here and below assume you have imported the library.
+import "github.com/src-d/enry/v2"
+
 lang, safe := enry.GetLanguageByExtension("foo.go")
 fmt.Println(lang, safe)
 // result: Go true
