@@ -201,7 +201,7 @@ The histogram shows the number of files detected (y-axis) per time interval buck
 We found few cases where enry turns slower than linguist due to
 Go regexp engine being slower than Ruby's, based on [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
-See (instructions)[#faster-regexp-engine-optional] for running enry with oniguruma.
+See [instructions](#misc) for running enry with oniguruma.
 
 
 Why Enry?
