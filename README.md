@@ -24,13 +24,8 @@ The recommended way to install the `enry` command-line tool is to either
 [download a release](https://github.com/src-d/enry/releases) or run:
 
 ```
-(cd /tmp; go get github.com/src-d/enry/v2/cmd/enry)
+(cd "$(mktemp -d)"; go mod init enry; go get github.com/src-d/enry/v2/cmd/enry)
 ```
-
-This project is now part of [source{d} Engine](https://sourced.tech/engine),
-which provides the simplest way to get started with a single command.
-Visit [sourced.tech/engine](https://sourced.tech/engine) for more information.
-
 
 Examples
 --------
