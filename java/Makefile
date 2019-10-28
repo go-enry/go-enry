@@ -59,4 +59,6 @@ package:
 clean:
 	rm -rf $(JAR)
 	rm -rf $(RESOURCES_DIR)
+	rm -rf $(JNAERATOR_JAR)
 
+.PHONY: test package clean linux-shared darwin-shared os-shared-lib

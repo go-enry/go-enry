@@ -29,6 +29,7 @@ LINUX_DIR=$(RESOURCES_DIR)/linux-x86-64
 LINUX_SHARED_LIB=$(LINUX_DIR)/libenry.so
 DARWIN_DIR=$(RESOURCES_DIR)/darwin
 DARWIN_SHARED_LIB=$(DARWIN_DIR)/libenry.dylib
+STATIC_LIB=$(RESOURCES_DIR)/libenry.a
 HEADER_FILE=libenry.h
 NATIVE_LIB=./shared/enry.go
 
@@ -78,5 +79,11 @@ $(LINUX_SHARED_LIB):
 	mkdir -p $(LINUX_DIR) && \
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=c-shared -o $(LINUX_SHARED_LIB) $(NATIVE_LIB) && \
 	mv $(LINUX_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
+
+
+static: $(STATIC_LIB)
+
+$(STATIC_LIB):
+	CGO_ENABLED=1 go build -buildmode=c-archive -o $(STATIC_LIB) $(NATIVE_LIB)
 
 .PHONY: benchmarks benchmarks-samples benchmarks-slow
