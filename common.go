@@ -26,8 +26,8 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByClassifier,
 }
 
-// DefaultClassifier is a Naive Bayes classifier trained on Linguist samples.
-var DefaultClassifier Classifier = &classifier{
+// defaultClassifier is a Naive Bayes classifier trained on Linguist samples.
+var defaultClassifier classifier = &naiveBayes{
 	languagesLogProbabilities: data.LanguagesLogProbabilities,
 	tokensLogProbabilities:    data.TokensLogProbabilities,
 	tokensTotal:               data.TokensTotal,
@@ -92,7 +92,7 @@ func GetLanguageByContent(filename string, content []byte) (language string, saf
 }
 
 // GetLanguageByClassifier returns the most probably language detected for the given content. It uses
-// DefaultClassifier, if no candidates are provided it returns OtherLanguage.
+// defaultClassifier, if no candidates are provided it returns OtherLanguage.
 func GetLanguageByClassifier(content []byte, candidates []string) (language string, safe bool) {
 	return getLanguageByStrategy(GetLanguagesByClassifier, "", content, candidates)
 }
@@ -108,10 +108,10 @@ func getFirstLanguageAndSafe(languages []string) (language string, safe bool) {
 	return
 }
 
-// GetLanguageBySpecificClassifier returns the most probably language for the given content using
+// getLanguageBySpecificClassifier returns the most probably language for the given content using
 // classifier to detect language.
-func GetLanguageBySpecificClassifier(content []byte, candidates []string, classifier Classifier) (language string, safe bool) {
-	languages := GetLanguagesBySpecificClassifier(content, candidates, classifier)
+func getLanguageBySpecificClassifier(content []byte, candidates []string, classifier classifier) (language string, safe bool) {
+	languages := getLanguagesBySpecificClassifier(content, candidates, classifier)
 	return getFirstLanguageAndSafe(languages)
 }
 
@@ -413,27 +413,28 @@ func GetLanguagesByContent(filename string, content []byte, _ []string) []string
 	return heuristic.Match(content)
 }
 
-// GetLanguagesByClassifier uses DefaultClassifier as a Classifier and returns a sorted slice of possible languages ordered by
-// decreasing language's probability. If there are not candidates it returns nil. It complies with the signature to be a Strategy type.
+// GetLanguagesByClassifier returns a sorted slice of possible languages ordered by
+// decreasing language's probability. If there are not candidates it returns nil.
+// It is a Strategy that uses a pre-trained defaultClassifier.
 func GetLanguagesByClassifier(filename string, content []byte, candidates []string) (languages []string) {
 	if len(candidates) == 0 {
 		return nil
 	}
 
-	return GetLanguagesBySpecificClassifier(content, candidates, DefaultClassifier)
+	return getLanguagesBySpecificClassifier(content, candidates, defaultClassifier)
 }
 
-// GetLanguagesBySpecificClassifier returns a slice of possible languages. It takes in a Classifier to be used.
-func GetLanguagesBySpecificClassifier(content []byte, candidates []string, classifier Classifier) (languages []string) {
+// getLanguagesBySpecificClassifier returns a slice of possible languages. It takes in a Classifier to be used.
+func getLanguagesBySpecificClassifier(content []byte, candidates []string, classifier classifier) (languages []string) {
 	mapCandidates := make(map[string]float64)
 	for _, candidate := range candidates {
 		mapCandidates[candidate]++
 	}
 
-	return classifier.Classify(content, mapCandidates)
+	return classifier.classify(content, mapCandidates)
 }
 
-// GetLanguageExtensions returns the different extensions being used by the language.
+// GetLanguageExtensions returns all extensions associated with the given language.
 func GetLanguageExtensions(language string) []string {
 	return data.ExtensionsByLanguage[language]
 }

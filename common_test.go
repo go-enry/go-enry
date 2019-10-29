@@ -332,23 +332,23 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 		name       string
 		filename   string
 		candidates []string
-		classifier Classifier
+		classifier classifier
 		expected   string
 	}{
-		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: nil, classifier: DefaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C/main.c"), candidates: []string{}, classifier: DefaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: DefaultClassifier, expected: "C++"},
-		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, classifier: DefaultClassifier, expected: "Ruby"},
-		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: DefaultClassifier, expected: "Python"},
-		{name: "TestGetLanguagesByClassifier_7", filename: os.DevNull, candidates: nil, classifier: DefaultClassifier, expected: "XML"},
+		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: defaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: nil, classifier: defaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C/main.c"), candidates: []string{}, classifier: defaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: defaultClassifier, expected: "C++"},
+		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, classifier: defaultClassifier, expected: "Ruby"},
+		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: defaultClassifier, expected: "Python"},
+		{name: "TestGetLanguagesByClassifier_7", filename: os.DevNull, candidates: nil, classifier: defaultClassifier, expected: "XML"},
 	}
 
 	for _, test := range test {
 		content, err := ioutil.ReadFile(test.filename)
 		assert.NoError(s.T(), err)
 
-		languages := GetLanguagesBySpecificClassifier(content, test.candidates, test.classifier)
+		languages := getLanguagesBySpecificClassifier(content, test.candidates, test.classifier)
 		var language string
 		if len(languages) == 0 {
 			language = OtherLanguage
