@@ -332,7 +332,7 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 		name       string
 		filename   string
 		candidates []string
-		classifier Classifier
+		classifier classifier
 		expected   string
 	}{
 		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: defaultClassifier, expected: "C"},
@@ -348,7 +348,7 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 		content, err := ioutil.ReadFile(test.filename)
 		assert.NoError(s.T(), err)
 
-		languages := GetLanguagesBySpecificClassifier(content, test.candidates, test.classifier)
+		languages := getLanguagesBySpecificClassifier(content, test.candidates, test.classifier)
 		var language string
 		if len(languages) == 0 {
 			language = OtherLanguage

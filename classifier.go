@@ -7,13 +7,13 @@ import (
 	"github.com/src-d/enry/v2/internal/tokenizer"
 )
 
-// Classifier is the interface in charge to detect the possible languages of the given content based on a set of
+// classifier is the interface in charge to detect the possible languages of the given content based on a set of
 // candidates. Candidates is a map which can be used to assign weights to languages dynamically.
-type Classifier interface {
-	Classify(content []byte, candidates map[string]float64) (languages []string)
+type classifier interface {
+	classify(content []byte, candidates map[string]float64) (languages []string)
 }
 
-type classifier struct {
+type naiveBayes struct {
 	languagesLogProbabilities map[string]float64
 	tokensLogProbabilities    map[string]map[string]float64
 	tokensTotal               float64
@@ -24,8 +24,8 @@ type scoredLanguage struct {
 	score    float64
 }
 
-// Classify returns a sorted slice of possible languages sorted by decreasing language's probability
-func (c *classifier) Classify(content []byte, candidates map[string]float64) []string {
+// classify returns a sorted slice of possible languages sorted by decreasing language's probability
+func (c *naiveBayes) classify(content []byte, candidates map[string]float64) []string {
 
 	var languages map[string]float64
 	if len(candidates) == 0 {
@@ -73,7 +73,7 @@ func sortLanguagesByScore(scoredLangs []*scoredLanguage) []string {
 	return sortedLanguages
 }
 
-func (c *classifier) knownLangs() map[string]float64 {
+func (c *naiveBayes) knownLangs() map[string]float64 {
 	langs := make(map[string]float64, len(c.languagesLogProbabilities))
 	for lang := range c.languagesLogProbabilities {
 		langs[lang]++
@@ -82,7 +82,7 @@ func (c *classifier) knownLangs() map[string]float64 {
 	return langs
 }
 
-func (c *classifier) tokensLogProbability(tokens []string, language string) float64 {
+func (c *naiveBayes) tokensLogProbability(tokens []string, language string) float64 {
 	var sum float64
 	for _, token := range tokens {
 		sum += c.tokenProbability(token, language)
@@ -91,7 +91,7 @@ func (c *classifier) tokensLogProbability(tokens []string, language string) floa
 	return sum
 }
 
-func (c *classifier) tokenProbability(token, language string) float64 {
+func (c *naiveBayes) tokenProbability(token, language string) float64 {
 	tokenProb, ok := c.tokensLogProbabilities[language][token]
 	if !ok {
 		tokenProb = math.Log(1.000000 / c.tokensTotal)
