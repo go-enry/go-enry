@@ -1,24 +1,21 @@
 # enry [![GoDoc](https://godoc.org/github.com/src-d/enry?status.svg)](https://godoc.org/github.com/src-d/enry) [![Build Status](https://travis-ci.com/src-d/enry.svg?branch=master)](https://travis-ci.com/src-d/enry) [![codecov](https://codecov.io/gh/src-d/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/src-d/enry)
 
-File programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
+Programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
 
-* [Installation](#installation)
-* [Examples](#examples)
 * [CLI](#cli)
-* [Java bindings](#java-bindings)
-* [Python bindings](#python-bindings)
+* [Library](#library)
+    * [Go](#go)
+    * [Java bindings](#java-bindings)
+    * [Python bindings](#python-bindings)
 * [Divergences from linguist](#divergences-from-linguist)
 * [Benchmarks](#benchmarks)
 * [Why Enry?](#why-enry)
 * [Development](#development)
     * [Sync with github/linguist upstream](#sync-with-githublinguist-upstream)
 * [Misc](#misc)
-    * [Benchmark](#benchmark)
-    * [Faster regexp engine (optional)](#faster-regexp-engine-optional)
 * [License](#license)
 
-Installation
-------------
+# CLI
 
 The recommended way to install the `enry` command-line tool is to either
 [download a release](https://github.com/src-d/enry/releases) or run:
@@ -27,10 +24,29 @@ The recommended way to install the `enry` command-line tool is to either
 (cd "$(mktemp -d)" && go mod init enry && go get github.com/src-d/enry/v2/cmd/enry)
 ```
 
-Examples
---------
+*enry* CLI accepts similar flags (`--breakdown/--json`) and produce an output, similar to *linguist*:
 
-If you are working in a [Go module](https://github.com/golang/go/wiki/Modules),
+```bash
+$ enry
+97.71%	Go
+1.60%	C
+0.31%	Shell
+0.22%	Java
+0.07%	Ruby
+0.05%	Makefile
+0.04%	Scala
+0.01%	Gnuplot
+```
+
+Note that enry's CLI **_does not need an actual git repository to work_**, which is an intentional difference from linguist.
+
+# Library
+
+*enry* is also available as a native Go library with FFI bindings for multiple programming languages.
+
+## Go
+
+In a [Go module](https://github.com/golang/go/wiki/Modules),
 import `enry` to the module by running:
 
 ```go
@@ -61,9 +77,9 @@ lang := enry.GetLanguage("foo.cpp", []byte("<cpp-code>"))
 // result: C++ true
 ```
 
-Note that the returned boolean value `safe` is set either to `true`, if there is only one possible language detected, or to `false` otherwise.
+Note that the returned boolean value `safe` is `true` if there is only one possible language detected.
 
-To get a list of possible languages for a given file, you can use the plural version of the detecting functions.
+To get a list of all possible languages for a given file, there is a plural version of the same API.
 
 ```go
 langs := enry.GetLanguages("foo.h",  []byte("<cpp-code>"))
@@ -76,96 +92,18 @@ langs := enry.GetLanguagesByFilename("Gemfile", []byte("<content>"), []string{})
 // result: []string{"Ruby"}
 ```
 
-
-CLI
-------------
-
-You can use enry as a command,
-
-```bash
-$ enry --help
-enry v2.0.0 build: 05-08-2019_20_40_35 commit: 6ccf0b6, based on linguist commit: e456098
-enry, A simple (and faster) implementation of github/linguist
-usage: enry [-mode=(file|line|byte)] [-prog] <path>
-        enry [-mode=(file|line|byte)] [-prog] [-json] [-breakdown] <path>
-        enry [-mode=(file|line|byte)] [-prog] [-json] [-breakdown]
-        enry [-version]
-```
-
-and on repository root, it'll return an output similar to *linguist*'s output,
-
-```bash
-$ enry
-97.71%	Go
-1.60%	C
-0.31%	Shell
-0.22%	Java
-0.07%	Ruby
-0.05%	Makefile
-0.04%	Scala
-0.01%	Gnuplot
-```
-
-but not only the output; its flags are also the same as *linguist*'s ones,
-
-```bash
-$ enry --breakdown
-97.71%	Go
-1.60%	C
-0.31%	Shell
-0.22%	Java
-0.07%	Ruby
-0.05%	Makefile
-0.04%	Scala
-0.01%	Gnuplot
-
-Scala
-java/build.sbt
-java/project/plugins.sbt
-
-Java
-java/src/main/java/tech/sourced/enry/Enry.java
-java/src/main/java/tech/sourced/enry/GoUtils.java
-java/src/main/java/tech/sourced/enry/Guess.java
-java/src/test/java/tech/sourced/enry/EnryTest.java
-
-Makefile
-Makefile
-java/Makefile
-
-Go
-benchmark_test.go
-```
-
-even the JSON flag,
-
-```bash
-$ enry --json | jq .
-{
-  "C": [
-    "internal/tokenizer/flex/lex.linguist_yy.c",
-    "internal/tokenizer/flex/lex.linguist_yy.h",
-    "internal/tokenizer/flex/linguist.h",
-    "python/_c_enry.c",
-    "python/enry.c"
-  ],
-  "Gnuplot": [
-    "benchmarks/plot-histogram.gp"
-  ],
-  "Go": [
-    "benchmark_test.go",
-```
-
-Note that enry's CLI **_doesn't need a git repository to work_**, which is intentionally different from the linguist.
-
 ## Java bindings
 
+Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/src-d/enry/blob/master/java).
 
-Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/src-d/enry/blob/master/java) and published on Maven at [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux.
+A library is published on Maven as [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
+# Python bindings
 
-## Python bindings
-Generated Python bindings using a C shared library and cffi are not available yet and are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
+Generated Python bindings using a C shared library and cffi are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
+
+A library is going to be published on pypi as [enry](https://pypi.org/project/enry/) for
+macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
 Divergences from linguist
 ------------
@@ -199,16 +137,17 @@ In all the cases above that have an issue number - we plan to update enry to mat
 Benchmarks
 ------------
 
-Enry's language detection has been compared with Linguist's one. In order to do that, Linguist's project directory [*linguist/samples*](https://github.com/github/linguist/tree/master/samples) was used as a set of files to run benchmarks against.
+Enry's language detection has been compared with Linguist's on [*linguist/samples*](https://github.com/github/linguist/tree/master/samples).
 
 We got these results:
 
 ![histogram](benchmarks/histogram/distribution.png)
 
-The histogram shows the number of files detected (y-axis) per time interval bucket (x-axis). As one can see, most of the files were detected faster by enry.
+The histogram shows the _number of files_ (y-axis) per _time interval bucket_ (x-axis).
+Most of the files were detected faster by enry.
 
-We found few cases where enry turns slower than linguist due to
-Go regexp engine being slower than Ruby's, based on [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
+There are several cases where enry is slower than linguist due to
+Go regexp engine being slower than Ruby's on, wich is based on [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
 See [instructions](#misc) for running enry with oniguruma.
 
@@ -216,9 +155,9 @@ See [instructions](#misc) for running enry with oniguruma.
 Why Enry?
 ------------
 
-In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/?ref_=tt_cl_t2) is one of the main characters. Henry is a linguist and at the very beginning of the movie enjoys guessing the origin of people based on their accent.
+In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Professor Henry Higgins](http://www.imdb.com/character/ch0011719/) is a linguist who at the very beginning of the movie enjoys guessing the origin of people based on their accent.
 
-"Enry Iggins" is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/?ref_=tt_cl_t1), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor during the first half of the movie.
+"Enry Iggins" is how [Eliza Doolittle](http://www.imdb.com/character/ch0011720/), [pronounces](https://www.youtube.com/watch?v=pwNKyTktDIE) the name of the Professor.
 
 ## Development
 
@@ -228,7 +167,7 @@ To build enry's CLI run:
 
 this will generate a binary in the project's root directory called `enry`.
 
-To run the tests:
+To run the tests use:
 
     make test
 
@@ -267,6 +206,7 @@ Separating all the necessary "manual" code changes to a different PR that includ
 ## Misc
 
 <details>
+  <summary>Running a benchmark & faster regexp engine</summary>
 
 ### Benchmark
 
