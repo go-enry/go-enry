@@ -413,8 +413,9 @@ func GetLanguagesByContent(filename string, content []byte, _ []string) []string
 	return heuristic.Match(content)
 }
 
-// GetLanguagesByClassifier uses defaultClassifier as a Classifier and returns a sorted slice of possible languages ordered by
-// decreasing language's probability. If there are not candidates it returns nil. It complies with the signature to be a Strategy type.
+// GetLanguagesByClassifier returns a sorted slice of possible languages ordered by
+// decreasing language's probability. If there are not candidates it returns nil.
+// It is a Strategy that uses a pre-trained defaultClassifier.
 func GetLanguagesByClassifier(filename string, content []byte, candidates []string) (languages []string) {
 	if len(candidates) == 0 {
 		return nil
@@ -433,7 +434,7 @@ func getLanguagesBySpecificClassifier(content []byte, candidates []string, class
 	return classifier.classify(content, mapCandidates)
 }
 
-// GetLanguageExtensions returns the different extensions being used by the language.
+// GetLanguageExtensions returns all extensions associated with the given language.
 func GetLanguageExtensions(language string) []string {
 	return data.ExtensionsByLanguage[language]
 }
