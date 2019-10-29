@@ -38,7 +38,7 @@ $ enry
 0.01%	Gnuplot
 ```
 
-Note that enry's CLI **_does not need an actual git repository to work_**, which is intentionally different from the linguist.
+Note that enry's CLI **_does not need an actual git repository to work_**, which is an intentional difference from linguist.
 
 # Library
 
