@@ -140,7 +140,7 @@ func BenchmarkClassifyTotal(b *testing.B) {
 	b.Run("Classify()_TOTAL", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
 			for _, sample := range samples {
-				o = DefaultClassifier.Classify(sample.content, nil)
+				o = defaultClassifier.Classify(sample.content, nil)
 			}
 
 			overcomeLanguages = o
@@ -195,7 +195,7 @@ func BenchmarkClassifyPerSample(b *testing.B) {
 	for _, sample := range samples {
 		b.Run("Classify()_SAMPLE_"+sample.filename, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				o = DefaultClassifier.Classify(sample.content, nil)
+				o = defaultClassifier.Classify(sample.content, nil)
 			}
 
 			overcomeLanguages = o
