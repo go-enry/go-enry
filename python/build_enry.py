@@ -3,10 +3,19 @@ ffibuilder = FFI()
 
 # cdef() expects a single string declaring the C types, functions and
 # globals needed to use the shared object. It must be in valid C syntax.
+# Taken from java/shared/libenry.h
 ffibuilder.cdef("""
+typedef unsigned char GoUint8;
+typedef long long GoInt64;
+typedef GoInt64 GoInt;
+
 typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 typedef _GoString_ GoString;
-typedef unsigned char GoUint8;
+
+typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
+
+
+extern GoString GetLanguage(GoString p0, GoSlice p1);
 
 /* Return type for GetLanguageByExtension */
 struct GetLanguageByExtension_return {
