@@ -3,7 +3,7 @@
 package regex
 
 import (
-	rubex "github.com/src-d/go-oniguruma"
+	rubex "github.com/go-enry/go-oniguruma"
 )
 
 type EnryRegexp = *rubex.Regexp

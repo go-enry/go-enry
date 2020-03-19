@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/bzz/enry/v2/data/rule"
+	"github.com/go-enry/go-enry/v2/data/rule"
 	"github.com/stretchr/testify/assert"
 )
 

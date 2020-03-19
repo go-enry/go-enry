@@ -4,7 +4,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/bzz/enry/v2/internal/tokenizer"
+	"github.com/go-enry/go-enry/v2/internal/tokenizer"
 )
 
 // classifier is the interface in charge to detect the possible languages of the given content based on a set of

@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bzz/enry/v2/data"
+	"github.com/go-enry/go-enry/v2/data"
 )
 
 type sample struct {

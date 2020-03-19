@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bzz/enry/v2/data"
+	"github.com/go-enry/go-enry/v2/data"
 )
 
 const binSniffLen = 8000

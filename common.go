@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bzz/enry/v2/data"
-	"github.com/bzz/enry/v2/regex"
+	"github.com/go-enry/go-enry/v2/data"
+	"github.com/go-enry/go-enry/v2/regex"
 )
 
 // OtherLanguage is used as a zero value when a function can not return a specific language.
