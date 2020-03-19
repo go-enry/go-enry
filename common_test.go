@@ -39,7 +39,7 @@ func (s *EnryTestSuite) TestRegexpEdgeCases() {
 	}
 
 	for _, r := range regexpEdgeCases {
-		filename := fmt.Sprintf("%s/samples/%s/%s", s.tmpLinguist, r.lang, r.filename)
+		filename := filepath.Join(s.tmpLinguist, "samples", r.lang, r.filename)
 
 		content, err := ioutil.ReadFile(filename)
 		require.NoError(s.T(), err)
@@ -116,7 +116,7 @@ func (s *EnryTestSuite) TestGetLanguage() {
 }
 
 func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
-	var modelinesDir = filepath.Join(s.tmpLinguist, "test/fixtures/Data/Modelines")
+	var modelinesDir = filepath.Join(s.tmpLinguist, "test", "fixtures", "Data", "Modelines")
 
 	tests := []struct {
 		name       string

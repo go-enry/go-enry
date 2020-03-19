@@ -13,77 +13,77 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const (
+var (
 	linguistURL          = "https://github.com/github/linguist.git"
 	linguistClonedEnvVar = "ENRY_TEST_REPO"
 	commit               = "3a1bd3c3d3e741a8aaec4704f782e06f5cd2a00d"
 	samplesDir           = "samples"
-	languagesFile        = "lib/linguist/languages.yml"
+	languagesFile        = filepath.Join("lib", "linguist", "languages.yml")
 
 	testDir   = "test_files"
-	assetsDir = "../assets"
+	assetsDir = filepath.Join("..", "assets")
 
 	// Extensions test
-	extensionGold         = testDir + "/extension.gold"
-	extensionTestTmplPath = assetsDir + "/extension.go.tmpl"
+	extensionGold         = filepath.Join(testDir, "extension.gold")
+	extensionTestTmplPath = filepath.Join(assetsDir, "extension.go.tmpl")
 	extensionTestTmplName = "extension.go.tmpl"
 
 	// Heuristics test
-	heuristicsTestFile  = "lib/linguist/heuristics.yml"
-	contentGold         = testDir + "/content.gold"
-	contentTestTmplPath = assetsDir + "/content.go.tmpl"
+	heuristicsTestFile  = filepath.Join("lib", "linguist", "heuristics.yml")
+	contentGold         = filepath.Join(testDir, "content.gold")
+	contentTestTmplPath = filepath.Join(assetsDir, "content.go.tmpl")
 	contentTestTmplName = "content.go.tmpl"
 
 	// Vendor test
-	vendorTestFile     = "lib/linguist/vendor.yml"
-	vendorGold         = testDir + "/vendor.gold"
-	vendorTestTmplPath = assetsDir + "/vendor.go.tmpl"
+	vendorTestFile     = filepath.Join("lib", "linguist", "vendor.yml")
+	vendorGold         = filepath.Join(testDir, "vendor.gold")
+	vendorTestTmplPath = filepath.Join(assetsDir, "vendor.go.tmpl")
 	vendorTestTmplName = "vendor.go.tmpl"
 
 	// Documentation test
-	documentationTestFile     = "lib/linguist/documentation.yml"
-	documentationGold         = testDir + "/documentation.gold"
-	documentationTestTmplPath = assetsDir + "/documentation.go.tmpl"
+	documentationTestFile     = filepath.Join("lib", "linguist", "documentation.yml")
+	documentationGold         = filepath.Join(testDir, "documentation.gold")
+	documentationTestTmplPath = filepath.Join(assetsDir, "documentation.go.tmpl")
 	documentationTestTmplName = "documentation.go.tmpl"
 
 	// Types test
-	typeGold         = testDir + "/type.gold"
-	typeTestTmplPath = assetsDir + "/type.go.tmpl"
+	typeGold         = filepath.Join(testDir, "type.gold")
+	typeTestTmplPath = filepath.Join(assetsDir, "type.go.tmpl")
 	typeTestTmplName = "type.go.tmpl"
 
 	// Interpreters test
-	interpreterGold         = testDir + "/interpreter.gold"
-	interpreterTestTmplPath = assetsDir + "/interpreter.go.tmpl"
+	interpreterGold         = filepath.Join(testDir, "interpreter.gold")
+	interpreterTestTmplPath = filepath.Join(assetsDir, "interpreter.go.tmpl")
 	interpreterTestTmplName = "interpreter.go.tmpl"
 
 	// Filenames test
-	filenameGold         = testDir + "/filename.gold"
-	filenameTestTmplPath = assetsDir + "/filename.go.tmpl"
+	filenameGold         = filepath.Join(testDir, "filename.gold")
+	filenameTestTmplPath = filepath.Join(assetsDir, "filename.go.tmpl")
 	filenameTestTmplName = "filename.go.tmpl"
 
 	// Aliases test
-	aliasGold         = testDir + "/alias.gold"
-	aliasTestTmplPath = assetsDir + "/alias.go.tmpl"
+	aliasGold         = filepath.Join(testDir, "alias.gold")
+	aliasTestTmplPath = filepath.Join(assetsDir, "alias.go.tmpl")
 	aliasTestTmplName = "alias.go.tmpl"
 
 	// Frequencies test
-	frequenciesGold         = testDir + "/frequencies.gold"
-	frequenciesTestTmplPath = assetsDir + "/frequencies.go.tmpl"
+	frequenciesGold         = filepath.Join(testDir, "frequencies.gold")
+	frequenciesTestTmplPath = filepath.Join(assetsDir, "frequencies.go.tmpl")
 	frequenciesTestTmplName = "frequencies.go.tmpl"
 
 	// commit test
-	commitGold         = testDir + "/commit.gold"
-	commitTestTmplPath = assetsDir + "/commit.go.tmpl"
+	commitGold         = filepath.Join(testDir, "commit.gold")
+	commitTestTmplPath = filepath.Join(assetsDir, "commit.go.tmpl")
 	commitTestTmplName = "commit.go.tmpl"
 
 	// mime test
-	mimeTypeGold         = testDir + "/mimeType.gold"
-	mimeTypeTestTmplPath = assetsDir + "/mimeType.go.tmpl"
+	mimeTypeGold         = filepath.Join(testDir, "mimeType.gold")
+	mimeTypeTestTmplPath = filepath.Join(assetsDir, "mimeType.go.tmpl")
 	mimeTypeTestTmplName = "mimeType.go.tmpl"
 
 	// colors test
-	colorsGold         = testDir + "/colors.gold"
-	colorsTestTmplPath = assetsDir + "/colors.go.tmpl"
+	colorsGold         = filepath.Join(testDir, "colors.gold")
+	colorsTestTmplPath = filepath.Join(assetsDir, "colors.go.tmpl")
 	colorsTestTmplName = "colors.go.tmpl"
 )
 
@@ -291,7 +291,7 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 		gold, err := ioutil.ReadFile(test.wantOut)
 		assert.NoError(s.T(), err)
 
-		outPath, err := ioutil.TempFile("/tmp", "generator-test-")
+		outPath, err := ioutil.TempFile("", "generator-test-")
 		assert.NoError(s.T(), err)
 		defer os.Remove(outPath.Name())
 		err = test.generate(test.fileToParse, test.samplesDir, outPath.Name(), test.tmplPath, test.tmplName, test.commit)
