@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/go-enry/go-enry/v2/regex"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -136,7 +137,7 @@ func TestRegexpOnInvalidUtf8(t *testing.T) {
 		{"th\u0100 filling", []string{"th", "filling"}}, // `thĀ filling`
 		{"привет, как дела?", []string{}},               // empty, no ASCII tokens
 	}
-	re := reRegularToken
+	re := regex.MustCompile(`[0-9A-Za-z_\.@#\/\*]+`) // a reRegularToken from tokenizer.go
 
 	for _, content := range origContent {
 		t.Run("", func(t *testing.T) {

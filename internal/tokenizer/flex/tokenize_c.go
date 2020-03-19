@@ -1,3 +1,5 @@
+// +build flex
+
 package flex
 
 // #include <stdlib.h>
