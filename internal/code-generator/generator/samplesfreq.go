@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"text/template"
 
-	"github.com/src-d/enry/v2/internal/tokenizer"
+	"github.com/bzz/enry/v2/internal/tokenizer"
 )
 
 type samplesFrequencies struct {

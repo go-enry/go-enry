@@ -11,6 +11,6 @@
 	Upstream Linguist YAML files are used to generate datastructures for data
 	package.
 */
-package enry // import "github.com/src-d/enry/v2"
+package enry // import "github.com/bzz/enry/v2"
 
 //go:generate make code-generate

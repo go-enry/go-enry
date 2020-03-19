@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/src-d/enry/v2/data"
+	"github.com/bzz/enry/v2/data"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

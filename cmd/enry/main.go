@@ -14,8 +14,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/src-d/enry/v2"
-	"github.com/src-d/enry/v2/data"
+	"github.com/bzz/enry/v2"
+	"github.com/bzz/enry/v2/data"
 )
 
 var (

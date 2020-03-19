@@ -1,4 +1,4 @@
-.linguist
+.linguist*
 benchmarks/output
 .ci
 Makefile.main
@@ -9,3 +9,4 @@ build/
 vendor/
 java/lib/
 .vscode/
+.venv

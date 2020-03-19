@@ -1,4 +1,4 @@
-# enry [![GoDoc](https://godoc.org/github.com/src-d/enry?status.svg)](https://godoc.org/github.com/src-d/enry) [![Build Status](https://travis-ci.com/src-d/enry.svg?branch=master)](https://travis-ci.com/src-d/enry) [![codecov](https://codecov.io/gh/src-d/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/src-d/enry)
+# enry [![GoDoc](https://godoc.org/github.com/bzz/enry?status.svg)](https://godoc.org/github.com/bzz/enry) [![Build Status](https://travis-ci.org/bzz/enry.svg?branch=master)](https://travis-ci.org/bzz/enry) [![codecov](https://codecov.io/gh/bzz/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/bzz/enry)
 
 Programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
 
@@ -18,10 +18,10 @@ Programming language detector and toolbox to ignore binary or vendored files. *e
 # CLI
 
 The recommended way to install the `enry` command-line tool is to either
-[download a release](https://github.com/src-d/enry/releases) or run:
+[download a release](https://github.com/bzz/enry/releases) or run:
 
 ```
-(cd "$(mktemp -d)" && go mod init enry && go get github.com/src-d/enry/v2/cmd/enry)
+(cd "$(mktemp -d)" && go mod init enry && go get github.com/bzz/enry/v2/cmd/enry)
 ```
 
 *enry* CLI accepts similar flags (`--breakdown/--json`) and produce an output, similar to *linguist*:
@@ -50,7 +50,7 @@ In a [Go module](https://github.com/golang/go/wiki/Modules),
 import `enry` to the module by running:
 
 ```go
-go get github.com/src-d/enry/v2
+go get github.com/bzz/enry/v2
 ```
 
 The rest of the examples will assume you have either done this or fetched the
@@ -58,7 +58,7 @@ library into your `GOPATH`.
 
 ```go
 // The examples here and below assume you have imported the library.
-import "github.com/src-d/enry/v2"
+import "github.com/bzz/enry/v2"
 
 lang, safe := enry.GetLanguageByExtension("foo.go")
 fmt.Println(lang, safe)
@@ -94,7 +94,7 @@ langs := enry.GetLanguagesByFilename("Gemfile", []byte("<content>"), []string{})
 
 ## Java bindings
 
-Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/src-d/enry/blob/master/java).
+Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/bzz/enry/blob/master/java).
 
 A library is published on Maven as [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
@@ -182,7 +182,7 @@ $ git clone https://github.com/github/linguist.git .linguist
 $ cd .linguist; git checkout <release-tag>; cd ..
 
 # put the new release's commit sha in the generator_test.go (to re-generate .gold test fixtures)
-# https://github.com/src-d/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
+# https://github.com/bzz/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
 
 $ make code-generate
 ```
@@ -197,7 +197,7 @@ To stay in sync, enry needs to be updated when a new release of the linguist inc
 There is no automation for detecting the changes in the linguist project, so this process above has to be done manually from time to time.
 
 When submitting a pull request syncing up to a new release, please make sure it only contains the changes in
-the generated files (in [data](https://github.com/src-d/enry/blob/master/data) subdirectory).
+the generated files (in [data](https://github.com/bzz/enry/blob/master/data) subdirectory).
 
 Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](##divergences-from-linguist) is very much appreciated as it simplifies the maintenance (review/release notes/etc).
 
@@ -210,7 +210,7 @@ Separating all the necessary "manual" code changes to a different PR that includ
 
 ### Benchmark
 
-All benchmark scripts are in [*benchmarks*](https://github.com/src-d/enry/blob/master/benchmarks) directory.
+All benchmark scripts are in [*benchmarks*](https://github.com/bzz/enry/blob/master/benchmarks) directory.
 
 
 #### Dependencies

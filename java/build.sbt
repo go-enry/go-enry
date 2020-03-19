@@ -7,8 +7,8 @@ enablePlugins(GitVersioning)
 sonatypeProfileName := "tech.sourced"
 
 // pom settings for sonatype
-homepage := Some(url("https://github.com/src-d/enry"))
-scmInfo := Some(ScmInfo(url("https://github.com/src-d/enry"),
+homepage := Some(url("https://github.com/bzz/enry"))
+scmInfo := Some(ScmInfo(url("https://github.com/bzz/enry"),
                             "git@github.com:src-d/enry.git"))
 developers += Developer("abeaumont",
                         "Alfredo Beaumont",

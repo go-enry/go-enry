@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/src-d/enry/v2/internal/code-generator/generator"
+	"github.com/bzz/enry/v2/internal/code-generator/generator"
 )
 
 const (
