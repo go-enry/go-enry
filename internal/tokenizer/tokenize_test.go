@@ -78,18 +78,19 @@ varBool = 3<=2>
 )
 
 var (
-	tokensFromTestContent = []string{"SHEBANG#!ruby", "SHEBANG#!node", "SHEBANG#!awk", "<!DOCTYPE>", "PUBLIC", "W3C", "DTD", "XHTML", "1", "0",
-		"Strict", "EN", "http", "www", "w3", "org", "TR", "xhtml1", "DTD", "xhtml1", "strict", "dtd", "<html>", "<head>", "<title>", "class=",
-		"</title>", "<style>", "<![CDATA[>", "example", "background", "color", "yellow", "</style>", "</head>", "<body>", "<div>", "<strong>",
-		"</strong>", "</div>", "</body>", "</html>", "(", "[", "]", ")", "[", "]", "{", "(", ")", "(", ")", "{", "}", "(", ")", ";", "{", ";",
-		"}", "]", "]", "#", "/usr/bin/ruby", "#", "/usr/bin/env", "node", "aaa", "#", "/usr/bin/env", "A", "B", "foo", "bar", "awk", "f", "#",
-		"python", "func", "Tokenize", "content", "byte", "string", "splitted", "bytes.Fields", "content", "tokens", "othercode", "ppp", "no",
-		"comment", "abb", "tokenByte", "notcatchasanumber", "number", "*", "anotherNumber", "if", "isTrue", "isToo", "b", "return", "tokens",
-		"oneBool", "varBool", "#ifndef", "#i", "m", "not", "a", "comment", "if", "the", "single", "line", "comment", "symbol", "is", "not",
-		"followed", "by", "a", "white", "PyErr_SetString", "PyExc_RuntimeError", "html", "PUBLIC", "xmlns", "id", "class", "This", "is", "a",
-		"XHTML", "sample", "file", "type", "#example", "background", "color", "yellow", "id", "Just", "a", "simple", "XHTML", "test", "page.",
-		"-", "|", "+", "&&", "<", "<", "-", "!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">",
-		"'", ",", ">", "=", ">", "=", "=", ">", "=", ">", ":", ">", "=", ">"}
+	tokensFromTestContent = []string{"SHEBANG#!ruby", "SHEBANG#!node", "SHEBANG#!awk", "<!DOCTYPE>", "html", "PUBLIC",
+		"W3C", "DTD", "XHTML", "1", "0", "Strict", "EN", "http", "www", "w3", "org", "TR", "xhtml1", "DTD", "xhtml1",
+		"strict", "dtd", "<html>", "xmlns=", "<head>", "<title>", "id=", "class=", "</title>", "<style>", "type=",
+		"<![CDATA[>", "example", "background", "color", "yellow", "</style>", "</head>", "<body>", "<div>", "id=",
+		"<strong>", "</strong>", "</div>", "</body>", "</html>", "(", "[", "]", ")", "[", "]", "{", "(", ")", "(", ")",
+		"{", "}", "(", ")", ";", "#", "/usr/bin/ruby", "#", "/usr/bin/env", "node", "aaa", "#", "/usr/bin/env", "A",
+		"B", "foo", "bar", "awk", "f", "#", "python", "func", "Tokenize", "content", "byte", "string", "splitted",
+		"bytes.Fields", "content", "tokens", "othercode", "ppp", "no", "comment", "abb", "tokenByte",
+		"notcatchasanumber", "number", "*", "anotherNumber", "if", "isTrue", "isToo", "b", "return", "tokens",
+		"oneBool", "varBool", "#ifndef", "#i", "m", "not", "a", "comment", "if", "the", "single", "line", "comment",
+		"symbol", "is", "not", "followed", "by", "a", "white", "PyErr_SetString", "PyExc_RuntimeError", "This", "is",
+		"a", "XHTML", "sample", "file", "Just", "a", "simple", "XHTML", "test", "page.", "-", "|", "+", "&&", "<", "<",
+		"!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">", "'", ","}
 
 	tests = []struct {
 		name     string
@@ -108,6 +109,7 @@ func TestTokenize(t *testing.T) {
 			after := string(test.content)
 			require.Equal(t, before, after, "the input slice was modified")
 			require.Equal(t, len(test.expected), len(tokens), fmt.Sprintf("token' slice length = %v, want %v", len(test.expected), len(tokens)))
+
 			for i, expectedToken := range test.expected {
 				assert.Equal(t, expectedToken, tokens[i], fmt.Sprintf("token = %v, want %v", tokens[i], expectedToken))
 			}

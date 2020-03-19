@@ -18,10 +18,6 @@ func Tokenize(content []byte) []string {
 		content = content[:ByteLimit]
 	}
 
-	// Copy the input so that changes wrought by the tokenization steps do not
-	// modify the caller's copy of the input. See #196.
-	content = append([]byte(nil), content...)
-
 	tokens := make([][]byte, 0, 50)
 	for _, extract := range extractTokens {
 		var extractedTokens [][]byte
@@ -162,7 +158,7 @@ func extractAndReplaceSGML(content []byte) ([]byte, [][]byte) {
 				continue
 			}
 
-			token := append(match[1], '>')
+			token := append(append([]byte(nil), match[1]...), '>')
 			SGMLTokens = append(SGMLTokens, token)
 			attributes := getSGMLAttributes(match[0])
 			SGMLTokens = append(SGMLTokens, attributes...)

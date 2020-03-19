@@ -1,8 +1,9 @@
 dist: trusty
 language: go
 go:
-  - '1.12.x'
-  - '1.11.x'
+  - '1.14.x'
+  - '1.13.x'
+
 env:
   global:
     - GO_VERSION_FOR_JVM='1.11.x'
@@ -12,8 +13,6 @@ env:
   matrix:
     - ONIGURUMA=0
     - ONIGURUMA=1
-matrix:
-  fast_finish: true
 
 stages:
   - name: test
@@ -22,7 +21,6 @@ stages:
   - name: publish
     if: tag IS present
 
-stage: test
 install:
   - >
     if [[ "${ONIGURUMA}" -gt 0 ]]; then
@@ -36,7 +34,7 @@ install:
       sudo dpkg -i "libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
     fi;
 script:
-  - make test-coverage
+  - go test ./...
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
