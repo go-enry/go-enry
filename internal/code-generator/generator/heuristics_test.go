@@ -106,7 +106,11 @@ func TestTemplateMatcherVars(t *testing.T) {
 
 	// render a tmpl
 	const contentTmpl = "../assets/content.go.tmpl"
-	tmpl, err := template.ParseFiles(contentTmpl)
+	tmpl, err := template.New("content.go.tmpl").Funcs(template.FuncMap{
+		"stringVal": func(val string) string {
+			return fmt.Sprintf("`%s`", val)
+		},
+	}).ParseFiles(contentTmpl)
 	require.NoError(t, err)
 
 	buf := bytes.NewBuffer(nil)

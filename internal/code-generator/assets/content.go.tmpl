@@ -27,12 +27,12 @@ var ContentHeuristics = map[string]*Heuristics{
 	{{- else if eq .Op "Or" -}}
 		rule.Or(
 			{{ template "Languages" .Langs -}}
-			regexp.MustCompile(`{{ .Pattern }}`),
+			regexp.MustCompile({{ .Pattern | stringVal }}),
 		),
 	{{- else if eq .Op "Not" -}}
 		rule.Not(
 			{{ template "Languages" .Langs -}}
-			regexp.MustCompile(`{{ .Pattern }}`),
+			regexp.MustCompile({{ .Pattern | stringVal }}),
 		),
 	{{- else if eq .Op "Always" -}}
 		rule.Always(

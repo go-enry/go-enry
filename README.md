@@ -118,6 +118,8 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 
 * [Heuristics for ".rno" extension](https://github.com/github/linguist/blob/3a1bd3c3d3e741a8aaec4704f782e06f5cd2a00d/lib/linguist/heuristics.yml#L365) in RUNOFF could not be parsed, due to unsupported lookahead in RE2 regexp engine.
 
+* [Heuristics for ".inc" extension](https://github.com/github/linguist/blob/f0e2d0d7f1ce600b2a5acccaef6b149c87d8b99c/lib/linguist/heuristics.yml#L222) in NASL could not be parsed, due to unsupported possessive quantifier in RE2 regexp engine.
+
 * As of [Linguist v5.3.2](https://github.com/github/linguist/releases/tag/v5.3.2) it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
 * Bayesian classifier can't distinguish "SQL" from "PLpgSQL. See [#194](https://github.com/src-d/enry/issues/194).
