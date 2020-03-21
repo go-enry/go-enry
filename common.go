@@ -471,3 +471,12 @@ func GetLanguageByAlias(alias string) (lang string, ok bool) {
 
 	return
 }
+
+// GetLanguageGroup returns language group or empty string if language does not have group.
+func GetLanguageGroup(language string) string {
+	if group, ok := data.LanguagesGroup[language]; ok {
+		return group
+	}
+
+	return ""
+}

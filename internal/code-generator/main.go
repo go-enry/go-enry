@@ -80,6 +80,11 @@ var (
 	colorsTmplPath = filepath.Join(assetsDir, "colors.go.tmpl")
 	colorsTmpl     = "colors.go.tmpl"
 
+	// groups.go generation
+	groupsFile     = filepath.Join("data", "groups.go")
+	groupsTmplPath = filepath.Join(assetsDir, "groups.go.tmpl")
+	groupsTmpl     = "groups.go.tmpl"
+
 	commitPath = filepath.Join(".linguist", ".git", "HEAD")
 )
 
@@ -112,6 +117,7 @@ func main() {
 		{generator.Commit, "", "", commitFile, commitTmplPath, commitTmpl, commit},
 		{generator.MimeType, languagesYAML, "", mimeTypeFile, mimeTypeTmplPath, mimeTypeTmpl, commit},
 		{generator.Colors, languagesYAML, "", colorsFile, colorsTmplPath, colorsTmpl, commit},
+		{generator.Groups, languagesYAML, "", groupsFile, groupsTmplPath, groupsTmpl, commit},
 	}
 
 	for _, file := range fileList {

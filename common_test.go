@@ -400,6 +400,24 @@ func (s *EnryTestSuite) TestGetLanguageType() {
 	}
 }
 
+func (s *EnryTestSuite) TestGetLanguageGroup() {
+	tests := []struct {
+		name     string
+		language string
+		expected string
+	}{
+		{name: "TestGetLanguageGroup_1", language: "BestLanguageEver", expected: ""},
+		{name: "TestGetLanguageGroup_2", language: "JSX", expected: "JavaScript"},
+		{name: "TestGetLanguageGroup_3", language: "HTML+PHP", expected: "HTML"},
+		{name: "TestGetLanguageGroup_4", language: "HTML", expected: ""},
+	}
+
+	for _, test := range tests {
+		langGroup := GetLanguageGroup(test.language)
+		assert.Equal(s.T(), test.expected, langGroup, fmt.Sprintf("%v: langGroup = %v, expected: %v", test.name, langGroup, test.expected))
+	}
+}
+
 func (s *EnryTestSuite) TestGetLanguageByAlias() {
 	tests := []struct {
 		name         string

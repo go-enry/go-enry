@@ -88,6 +88,11 @@ var (
 	colorsGold         = filepath.Join(testDir, "colors.gold")
 	colorsTestTmplPath = filepath.Join(assetsDir, "colors.go.tmpl")
 	colorsTestTmplName = "colors.go.tmpl"
+
+	// colors test
+	groupsGold         = filepath.Join(testDir, "groups.gold")
+	groupsTestTmplPath = filepath.Join(assetsDir, "groups.go.tmpl")
+	groupsTestTmplName = "groups.go.tmpl"
 )
 
 type GeneratorTestSuite struct {
@@ -260,6 +265,16 @@ func (s *GeneratorTestSuite) SetupSuite() {
 			commit:      commit,
 			generate:    Colors,
 			wantOut:     colorsGold,
+		},
+		{
+			name:        "Groups()",
+			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			samplesDir:  "",
+			tmplPath:    groupsTestTmplPath,
+			tmplName:    groupsTestTmplName,
+			commit:      commit,
+			generate:    Groups,
+			wantOut:     groupsGold,
 		},
 	}
 }

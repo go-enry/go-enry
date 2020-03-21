@@ -24,7 +24,7 @@ func Colors(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string)
 	langColorMap := buildLanguageColorMap(languages)
 
 	buf := &bytes.Buffer{}
-	if err := executeMimeTemplate(buf, langColorMap, tmplPath, tmplName, commit); err != nil {
+	if err := executeColorTemplate(buf, langColorMap, tmplPath, tmplName, commit); err != nil {
 		return err
 	}
 

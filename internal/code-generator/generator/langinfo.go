@@ -5,6 +5,7 @@ import "sort"
 type languageInfo struct {
 	Type         string   `yaml:"type,omitempty"`
 	Color        string   `yaml:"color,omitempty"`
+	Group        string   `yaml:"group,omitempty"`
 	Aliases      []string `yaml:"aliases,omitempty"`
 	Extensions   []string `yaml:"extensions,omitempty,flow"`
 	Interpreters []string `yaml:"interpreters,omitempty,flow"`
