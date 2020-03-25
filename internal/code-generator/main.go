@@ -128,7 +128,7 @@ func getCommit(path string) (string, error) {
 	}
 
 	if string(commit) == "ref: refs/heads/master\n" {
-		path = filepath.Join(".linguist", ".git/", string(commit[5:len(commit)-1]))
+		path = filepath.Join(".linguist", ".git", string(commit[5:len(commit)-1]))
 		commit, err = ioutil.ReadFile(path)
 		if err != nil {
 			return "", err
