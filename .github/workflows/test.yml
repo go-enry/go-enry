@@ -17,6 +17,8 @@ jobs:
       uses: actions/checkout@v2
     - name: Test
       run: go test ./...
+      env:
+        ENRY_DEBUG: 1
   test-oniguruma:
     strategy:
       matrix:
