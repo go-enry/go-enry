@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"text/template"
 
 	"github.com/go-enry/go-enry/v2/internal/tokenizer"
@@ -107,49 +108,46 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 	}, nil
 }
 
+// readSamples collects ./samples/ filenames from the Linguist codebase, skiping symlinks.
 func readSamples(samplesLangDir string) ([]string, error) {
-	const samplesLangFilesDir = "filenames"
-	sampleFiles, err := ioutil.ReadDir(samplesLangDir)
-	if err != nil {
-		return nil, err
-	}
-
+	const specialSubDir = "filenames"
 	var samples []string
-	for _, sampleFile := range sampleFiles {
-		filename := filepath.Join(samplesLangDir, sampleFile.Name())
-		if sampleFile.Mode().IsRegular() {
-			samples = append(samples, filename)
-			continue
-		}
 
-		if sampleFile.IsDir() && sampleFile.Name() == samplesLangFilesDir {
-			subSamples, err := readSubSamples(filename)
-			if err != nil {
-				return nil, err
+	err := filepath.Walk(samplesLangDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("failure accessing a path %q: %v\n", path, err)
+			return err
+		}
+		if info.IsDir() {
+			switch info.Name() {
+			case filepath.Base(samplesLangDir):
+				return nil
+			case specialSubDir:
+				return nil
+			default:
+				return filepath.SkipDir
 			}
-
-			samples = append(samples, subSamples...)
 		}
+		// skip git file symlinks on win and *nix
+		if isKnownSymlinkInLinguist(path) || !info.Mode().IsRegular() {
+			return nil
+		}
+		samples = append(samples, path)
+		return nil
+	})
 
-	}
-
-	return samples, nil
+	return samples, err
 }
 
-func readSubSamples(path string) ([]string, error) {
-	subSamples := []string{}
-	entries, err := ioutil.ReadDir(path)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, entry := range entries {
-		if entry.Mode().IsRegular() {
-			subSamples = append(subSamples, filepath.Join(path, entry.Name()))
-		}
-	}
-
-	return subSamples, nil
+// isKnownSymlinkInLinguist checks if the file name is on the list of known symlinks.
+// On Windows, there is no symlink support in Git [1] and those become regular text files,
+// so we have to skip these files manually, maintaing a list here :/
+//  1. https://github.com/git-for-windows/git/wiki/Symbolic-Links
+//
+// $ find -L .linguist/samples -xtype l
+func isKnownSymlinkInLinguist(path string) bool {
+	return strings.HasSuffix(path, filepath.Join("Ant Build System", "filenames", "build.xml")) ||
+		strings.HasSuffix(path, filepath.Join("Markdown", "symlink.md"))
 }
 
 func getTokens(samples []string) ([]string, error) {
