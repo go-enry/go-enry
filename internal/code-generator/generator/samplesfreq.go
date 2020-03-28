@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -29,6 +30,21 @@ func Frequencies(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit st
 	freqs, err := getFrequencies(samplesDir)
 	if err != nil {
 		return err
+	}
+
+	if _, ok := os.LookupEnv("ENRY_DEBUG"); ok {
+		log.Printf("Total samples: %d\n", freqs.LanguageTotal)
+		log.Printf("Total tokens: %d\n", freqs.TokensTotal)
+
+		keys := make([]string, 0, len(freqs.Languages))
+		for k := range freqs.Languages {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			fmt.Printf(" %s: %d\n", k, freqs.Languages[k])
+		}
 	}
 
 	buf := &bytes.Buffer{}
