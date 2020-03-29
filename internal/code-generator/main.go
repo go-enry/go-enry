@@ -3,81 +3,84 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"path/filepath"
 
 	"github.com/go-enry/go-enry/v2/internal/code-generator/generator"
 )
 
-const (
-	// languages info file
-	languagesYAML = ".linguist/lib/linguist/languages.yml"
+var (
+	// directories
+	samplesDir = filepath.Join(".linguist", "samples")
+	libDir     = filepath.Join(".linguist", "lib", "linguist")
+	assetsDir  = filepath.Join("internal", "code-generator", "assets")
 
-	// linguist's samples directory
-	samplesDir = ".linguist/samples"
+	// languages info file
+	languagesYAML = filepath.Join(libDir, "languages.yml")
 
 	// extension.go generation
-	extensionsFile     = "data/extension.go"
-	extensionsTmplPath = "internal/code-generator/assets/extension.go.tmpl"
+	extensionsFile     = filepath.Join("data", "extension.go")
+	extensionsTmplPath = filepath.Join(assetsDir, "extension.go.tmpl")
 	extensionsTmpl     = "extension.go.tmpl"
 
 	// content.go generation
-	heuristicsYAML  = ".linguist/lib/linguist/heuristics.yml"
-	contentFile     = "data/content.go"
-	contentTmplPath = "internal/code-generator/assets/content.go.tmpl"
+	heuristicsYAML  = filepath.Join(libDir, "heuristics.yml")
+	contentFile     = filepath.Join("data", "content.go")
+	contentTmplPath = filepath.Join(assetsDir, "content.go.tmpl")
 	contentTmpl     = "content.go.tmpl"
 
 	// vendor.go generation
-	vendorYAML     = ".linguist/lib/linguist/vendor.yml"
-	vendorFile     = "data/vendor.go"
-	vendorTmplPath = "internal/code-generator/assets/vendor.go.tmpl"
+	vendorYAML     = filepath.Join(libDir, "vendor.yml")
+	vendorFile     = filepath.Join("data", "vendor.go")
+	vendorTmplPath = filepath.Join(assetsDir, "vendor.go.tmpl")
 	vendorTmpl     = "vendor.go.tmpl"
 
 	// documentation.go generation
-	documentationYAML     = ".linguist/lib/linguist/documentation.yml"
-	documentationFile     = "data/documentation.go"
-	documentationTmplPath = "internal/code-generator/assets/documentation.go.tmpl"
+	documentationYAML     = filepath.Join(libDir, "documentation.yml")
+	documentationFile     = filepath.Join("data", "documentation.go")
+	documentationTmplPath = filepath.Join(assetsDir, "documentation.go.tmpl")
 	documentationTmpl     = "documentation.go.tmpl"
 
 	// type.go generation
-	typeFile     = "data/type.go"
-	typeTmplPath = "internal/code-generator/assets/type.go.tmpl"
+	typeFile     = filepath.Join("data", "type.go")
+	typeTmplPath = filepath.Join(assetsDir, "type.go.tmpl")
 	typeTmpl     = "type.go.tmpl"
 
 	// interpreter.go generation
-	interpretersFile     = "data/interpreter.go"
-	interpretersTmplPath = "internal/code-generator/assets/interpreter.go.tmpl"
+	interpretersFile     = filepath.Join("data", "interpreter.go")
+	interpretersTmplPath = filepath.Join(assetsDir, "interpreter.go.tmpl")
 	interpretersTmpl     = "interpreter.go.tmpl"
 
 	// filename.go generation
-	filenamesFile     = "data/filename.go"
-	filenamesTmplPath = "internal/code-generator/assets/filename.go.tmpl"
+	filenamesFile     = filepath.Join("data", "filename.go")
+	filenamesTmplPath = filepath.Join(assetsDir, "filename.go.tmpl")
 	filenamesTmpl     = "filename.go.tmpl"
 
 	// alias.go generation
-	aliasesFile     = "data/alias.go"
-	aliasesTmplPath = "internal/code-generator/assets/alias.go.tmpl"
+	aliasesFile     = filepath.Join("data", "alias.go")
+	aliasesTmplPath = filepath.Join(assetsDir, "alias.go.tmpl")
 	aliasesTmpl     = "alias.go.tmpl"
 
 	// frequencies.go generation
-	frequenciesFile     = "data/frequencies.go"
-	frequenciesTmplPath = "internal/code-generator/assets/frequencies.go.tmpl"
+	frequenciesFile     = filepath.Join("data", "frequencies.go")
+	frequenciesTmplPath = filepath.Join(assetsDir, "frequencies.go.tmpl")
 	frequenciesTmpl     = "frequencies.go.tmpl"
 
 	// commit.go generation
-	commitFile     = "data/commit.go"
-	commitTmplPath = "internal/code-generator/assets/commit.go.tmpl"
+	commitFile     = filepath.Join("data", "commit.go")
+	commitTmplPath = filepath.Join(assetsDir, "commit.go.tmpl")
 	commitTmpl     = "commit.go.tmpl"
 
 	// mimeType.go generation
-	mimeTypeFile     = "data/mimeType.go"
-	mimeTypeTmplPath = "internal/code-generator/assets/mimeType.go.tmpl"
+	mimeTypeFile     = filepath.Join("data", "mimeType.go")
+	mimeTypeTmplPath = filepath.Join(assetsDir, "mimeType.go.tmpl")
 	mimeTypeTmpl     = "mimeType.go.tmpl"
 
 	// colors.go generation
-	colorsFile     = "data/colors.go"
-	colorsTmplPath = "internal/code-generator/assets/colors.go.tmpl"
+	colorsFile     = filepath.Join("data", "colors.go")
+	colorsTmplPath = filepath.Join(assetsDir, "colors.go.tmpl")
 	colorsTmpl     = "colors.go.tmpl"
 
-	commitPath = ".linguist/.git/HEAD"
+	commitPath = filepath.Join(".linguist", ".git", "HEAD")
 )
 
 type generatorFiles struct {
@@ -125,7 +128,7 @@ func getCommit(path string) (string, error) {
 	}
 
 	if string(commit) == "ref: refs/heads/master\n" {
-		path = ".linguist/.git/" + string(commit[5:len(commit)-1])
+		path = filepath.Join(".linguist", ".git", string(commit[5:len(commit)-1]))
 		commit, err = ioutil.ReadFile(path)
 		if err != nil {
 			return "", err

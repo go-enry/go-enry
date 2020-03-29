@@ -9,7 +9,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-enry/go-enry/v2/internal/tokenizer"
+
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -302,7 +305,23 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 		expected := normalizeSpaces(string(gold))
 		actual := normalizeSpaces(string(out))
 		assert.Equal(s.T(), expected, actual, "Test %s", test.name)
+		if expected != actual {
+			s.T().Logf("%s generated is different from %q", test.name, test.wantOut)
+			s.T().Logf("Expected %q", expected[:400])
+			s.T().Logf("Actual %q", actual[:400])
+		}
+
 	}
+}
+
+func (s *GeneratorTestSuite) TestTokenizerOnATS() {
+	const suspiciousSample = "samples/ATS/csv_parse.hats"
+	sFile := filepath.Join(s.tmpLinguist, suspiciousSample)
+	content, err := ioutil.ReadFile(sFile)
+	require.NoError(s.T(), err)
+
+	tokens := tokenizer.Tokenize(content)
+	assert.Equal(s.T(), 381, len(tokens), "Number of tokens using LF as line endings")
 }
 
 // normalizeSpaces returns a copy of str with whitespaces normalized.
