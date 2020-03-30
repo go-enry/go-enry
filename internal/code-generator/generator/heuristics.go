@@ -163,9 +163,11 @@ func parseYaml(file string) (*Heuristics, error) {
 // - lookbehind & lookahead
 // - named & numbered capturing group/after text matching
 // - backreference
+// - possessive quantifier
 // For referece on supported syntax see https://github.com/google/re2/wiki/Syntax
 func isUnsupportedRegexpSyntax(reg string) bool {
-	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `\1`) ||
+	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) ||
+		strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
 		// See https://github.com/github/linguist/pull/4243#discussion_r246105067
 		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
 }

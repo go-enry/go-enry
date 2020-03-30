@@ -4,10 +4,12 @@ package generator
 
 import (
 	"bytes"
+	"fmt"
 	"go/format"
 	"io"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -32,12 +34,19 @@ func executeTemplate(w io.Writer, name, path, commit string, fmap template.FuncM
 	getCommit := func() string {
 		return commit
 	}
+	// stringVal returns escaped string that can be directly placed into go code.
+	// for value test`s it would return `test`+"`"+`s`
+	stringVal := func(val string) string {
+		val = strings.ReplaceAll(val, "`", "`+\"`\"+`")
+		return fmt.Sprintf("`%s`", val)
+	}
 
 	const headerTmpl = "header.go.tmpl"
 	headerPath := filepath.Join(filepath.Dir(path), headerTmpl)
 
 	h := template.Must(template.New(headerTmpl).Funcs(template.FuncMap{
 		"getCommit": getCommit,
+		"stringVal": stringVal,
 	}).ParseFiles(headerPath))
 
 	buf := bytes.NewBuffer(nil)
@@ -49,6 +58,7 @@ func executeTemplate(w io.Writer, name, path, commit string, fmap template.FuncM
 		fmap = make(template.FuncMap)
 	}
 	fmap["getCommit"] = getCommit
+	fmap["stringVal"] = stringVal
 
 	t := template.Must(template.New(name).Funcs(fmap).ParseFiles(path))
 	if err := t.Execute(buf, data); err != nil {
