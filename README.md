@@ -1,12 +1,18 @@
-# enry [![GoDoc](https://godoc.org/github.com/bzz/enry?status.svg)](https://godoc.org/github.com/bzz/enry) [![Build Status](https://travis-ci.org/bzz/enry.svg?branch=master)](https://travis-ci.org/bzz/enry) [![codecov](https://codecov.io/gh/bzz/enry/branch/master/graph/badge.svg)](https://codecov.io/gh/bzz/enry)
+# go-enry [![GoDoc](https://godoc.org/github.com/go-enry/go-enry?status.svg)](https://godoc.org/github.com/go-enry/go-enry) [![Build Status](https://travis-ci.org/bzz/enry.svg?branch=master)](https://travis-ci.org/bzz/enry) [![codecov](https://codecov.io/gh/go-enry/go-enry/branch/master/graph/badge.svg)](https://codecov.io/gh/go-enry/go-enry)
 
-Programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
+Programming language detector and toolbox to ignore binary or vendored files. *enry*, started as a port to _Go_ of the original [Linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved *2x performance*.
 
 * [CLI](#cli)
 * [Library](#library)
-    * [Go](#go)
-    * [Java bindings](#java-bindings)
-    * [Python bindings](#python-bindings)
+    * [Use cases](#use-cases)
+        * [By filename](#by-filename)
+        * [By text](#by-text)
+        * [By file](#by-file)
+        * [Filtering](#filtering-vendoring-binaries-etc)
+    * [Languages](#languages)
+        * [Go](#go)
+        * [Java bindings](#java-bindings)
+        * [Python bindings](#python-bindings)
 * [Divergences from linguist](#divergences-from-linguist)
 * [Benchmarks](#benchmarks)
 * [Why Enry?](#why-enry)
@@ -17,39 +23,58 @@ Programming language detector and toolbox to ignore binary or vendored files. *e
 
 # CLI
 
-The recommended way to install the `enry` command-line tool is to either
-[download a release](https://github.com/bzz/enry/releases) or run:
-
-```
-(cd "$(mktemp -d)" && go mod init enry && go get github.com/go-enry/go-enry/v2/cmd/enry)
-```
-
-*enry* CLI accepts similar flags (`--breakdown/--json`) and produce an output, similar to *linguist*:
-
-```bash
-$ enry
-97.71%	Go
-1.60%	C
-0.31%	Shell
-0.22%	Java
-0.07%	Ruby
-0.05%	Makefile
-0.04%	Scala
-0.01%	Gnuplot
-```
-
-Note that enry's CLI **_does not need an actual git repository to work_**, which is an intentional difference from linguist.
+The CLI binary is hosted in a separate repository [go-enry/enry](https://github.com/go-enry/enry).
 
 # Library
 
-*enry* is also available as a native Go library with FFI bindings for multiple programming languages.
+*enry* is also a Go library for guessing a programming language that exposes API through FFI to multiple programming environments.
 
-## Go
+## Use cases
+
+*enry* guesses a programming language using a sequence of matching *strategies* that are
+applied progressively to narrow down the possible options. Each *strategy* varies on the type
+of input data that it needs to make a decision: file name, extension, the first line of the file, the full content of the file, etc.
+
+Depending on available input data, enry API can be roughly divided into the next categories or use cases.
+
+### By filename
+Next functions require only a name of the file to make a guess:
+ - `GetLanguageByExtension` uses only file extension (wich may be ambiguous)
+ - `GetLanguageByFilename` useful for cases like `.gitignore`, `.bashrc`, etc
+ - all [filtering helpers](#filtering)
+
+ Please note that such guesses are expected not to be very accurate.
+
+### By text
+To make a guess only based on the content of the file or a text snippet, use
+ - `GetLanguageByShebang` reads only the first line of text to identify the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)).
+ - `GetLanguageByModeline` for cases when Vim/Emacs modeline e.g. `/* vim: set ft=cpp: */` may be present at a head or a tail of the text.
+ - `GetLanguageByClassifier` uses a Bayesian classifier trained on all the `./samples/` from Linguist.
+
+   It usually is a last-resort strategy that is used to disambiguate the guess of the previous strategies, and thus it requires a list of "candidate" guesses. One can provide a list of all known languages - keys from the `data.LanguagesLogProbabilities` as possible candidates if more intelligent hypotheses are not available, at the price of possibly suboptimal accuracy.
+
+### By file
+The most accurate guess would be one when both, the file name and the content are available:
+ - `GetLanguagesByContent` only uses file extension and a set of regexp-based content heuristics.
+ - `GetLanguages` uses the full set of matching strategies and is expected to be most accurate.
+
+### Filtering: vendoring, binaries, etc
+*enry* expose a set of file-level helpers `Is*` to simplify filtering out the files that are less interesting for the purpose of source code analysis:
+ - `IsBinary`
+ - `IsVendor`
+ - `IsConfiguration`
+ - `IsDocumentation`
+ - `IsDotFile`
+ - `IsImage`
+
+## Languages
+
+### Go
 
 In a [Go module](https://github.com/golang/go/wiki/Modules),
 import `enry` to the module by running:
 
-```go
+```sh
 go get github.com/go-enry/go-enry/v2
 ```
 
@@ -79,7 +104,7 @@ lang := enry.GetLanguage("foo.cpp", []byte("<cpp-code>"))
 
 Note that the returned boolean value `safe` is `true` if there is only one possible language detected.
 
-To get a list of all possible languages for a given file, there is a plural version of the same API.
+A plural version of the same API allows getting a list of all possible languages for a given file.
 
 ```go
 langs := enry.GetLanguages("foo.h",  []byte("<cpp-code>"))
@@ -92,27 +117,25 @@ langs := enry.GetLanguagesByFilename("Gemfile", []byte("<content>"), []string{})
 // result: []string{"Ruby"}
 ```
 
-## Java bindings
+### Java bindings
 
-Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/bzz/enry/blob/master/java).
+Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/go-enry/go-enry/blob/master/java).
 
 A library is published on Maven as [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
-# Python bindings
+### Python bindings
 
 Generated Python bindings using a C shared library and cffi are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
 
 A library is going to be published on pypi as [enry](https://pypi.org/project/enry/) for
 macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
-Divergences from linguist
+Divergences from Linguist
 ------------
 
-The `enry` library is based on the data from `github/linguist` version **v7.5.1**.
+The `enry` library is based on the data from `github/linguist` version **v7.9.0**.
 
-As opposed to linguist, `enry` [CLI tool](#cli) does *not* require a full Git repository in the filesystem in order to report languages.
-
-Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from linguist:
+Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
 * [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine.
 
@@ -131,7 +154,7 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 
 * Overriding languages and types though `.gitattributes` is not yet supported. See [#18](https://github.com/src-d/enry/issues/18).
 
-* `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as linguist does
+* `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as Linguist does
 
 In all the cases above that have an issue number - we plan to update enry to match Linguist behavior.
 
@@ -148,7 +171,7 @@ We got these results:
 The histogram shows the _number of files_ (y-axis) per _time interval bucket_ (x-axis).
 Most of the files were detected faster by enry.
 
-There are several cases where enry is slower than linguist due to
+There are several cases where enry is slower than Linguist due to
 Go regexp engine being slower than Ruby's on, wich is based on [oniguruma](https://github.com/kkos/oniguruma) library, written in C.
 
 See [instructions](#misc) for running enry with oniguruma.
@@ -163,15 +186,12 @@ In the movie [My Fair Lady](https://en.wikipedia.org/wiki/My_Fair_Lady), [Profes
 
 ## Development
 
-To build enry's CLI run:
-
-    make build
-
-this will generate a binary in the project's root directory called `enry`.
-
 To run the tests use:
 
-    make test
+    go test ./...
+
+Setting `ENRY_TEST_REPO` to the path to existing checkout of Linguist will avoid cloning it and sepeed tests up.
+Setting `ENRY_DEBUG=1` will provide insight in the Bayesian classifier building done by `make code-generate`.
 
 
 ### Sync with github/linguist upstream
@@ -184,7 +204,7 @@ $ git clone https://github.com/github/linguist.git .linguist
 $ cd .linguist; git checkout <release-tag>; cd ..
 
 # put the new release's commit sha in the generator_test.go (to re-generate .gold test fixtures)
-# https://github.com/bzz/enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
+# https://github.com/go-enry/go-enry/blob/13d3d66d37a87f23a013246a1b0678c9ee3d524b/internal/code-generator/generator/generator_test.go#L18
 
 $ make code-generate
 ```
@@ -199,9 +219,9 @@ To stay in sync, enry needs to be updated when a new release of the linguist inc
 There is no automation for detecting the changes in the linguist project, so this process above has to be done manually from time to time.
 
 When submitting a pull request syncing up to a new release, please make sure it only contains the changes in
-the generated files (in [data](https://github.com/bzz/enry/blob/master/data) subdirectory).
+the generated files (in [data](https://github.com/go-enry/go-enry/blob/master/data) subdirectory).
 
-Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](##divergences-from-linguist) is very much appreciated as it simplifies the maintenance (review/release notes/etc).
+Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](#divergences-from-linguist) is very much appreciated as it simplifies the maintenance (review/release notes/etc).
 
 
 
@@ -212,7 +232,7 @@ Separating all the necessary "manual" code changes to a different PR that includ
 
 ### Benchmark
 
-All benchmark scripts are in [*benchmarks*](https://github.com/bzz/enry/blob/master/benchmarks) directory.
+All benchmark scripts are in [*benchmarks*](https://github.com/go-enry/go-enry/blob/master/benchmarks) directory.
 
 
 #### Dependencies
@@ -225,15 +245,13 @@ As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
 
 
 #### Quick benchmark
-To run quicker benchmarks you can either:
+To run quicker benchmarks
 
     make benchmarks
 
-to get average times for the main detection function and strategies for the whole samples set or:
+to get average times for the primary detection function and strategies for the whole samples set. If you want to see measures per sample file use:
 
     make benchmarks-samples
-
-if you want to see measures per sample file.
 
 
 #### Full benchmark
@@ -242,7 +260,7 @@ If you want to reproduce the same benchmarks as reported above:
  - Install [gnuplot](http://gnuplot.info) (in order to plot the histogram)
  - Run `ENRY_TEST_REPO="$PWD/.linguist" benchmarks/run.sh` (takes ~15h)
 
-It will run the benchmarks for enry and linguist, parse the output, create csv files and plot the histogram.
+It will run the benchmarks for enry and Linguist, parse the output, create csv files and plot the histogram.
 
 ### Faster regexp engine (optional)
 
