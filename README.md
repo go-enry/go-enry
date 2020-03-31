@@ -9,6 +9,7 @@ Programming language detector and toolbox to ignore binary or vendored files. *e
         * [By text](#by-text)
         * [By file](#by-file)
         * [Filtering](#filtering-vendoring-binaries-etc)
+        * [Coloring](#language-colors-and-groups)
     * [Languages](#languages)
         * [Go](#go)
         * [Java bindings](#java-bindings)
