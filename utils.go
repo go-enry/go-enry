@@ -80,5 +80,9 @@ func GetColor(language string) string {
 		return color
 	}
 
+	if color, ok := data.LanguagesColor[GetLanguageGroup(language)]; ok {
+		return color
+	}
+
 	return "#cccccc"
 }

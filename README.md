@@ -67,6 +67,11 @@ The most accurate guess would be one when both, the file name and the content ar
  - `IsDotFile`
  - `IsImage`
 
+### Language colors and groups
+*enry* exposes function to get language color to use for example in presenting statistics in graphs:
+ - `GetColor`
+ - `GetLanguageGroup` can be used to group similar languages together e.g. for `Less` this function will return `CSS`
+
 ## Languages
 
 ### Go

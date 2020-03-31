@@ -1,0 +1,7 @@
+package data
+
+var LanguagesGroup = map[string]string{
+  {{range $language, $group := . -}}
+  "{{$language}}": "{{$group -}}",
+  {{end -}}
+}
