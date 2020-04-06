@@ -133,6 +133,47 @@ func TestIsDotFile(t *testing.T) {
 		assert.Equal(t, test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
 	}
 }
+func TestIsTestFile(t *testing.T) {
+	tests := []struct {
+		name     string
+		path     string
+		expected bool
+	}{
+		{name: "TestPHP_Is", path: "tests/FooTest.php", expected: true},
+		{name: "TestPHP_Not", path: "foo/FooTest.php", expected: false},
+		{name: "TestJava_Is_1", path: "test/FooTest.java", expected: true},
+		{name: "TestJava_Is_2", path: "test/FooTests.java", expected: true},
+		{name: "TestJava_Is_3", path: "test/TestFoo.java", expected: true},
+		{name: "TestJava_Is_4", path: "test/qux/TestFoo.java", expected: true},
+		{name: "TestJava_Not", path: "foo/FooTest.java", expected: false},
+		{name: "TestScala_Is_1", path: "test/FooTest.scala", expected: true},
+		{name: "TestScala_Is_2", path: "test/FooTests.scala", expected: true},
+		{name: "TestScala_Is_3", path: "test/FooSpec.scala", expected: true},
+		{name: "TestScala_Is_4", path: "test/qux/FooSpecs.scala", expected: true},
+		{name: "TestScala_Not", path: "foo/FooTest.scala", expected: false},
+		{name: "TestPython_Is", path: "test_foo.py", expected: true},
+		{name: "TestPython_Not", path: "foo_test.py", expected: false},
+		{name: "TestGo_Is", path: "foo_test.go", expected: true},
+		{name: "TestGo_Not", path: "test_foo.go", expected: false},
+		{name: "TestRuby_Is_1", path: "foo_test.rb", expected: true},
+		{name: "TestRuby_Is_1", path: "foo_spec.rb", expected: true},
+		{name: "TestRuby_Not", path: "foo_specs.rb", expected: false},
+		{name: "TestCSharp_Is_1", path: "FooTest.cs", expected: true},
+		{name: "TestCSharp_Is_2", path: "foo/FooTests.cs", expected: true},
+		{name: "TestCSharp_Not", path: "foo/TestFoo.cs", expected: false},
+		{name: "TestJavaScript_Is_1", path: "foo.test.js", expected: true},
+		{name: "TestJavaScript_Is_2", path: "foo.spec.js", expected: true},
+		{name: "TestJavaScript_Not", path: "footest.js", expected: false},
+		{name: "TestTypeScript_Is_1", path: "foo.test.ts", expected: true},
+		{name: "TestTypeScript_Is_2", path: "foo.spec.ts", expected: true},
+		{name: "TestTypeScript_Not", path: "footest.ts", expected: false},
+	}
+
+	for _, test := range tests {
+		is := IsTest(test.path)
+		assert.Equal(t, test.expected, is, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+	}
+}
 
 func TestGetColor(t *testing.T) {
 	tests := []struct {

@@ -60,6 +60,11 @@ func IsVendor(path string) bool {
 	return data.VendorMatchers.Match(path)
 }
 
+// IsTest returns whether or not path is a test path.
+func IsTest(path string) bool {
+	return data.TestMatchers.Match(path)
+}
+
 // IsBinary detects if data is a binary value based on:
 // http://git.kernel.org/cgit/git/git.git/tree/xdiff-interface.c?id=HEAD#n198
 func IsBinary(data []byte) bool {

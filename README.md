@@ -67,6 +67,7 @@ The most accurate guess would be one when both, the file name and the content ar
  - `IsDocumentation`
  - `IsDotFile`
  - `IsImage`
+ - `IsTest`
 
 ### Language colors and groups
 *enry* exposes function to get language color to use for example in presenting statistics in graphs:
