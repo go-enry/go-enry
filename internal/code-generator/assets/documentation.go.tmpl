@@ -1,9 +1,10 @@
 package data
 
-import "gopkg.in/toqueteos/substring.v1"
+import "github.com/go-enry/go-enry/v2/regex"
 
-var DocumentationMatchers = substring.Or(
+var DocumentationMatchers = []regex.EnryRegexp{
 	{{range $regexp := . -}}
-	substring.Regexp(`{{ $regexp }}`),
+	regex.MustCompile(`{{ $regexp }}`),
 	{{end -}}
-)
+}
+
