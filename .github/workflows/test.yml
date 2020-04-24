@@ -29,7 +29,7 @@ jobs:
         go-version: [1.13.x, 1.14.x]
     runs-on: ubuntu-latest
     env:
-      ONIGURUMA_VERSION: 6.9.1
+      ONIGURUMA_VERSION: 6.9.4
     steps:
     - name: Install libonig5
       run: |
