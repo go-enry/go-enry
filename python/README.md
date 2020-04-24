@@ -1,16 +1,15 @@
 # Python bindings for enry
 
-Python bingings thoug cFFI (API, out-of-line) for calling enr Go functions though CGo wrapper.
+Python bindings through cFFI (API, out-of-line) for calling enry Go functions exposed by CGo wrapper.
 
 ## Build
 
 ```
-$ make static
-$ python enry_build.py
+$ cd .. && make static
+$ python build_enry.py
 ```
 
-Will build static library for Cgo wrapper `libenry`, then generate and build `enry.c` 
-- a CPython extension that
+Will build a static library for Cgo wrapper `libenry`, then generate and build `enry.c` - a CPython extension that provides actual bindings.
 
 ## Run
 
@@ -21,9 +20,9 @@ $ python enry.py
 ```
 
 ## TODOs
- - [ ] try ABI mode, to aviod dependency on C compiler on install (+perf test?)
- - [ ] ready `libenry.h` and generate `ffibuilder.cdef` content
- - [ ] helpers for sending/recieving Go slices to C
+ - [x] helpers for sending/receiving Go slices to C
+ - [ ] read `libenry.h` and generate `ffibuilder.cdef(...)` content
  - [ ] cover the rest of enry API
  - [ ] add `setup.py`
  - [ ] build/release automation on CI (publish on pypi)
+ - [ ] try ABI mode, to avoid dependency on C compiler on install (+perf test?)
