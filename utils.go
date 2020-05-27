@@ -11,8 +11,13 @@ import (
 
 const binSniffLen = 8000
 
-var configurationLanguages = map[string]bool{
-	"XML": true, "JSON": true, "TOML": true, "YAML": true, "INI": true, "SQL": true,
+var configurationLanguages = map[string]struct{}{
+	"XML":  {},
+	"JSON": {},
+	"TOML": {},
+	"YAML": {},
+	"INI":  {},
+	"SQL":  {},
 }
 
 // IsConfiguration tells if filename is in one of the configuration languages.
@@ -96,6 +101,30 @@ func GetColor(language string) string {
 func matchRegexSlice(exprs []regex.EnryRegexp, str string) bool {
 	for _, expr := range exprs {
 		if expr.MatchString(str) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// IsGenerated returns whether the file with the given path and content is a
+// generated file.
+func IsGenerated(path string, content []byte) bool {
+	ext := strings.ToLower(filepath.Ext(path))
+	if _, ok := data.GeneratedCodeExtensions[ext]; ok {
+		return true
+	}
+
+	for _, m := range data.GeneratedCodeNameMatchers {
+		if m(path) {
+			return true
+		}
+	}
+
+	path = strings.ToLower(path)
+	for _, m := range data.GeneratedCodeMatchers {
+		if m(path, ext, content) {
 			return true
 		}
 	}

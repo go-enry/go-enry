@@ -51,6 +51,12 @@ def is_vendor(filename: str) -> bool:
     guess = lib.IsVendor(fName)
     return go_bool_to_py(guess)
 
+def is_generated(filename: str, content: bytes) -> bool:
+    fname, c_str = py_str_to_go(filename)
+    fcontent, c_bytes = py_bytes_to_go(content)
+    guess = lib.IsGenerated(fname, fcontent)
+    return go_bool_to_py(guess)
+
 
 ## Tests
 from collections import namedtuple
