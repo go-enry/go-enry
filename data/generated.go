@@ -188,7 +188,11 @@ func isSourceMap(path, _ string, content []byte) bool {
 		return true
 	}
 
-	firstLine := getLines(content, 1)[0]
+	firstLine := getFirstLine(content)
+	if len(firstLine) == 0 {
+		return false
+	}
+
 	for _, r := range sourceMapRegexps {
 		if r.Match(firstLine) {
 			return true
@@ -203,7 +207,7 @@ func isCompiledCoffeeScript(path, ext string, content []byte) bool {
 		return false
 	}
 
-	firstLine := getLines(content, 1)[0]
+	firstLine := getFirstLine(content)
 	lastLines := getLines(content, -2)
 
 	if string(firstLine) == "(function() {" &&
@@ -751,6 +755,14 @@ func isGeneratedJooq(_, ext string, content []byte) bool {
 	}
 
 	return false
+}
+
+func getFirstLine(content []byte) []byte {
+	lines := getLines(content, 1)
+	if len(lines) > 0 {
+		return lines[0]
+	}
+	return nil
 }
 
 // getLines returns up to the first n lines. A negative index will return up to
