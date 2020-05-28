@@ -126,6 +126,11 @@ func IsVendor(path string) bool {
 	return enry.IsVendor(path)
 }
 
+//export IsGenerated
+func IsGenerated(path string, content []byte) bool {
+	return enry.IsGenerated(path, content)
+}
+
 //export GetColor
 func GetColor(language string) string {
 	return enry.GetColor(language)
