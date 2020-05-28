@@ -8,6 +8,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestGetFirstLineEmptyContent(t *testing.T) {
+	require.Nil(t, getFirstLine(nil))
+}
+
 func TestForEachLine(t *testing.T) {
 	const sample = "foo\nbar\nboomboom\nbleepbloop\n"
 	var lines = strings.Split(sample, "\n")
