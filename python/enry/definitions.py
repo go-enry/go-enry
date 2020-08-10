@@ -22,8 +22,6 @@ GetLanguageExtensions = transform_types_ret_str_slice([str])(lib.GetLanguageExte
 GetMimeType = transform_types([str, str], str)(lib.GetMimeType)
 GetColor = transform_types([str], str)(lib.GetColor)
 
-# TODO: GetLanguages
-# TODO: GetLanguageExtensions
 IsVendor = transform_types([str], bool)(lib.IsVendor)
 IsGenerated = transform_types([str, bytes], bool)(lib.IsGenerated)
 IsBinary = transform_types([bytes], bool)(lib.IsBinary)
