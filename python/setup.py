@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 def build_go_archive():
     logger.info("Building C archive with static library")
     if shutil.which("go") is None:
-        raise EnvironmentError("You should have go installed and available on your path in order to build this module")
+        raise EnvironmentError("You should have Go installed and available on your path in order to build this module")
     subprocess.check_output(["make", "static"], cwd="../")
     logger.info("C archive successfully built")
 
