@@ -1,5 +1,5 @@
 on: [push, pull_request]
-name: Test
+name: Go Tests
 jobs:
   test:
     strategy:
@@ -12,7 +12,6 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go-version }}
-
     - name: Set git on win to use LF
       run: |
         git config --global core.autocrlf false
@@ -23,6 +22,7 @@ jobs:
       run: go test ./...
       env:
         ENRY_DEBUG: 1
+
   test-oniguruma:
     strategy:
       matrix:
@@ -37,7 +37,7 @@ jobs:
         sudo dpkg -i "libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
         wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
         sudo dpkg -i "libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
-  
+
     - name: Install Go
       uses: actions/setup-go@v1
       with:
