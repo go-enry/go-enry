@@ -31,6 +31,9 @@ class build_static_and_install(install):
         super(build_static_and_install, self).run()
 
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="enry",
     version="0.1.1",
