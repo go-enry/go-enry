@@ -1,0 +1,27 @@
+on: [push, pull_request]
+name: Python Tests
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Install Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r python/requirements.txt
+        if [ -f python/requirements.dev.txt ]; then pip install -r python/requirements.dev.txt; fi
+    - name: Build and install package
+      run: |
+        pip install -e python
+    - name: Test
+      run: |
+        pytest python/
