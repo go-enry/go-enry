@@ -426,7 +426,7 @@ func (s *EnryTestSuite) TestGetLanguageByAlias() {
 		expectedOk   bool
 	}{
 		{name: "TestGetLanguageByAlias_1", alias: "BestLanguageEver", expectedLang: OtherLanguage, expectedOk: false},
-		{name: "TestGetLanguageByAlias_2", alias: "aspx-vb", expectedLang: "ASP", expectedOk: true},
+		{name: "TestGetLanguageByAlias_2", alias: "aspx-vb", expectedLang: "ASP.NET", expectedOk: true},
 		{name: "TestGetLanguageByAlias_3", alias: "C++", expectedLang: "C++", expectedOk: true},
 		{name: "TestGetLanguageByAlias_4", alias: "c++", expectedLang: "C++", expectedOk: true},
 		{name: "TestGetLanguageByAlias_5", alias: "objc", expectedLang: "Objective-C", expectedOk: true},
@@ -448,6 +448,7 @@ func (s *EnryTestSuite) TestLinguistCorpus() {
 	const filenamesDir = "filenames"
 	var cornerCases = map[string]bool{
 		"drop_stuff.sql": true, // https://github.com/src-d/enry/issues/194
+		"modeline.txt":   true, // Because of unsupported negative lookahead RE syntax (https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521)
 		// .es and .ice fail heuristics parsing, but do not fail any tests
 	}
 
