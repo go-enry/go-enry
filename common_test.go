@@ -290,6 +290,30 @@ func (s *EnryTestSuite) TestGetLanguagesByExtension() {
 	}
 }
 
+func (s *EnryTestSuite) TestGetLanguagesByManpage() {
+	tests := []struct {
+		name       string
+		filename   string
+		content    []byte
+		candidates []string
+		expected   []string
+	}{
+		{name: "TestGetLanguagesByManpage_1", filename: "bsdmalloc.3malloc", expected: []string{"Roff Manpage", "Roff"}},
+		{name: "TestGetLanguagesByManpage_2", filename: "dirent.h.0p", expected: []string{"Roff Manpage", "Roff"}},
+		{name: "TestGetLanguagesByManpage_3", filename: "linguist.1gh", expected: []string{"Roff Manpage", "Roff"}},
+		{name: "TestGetLanguagesByManpage_4", filename: "test.1.in", expected: []string{"Roff Manpage", "Roff"}},
+		{name: "TestGetLanguagesByManpage_5", filename: "test.man.in", expected: []string{"Roff Manpage", "Roff"}},
+		{name: "TestGetLanguagesByManpage_6", filename: "test.mdoc.in", expected: []string{"Roff Manpage", "Roff"}},
+		{name: "TestGetLanguagesByManpage_7", filename: "foo.h", expected: nil},
+		{name: "TestGetLanguagesByManpage_8", filename: "", expected: nil},
+	}
+
+	for _, test := range tests {
+		languages := GetLanguagesByManpage(test.filename, test.content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
+	}
+}
+
 func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 	test := []struct {
 		name       string

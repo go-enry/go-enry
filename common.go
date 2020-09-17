@@ -22,6 +22,7 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByFilename,
 	GetLanguagesByShebang,
 	GetLanguagesByExtension,
+	GetLanguagesByManpage,
 	GetLanguagesByContent,
 	GetLanguagesByClassifier,
 }
@@ -377,6 +378,26 @@ func GetLanguagesByExtension(filename string, _ []byte, _ []string) []string {
 		languages, ok := data.LanguagesByExtension[ext]
 		if ok {
 			return languages
+		}
+	}
+
+	return nil
+}
+
+var (
+	manpageExtension = regex.MustCompile(`\.(?:[1-9](?:[a-z_]+[a-z_0-9]*)?|0p|n|man|mdoc)(?:\.in)?$`)
+)
+
+// GetLanguagesByManpage returns a slice of possible manpage languages for the given filename.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByManpage(filename string, _ []byte, _ []string) []string {
+	filename = strings.ToLower(filename)
+
+	// Check if matches Roff man page filenames
+	if manpageExtension.Match([]byte(filename)) {
+		return []string{
+			"Roff Manpage",
+			"Roff",
 		}
 	}
 
