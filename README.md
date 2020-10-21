@@ -150,7 +150,7 @@ macOS and linux platforms. Windows support is planned under [src-d/enry#150](htt
 
 ## Divergences from Linguist
 
-The `enry` library is based on the data from `github/linguist` version **v7.11.0**.
+The `enry` library is based on the data from `github/linguist` version **v7.11.1**.
 
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
