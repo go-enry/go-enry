@@ -23,6 +23,7 @@ type EnryTestSuite struct {
 	tmpLinguist string
 	needToClone bool
 	samplesDir  string
+	testFixturesDir string
 }
 
 func (s *EnryTestSuite) TestRegexpEdgeCases() {
@@ -71,6 +72,9 @@ func (s *EnryTestSuite) SetupSuite() {
 	}
 	s.samplesDir = filepath.Join(s.tmpLinguist, "samples")
 	s.T().Logf("using samples from %s", s.samplesDir)
+
+	s.testFixturesDir = filepath.Join(s.tmpLinguist, "test", "fixtures")
+	s.T().Logf("using test fixtures from %s", s.samplesDir)
 
 	cwd, err := os.Getwd()
 	assert.NoError(s.T(), err)
@@ -310,6 +314,31 @@ func (s *EnryTestSuite) TestGetLanguagesByManpage() {
 
 	for _, test := range tests {
 		languages := GetLanguagesByManpage(test.filename, test.content, test.candidates)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
+	}
+}
+
+
+func (s *EnryTestSuite) TestGetLanguagesByXML() {
+	tests := []struct {
+		name       string
+		filename   string
+		candidates []string
+		expected   []string
+
+	}{
+		{name: "TestGetLanguagesByXML_1", filename: filepath.Join(s.testFixturesDir, "XML/app.config"), expected: []string{"XML"}},
+		{name: "TestGetLanguagesByXML_2", filename: filepath.Join(s.testFixturesDir, "XML/AssertionIDRequestOptionalAttributes.xml.svn-base"), expected: []string{"XML"}},
+		// no XML header so should not be identified by this strategy
+		{name: "TestGetLanguagesByXML_3", filename: filepath.Join(s.samplesDir, "XML/libsomething.dll.config"), expected: nil},
+		{name: "TestGetLanguagesByXML_4", filename: filepath.Join(s.samplesDir, "Eagle/Eagle.sch"), candidates: []string{"Eagle"}, expected: []string{"Eagle"}},
+	}
+
+	for _, test := range tests {
+		content, err := ioutil.ReadFile(test.filename)
+		assert.NoError(s.T(), err)
+
+		languages := GetLanguagesByXML(test.filename, content, test.candidates)
 		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
 	}
 }
