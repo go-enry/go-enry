@@ -6,7 +6,7 @@ Python bindings through cFFI (API, out-of-line) for calling enry Go functions ex
 
 ```
 $ pushd .. && make static && popd
-$ pip install -r requirments.txt
+$ pip install -r requirements.txt
 $ python build_enry.py
 ```
 
