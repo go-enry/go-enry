@@ -22,8 +22,8 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByFilename,
 	GetLanguagesByShebang,
 	GetLanguagesByExtension,
-	GetLanguagesByManpage,
 	GetLanguagesByXML,
+	GetLanguagesByManpage,
 	GetLanguagesByContent,
 	GetLanguagesByClassifier,
 }
