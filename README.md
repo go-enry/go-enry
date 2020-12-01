@@ -173,8 +173,6 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 - Detection of [generated files](https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/generated.rb#L53) is not supported yet.
   (Thus they are not excluded from CLI output). See [#213](https://github.com/src-d/enry/issues/213).
 
-- XML detection strategy is not implemented. See [#192](https://github.com/src-d/enry/issues/192).
-
 - Overriding languages and types though `.gitattributes` is not yet supported. See [#18](https://github.com/src-d/enry/issues/18).
 
 - `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as Linguist does

@@ -22,6 +22,7 @@ var DefaultStrategies = []Strategy{
 	GetLanguagesByFilename,
 	GetLanguagesByShebang,
 	GetLanguagesByExtension,
+	GetLanguagesByXML,
 	GetLanguagesByManpage,
 	GetLanguagesByContent,
 	GetLanguagesByClassifier,
@@ -329,13 +330,21 @@ func getInterpreter(data []byte) (interpreter string) {
 	return
 }
 
-func getFirstLine(content []byte) []byte {
-	nlpos := bytes.IndexByte(content, '\n')
-	if nlpos < 0 {
-		return content
+func getFirstLines(content []byte, count int) []byte {
+	nlpos := -1
+	for ; count > 0; count-- {
+		pos := bytes.IndexByte(content[nlpos+1:], '\n')
+		if pos < 0 {
+			return content
+		}
+		nlpos += pos + 1
 	}
 
 	return content[:nlpos]
+}
+
+func getFirstLine(content []byte) []byte {
+	return getFirstLines(content, 1)
 }
 
 func hasShebang(line []byte) bool {
@@ -398,6 +407,29 @@ func GetLanguagesByManpage(filename string, _ []byte, _ []string) []string {
 		return []string{
 			"Roff Manpage",
 			"Roff",
+		}
+	}
+
+	return nil
+}
+
+var (
+	xmlHeader = regex.MustCompile(`<?xml version=`)
+)
+
+// GetLanguagesByXML returns a slice of possible XML language for the given filename.
+// It complies with the signature to be a Strategy type.
+func GetLanguagesByXML(_ string, content []byte, candidates []string) []string {
+	if len(candidates) > 0 {
+		return candidates
+	}
+
+	header := getFirstLines(content, 2)
+
+	// Check if contains XML header
+	if xmlHeader.Match(header) {
+		return []string{
+			"XML",
 		}
 	}
 
