@@ -20,9 +20,9 @@ const linguistClonedEnvVar = "ENRY_TEST_REPO"
 
 type EnryTestSuite struct {
 	suite.Suite
-	tmpLinguist string
-	needToClone bool
-	samplesDir  string
+	tmpLinguist     string
+	needToClone     bool
+	samplesDir      string
 	testFixturesDir string
 }
 
@@ -318,14 +318,12 @@ func (s *EnryTestSuite) TestGetLanguagesByManpage() {
 	}
 }
 
-
 func (s *EnryTestSuite) TestGetLanguagesByXML() {
 	tests := []struct {
 		name       string
 		filename   string
 		candidates []string
 		expected   []string
-
 	}{
 		{name: "TestGetLanguagesByXML_1", filename: filepath.Join(s.testFixturesDir, "XML/app.config"), expected: []string{"XML"}},
 		{name: "TestGetLanguagesByXML_2", filename: filepath.Join(s.testFixturesDir, "XML/AssertionIDRequestOptionalAttributes.xml.svn-base"), expected: []string{"XML"}},
@@ -460,7 +458,7 @@ func (s *EnryTestSuite) TestGetLanguageGroup() {
 		expected string
 	}{
 		{name: "TestGetLanguageGroup_1", language: "BestLanguageEver", expected: ""},
-		{name: "TestGetLanguageGroup_2", language: "JSX", expected: "JavaScript"},
+		{name: "TestGetLanguageGroup_2", language: "Bison", expected: "Yacc"},
 		{name: "TestGetLanguageGroup_3", language: "HTML+PHP", expected: "HTML"},
 		{name: "TestGetLanguageGroup_4", language: "HTML", expected: ""},
 	}
