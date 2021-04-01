@@ -13,24 +13,54 @@ import (
 
 func TestIsVendor(t *testing.T) {
 	tests := []struct {
-		name     string
 		path     string
 		expected bool
 	}{
-		{name: "TestIsVendor_1", path: "foo/bar", expected: false},
-		{name: "TestIsVendor_2", path: "foo/vendor/foo", expected: true},
-		{name: "TestIsVendor_3", path: ".sublime-project", expected: true},
-		{name: "TestIsVendor_4", path: "leaflet.draw-src.js", expected: true},
-		{name: "TestIsVendor_5", path: "foo/bar/MochiKit.js", expected: true},
-		{name: "TestIsVendor_6", path: "foo/bar/dojo.js", expected: true},
-		{name: "TestIsVendor_7", path: "foo/env/whatever", expected: true},
-		{name: "TestIsVendor_8", path: "foo/.imageset/bar", expected: true},
-		{name: "TestIsVendor_9", path: "Vagrantfile", expected: true},
+		{"cache/", true},
+		{"random/cache/", true},
+		{"cache", false},
+		{"dependencies/", true},
+		{"Dependencies/", true},
+		{"dependency/", false},
+		{"dist/", true},
+		{"dist", false},
+		{"random/dist/", true},
+		{"random/dist", false},
+		{"deps/", true},
+		{"configure", true},
+		{"a/configure", true},
+		{"config.guess", true},
+		{"config.guess/", false},
+		{".vscode/", true},
+		{"doc/_build/", true},
+		{"a/docs/_build/", true},
+		{"a/dasdocs/_build-vsdoc.js", true},
+		{"a/dasdocs/_build-vsdoc.j", false},
+		{"foo/bar", false},
+		{".sublime-project", true},
+		{"foo/vendor/foo", true},
+		{"leaflet.draw-src.js", true},
+		{"foo/bar/MochiKit.js", true},
+		{"foo/bar/dojo.js", true},
+		{"foo/env/whatever", true},
+		{"foo/.imageset/bar", true},
+		{"Vagrantfile", true},
 	}
+	for _, tt := range tests {
+		t.Run(tt.path, func(t *testing.T) {
+			if got := IsVendor(tt.path); got != tt.expected {
+				t.Errorf("IsVendor() = %v, expected %v", got, tt.expected)
+			}
+		})
+	}
+}
 
-	for _, test := range tests {
-		is := IsVendor(test.path)
-		assert.Equal(t, is, test.expected, fmt.Sprintf("%v: is = %v, expected: %v", test.name, is, test.expected))
+func BenchmarkIsVendor(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IsVendor(".vscode/")
+		IsVendor("cache/")
+		IsVendor("foo/bar")
+		IsVendor("foo/bar/MochiKit.js")
 	}
 }
 
