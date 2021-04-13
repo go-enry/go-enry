@@ -119,6 +119,38 @@ func (s *EnryTestSuite) TestGetLanguage() {
 	}
 }
 
+func (s *EnryTestSuite) TestGetLanguages() {
+	tests := []struct {
+		name     string
+		filename string
+		content  []byte
+		expected []string
+	}{
+		// With no content or filename, no language can be detected
+		{name: "TestGetLanguages_0", filename: "", content: []byte{}, expected: nil},
+		// The strategy that will match is GetLanguagesByExtension. Lacking content, it will return those results.
+		{name: "TestGetLanguages_1", filename: "foo.h", content: []byte{}, expected: []string{"C", "C++", "Objective-C"}},
+		// GetLanguagesByExtension will return an unambiguous match when there is a single result.
+		{name: "TestGetLanguages_2", filename: "foo.groovy", content: []byte{}, expected: []string{"Groovy"}},
+		// GetLanguagesByExtension will return "Rust", "RenderScript" for .rs,
+		// then GetLanguagesByContent will take the first rule that matches (in this case Rust)
+		{name: "TestGetLanguages_3", filename: "foo.rs", content: []byte("use \n#include"), expected: []string{"Rust"}},
+		// .. and in this case, RenderScript (no content that matches a Rust regex can be included, because it runs first.)
+		{name: "TestGetLanguages_4", filename: "foo.rs", content: []byte("#include"), expected: []string{"RenderScript"}},
+		// GetLanguagesByExtension will return "AMPL", "Linux Kernel Module", "Modula-2", "XML",
+		// then GetLanguagesByContent will ALWAYS return Linux Kernel Module and AMPL when there is no content,
+		// and no further classifier can do anything without content
+		{name: "TestGetLanguages_5", filename: "foo.mod", content: []byte{}, expected: []string{"Linux Kernel Module", "AMPL"}},
+		// ...with some AMPL tokens, the DefaultClassifier will pick AMPL as the most likely language.
+		{name: "TestGetLanguages_6", filename: "foo.mod", content: []byte("BEAMS ROWS - TotalWeight"), expected: []string{"AMPL", "Linux Kernel Module"}},
+	}
+
+	for _, test := range tests {
+		languages := GetLanguages(test.filename, test.content)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: %v, expected: %v", test.name, languages, test.expected))
+	}
+}
+
 func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
 	var modelinesDir = filepath.Join(s.tmpLinguist, "test", "fixtures", "Data", "Modelines")
 
