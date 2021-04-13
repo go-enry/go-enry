@@ -1,0 +1,7 @@
+package data
+
+var IDByLanguage = map[string]int{
+  {{range $language, $id := . -}}
+  "{{$language}}": {{$id -}},
+  {{end -}}
+}

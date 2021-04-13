@@ -490,6 +490,14 @@ func GetLanguageExtensions(language string) []string {
 	return data.ExtensionsByLanguage[language]
 }
 
+// GetLanguageID returns the ID for the language. IDs are assigned by GitHub.
+//
+// NOTE: The zero value (0) is a valid language ID, so this API has no way to
+// distinguish an invalid language name and a match on the language with ID 0.
+func GetLanguageID(language string) int {
+	return data.IDByLanguage[language]
+}
+
 // Type represent language's type. Either data, programming, markup, prose, or unknown.
 type Type int
 
