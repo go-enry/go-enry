@@ -550,18 +550,20 @@ func (s *EnryTestSuite) TestGetLanguageID() {
 		name       string
 		language   string
 		expectedID int
+		found      bool
 	}{
-		{name: "TestGetLanguageID_1", language: "1C Enterprise", expectedID: 0},
-		{name: "TestGetLanguageID_2", language: "BestLanguageEver", expectedID: 0}, // Cannot distinguish from 1C Enterprise
-		{name: "TestGetLanguageID_3", language: "C++", expectedID: 43},
-		{name: "TestGetLanguageID_5", language: "Objective-C", expectedID: 257},
-		{name: "TestGetLanguageID_6", language: "golang", expectedID: 0}, // Aliases are not supported
-		{name: "TestGetLanguageID_7", language: "Go", expectedID: 132},
-		{name: "TestGetLanguageID_8", language: "Makefile", expectedID: 220},
+		{name: "TestGetLanguageID_1", language: "1C Enterprise", expectedID: 0, found: true},
+		{name: "TestGetLanguageID_2", language: "BestLanguageEver", expectedID: 0, found: false},
+		{name: "TestGetLanguageID_3", language: "C++", expectedID: 43, found: true},
+		{name: "TestGetLanguageID_5", language: "Objective-C", expectedID: 257, found: true},
+		{name: "TestGetLanguageID_6", language: "golang", expectedID: 0, found: false}, // Aliases are not supported
+		{name: "TestGetLanguageID_7", language: "Go", expectedID: 132, found: true},
+		{name: "TestGetLanguageID_8", language: "Makefile", expectedID: 220, found: true},
 	}
 
 	for _, test := range tests {
-		id := GetLanguageID(test.language)
+		id, found := GetLanguageID(test.language)
 		assert.Equal(s.T(), test.expectedID, id, fmt.Sprintf("%v: id = %v, expected: %v", test.name, id, test.expectedID))
+		assert.Equal(s.T(), test.found, found, fmt.Sprintf("%v: found = %t, expected: %t", test.name, found, test.found))
 	}
 }
