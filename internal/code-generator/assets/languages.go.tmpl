@@ -1,0 +1,9 @@
+package language
+
+type Language string
+
+const (
+    {{ range $language, $color := . -}}
+    {{ $language | languageConst }} Language = "{{ $language }}"
+    {{ end -}}
+)
