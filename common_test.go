@@ -576,3 +576,26 @@ func (s *EnryTestSuite) TestLinguistCorpus() {
 
 	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
 }
+
+func (s *EnryTestSuite) TestGetLanguageID() {
+	tests := []struct {
+		name       string
+		language   string
+		expectedID int
+		found      bool
+	}{
+		{name: "TestGetLanguageID_1", language: "1C Enterprise", expectedID: 0, found: true},
+		{name: "TestGetLanguageID_2", language: "BestLanguageEver", expectedID: 0, found: false},
+		{name: "TestGetLanguageID_3", language: "C++", expectedID: 43, found: true},
+		{name: "TestGetLanguageID_5", language: "Objective-C", expectedID: 257, found: true},
+		{name: "TestGetLanguageID_6", language: "golang", expectedID: 0, found: false}, // Aliases are not supported
+		{name: "TestGetLanguageID_7", language: "Go", expectedID: 132, found: true},
+		{name: "TestGetLanguageID_8", language: "Makefile", expectedID: 220, found: true},
+	}
+
+	for _, test := range tests {
+		id, found := GetLanguageID(test.language)
+		assert.Equal(s.T(), test.expectedID, id, fmt.Sprintf("%v: id = %v, expected: %v", test.name, id, test.expectedID))
+		assert.Equal(s.T(), test.found, found, fmt.Sprintf("%v: found = %t, expected: %t", test.name, found, test.found))
+	}
+}
