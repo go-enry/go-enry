@@ -4,7 +4,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.14.x]
+        go-version: [1.15.x, 1.16.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -26,7 +26,7 @@ jobs:
   test-oniguruma:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.14.x]
+        go-version: [1.15.x, 1.16.x]
     runs-on: ubuntu-latest
     env:
       ONIGURUMA_VERSION: 6.9.4
