@@ -3,6 +3,7 @@ package enry
 import (
 	"bufio"
 	"bytes"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -314,13 +315,17 @@ func getInterpreter(data []byte) (interpreter string) {
 		return ""
 	}
 
-	if bytes.Contains(splitted[0], []byte("env")) {
-		if len(splitted) > 1 {
-			interpreter = string(splitted[1])
+	// Extract interpreter name from path. Use path.Base because
+	// shebang on Cygwin/Windows still use a forward slash
+	interpreter = path.Base(string(splitted[0]))
+
+	// #!/usr/bin/env [...]
+	if interpreter == "env" {
+		if len(splitted) == 1 {
+			// /usr/bin/env with no arguments
+			return ""
 		}
-	} else {
-		splittedPath := bytes.Split(splitted[0], []byte{'/'})
-		interpreter = string(splittedPath[len(splittedPath)-1])
+		interpreter = path.Base(string(splitted[1]))
 	}
 
 	if interpreter == "sh" {
