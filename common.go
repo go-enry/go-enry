@@ -111,13 +111,6 @@ func getFirstLanguageAndSafe(languages []string) (language string, safe bool) {
 	return
 }
 
-// getLanguageBySpecificClassifier returns the most probably language for the given content using
-// classifier to detect language.
-func getLanguageBySpecificClassifier(content []byte, candidates []string, classifier classifier) (language string, safe bool) {
-	languages := getLanguagesBySpecificClassifier(content, candidates, classifier)
-	return getFirstLanguageAndSafe(languages)
-}
-
 // GetLanguages applies a sequence of strategies based on the given filename and content
 // to find out the most probable languages to return.
 //
@@ -300,9 +293,11 @@ func GetLanguagesByShebang(_ string, content []byte, _ []string) (languages []st
 var (
 	shebangExecHack = regex.MustCompile(`exec (\w+).+\$0.+\$@`)
 	pythonVersion   = regex.MustCompile(`python\d\.\d+`)
+	envOptArgs      = regex.MustCompile(`-[i0uCSv]*|--\S+`)
+	envVarArgs      = regex.MustCompile(`\S+=\S+`)
 )
 
-func getInterpreter(data []byte) (interpreter string) {
+func getInterpreter(data []byte) string {
 	line := getFirstLine(data)
 	if !hasShebang(line) {
 		return ""
@@ -317,13 +312,20 @@ func getInterpreter(data []byte) (interpreter string) {
 
 	// Extract interpreter name from path. Use path.Base because
 	// shebang on Cygwin/Windows still use a forward slash
-	interpreter = path.Base(string(splitted[0]))
+	interpreter := path.Base(string(splitted[0]))
 
 	// #!/usr/bin/env [...]
 	if interpreter == "env" {
 		if len(splitted) == 1 {
 			// /usr/bin/env with no arguments
 			return ""
+		}
+		for len(splitted) > 2 {
+			if envOptArgs.Match(splitted[1]) || envVarArgs.Match(splitted[1]) {
+				splitted = append(splitted[:1], splitted[2:]...)
+				continue
+			}
+			break
 		}
 		interpreter = path.Base(string(splitted[1]))
 	}
@@ -342,7 +344,7 @@ func getInterpreter(data []byte) (interpreter string) {
 		interpreter = ""
 	}
 
-	return
+	return interpreter
 }
 
 func getFirstLines(content []byte, count int) []byte {
