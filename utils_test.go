@@ -217,7 +217,7 @@ func TestGetColor(t *testing.T) {
 		{name: "TestGetColor_1", language: "Go", expected: "#00ADD8"},
 		{name: "TestGetColor_2", language: "SomeRandom", expected: "#cccccc"},
 		{name: "TestGetColor_3", language: "HTML", expected: "#e34c26"},
-		{name: "TestGetColor_4", language: "HTML+PHP", expected: "#e34c26"},
+		{name: "TestGetColor_4", language: "HTML+PHP", expected: "#4f5d95"},
 	}
 
 	for _, test := range tests {
