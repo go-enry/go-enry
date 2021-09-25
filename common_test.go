@@ -297,7 +297,49 @@ println("The shell script says ",vm.arglist.concat(" "));`
 		{name: "TestGetLanguagesByShebang_9", content: []byte(multilineExecHack), expected: []string{"Tcl"}},
 		{name: "TestGetLanguagesByShebang_10", content: []byte(multilineNoExecHack), expected: []string{"Shell"}},
 		{name: "TestGetLanguagesByShebang_11", content: []byte(`#!/envinpath/python`), expected: []string{"Python"}},
-		{name: "TestGetLanguagesByShebang_12", content: []byte(`#!`), expected: nil},
+
+		{name: "TestGetLanguagesByShebang_12", content: []byte(""), expected: nil},
+		{name: "TestGetLanguagesByShebang_13", content: []byte("foo"), expected: nil},
+		{name: "TestGetLanguagesByShebang_14", content: []byte("#bar"), expected: nil},
+		{name: "TestGetLanguagesByShebang_15", content: []byte("#baz"), expected: nil},
+		{name: "TestGetLanguagesByShebang_16", content: []byte("///"), expected: nil},
+		{name: "TestGetLanguagesByShebang_17", content: []byte("\n\n\n\n\n"), expected: nil},
+		{name: "TestGetLanguagesByShebang_18", content: []byte(" #!/usr/sbin/ruby"), expected: nil},
+		{name: "TestGetLanguagesByShebang_19", content: []byte("\n#!/usr/sbin/ruby"), expected: nil},
+		{name: "TestGetLanguagesByShebang_20", content: []byte("#!"), expected: nil},
+		{name: "TestGetLanguagesByShebang_21", content: []byte("#! "), expected: nil},
+		{name: "TestGetLanguagesByShebang_22", content: []byte("#!/usr/bin/env"), expected: nil},
+		{name: "TestGetLanguagesByShebang_23", content: []byte("#!/usr/bin/env osascript -l JavaScript"), expected: nil},
+		{name: "TestGetLanguagesByShebang_24", content: []byte("#!/usr/bin/env osascript -l AppleScript"), expected: nil},
+		{name: "TestGetLanguagesByShebang_25", content: []byte("#!/usr/bin/env osascript -l foobar"), expected: nil},
+		{name: "TestGetLanguagesByShebang_26", content: []byte("#!/usr/bin/osascript -l JavaScript"), expected: nil},
+		{name: "TestGetLanguagesByShebang_27", content: []byte("#!/usr/bin/osascript -l foobar"), expected: nil},
+
+		{name: "TestGetLanguagesByShebang_28", content: []byte("#!/usr/sbin/ruby\n# bar"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByShebang_29", content: []byte("#!/usr/bin/ruby\n# foo"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByShebang_30", content: []byte("#!/usr/sbin/ruby"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByShebang_31", content: []byte("#!/usr/sbin/ruby foo bar baz\n"), expected: []string{"Ruby"}},
+
+		{name: "TestGetLanguagesByShebang_32", content: []byte("#!/usr/bin/env Rscript\n# example R script\n#\n"), expected: []string{"R"}},
+		{name: "TestGetLanguagesByShebang_33", content: []byte("#!/usr/bin/env ruby\n# baz"), expected: []string{"Ruby"}},
+
+		{name: "TestGetLanguagesByShebang_34", content: []byte("#!/usr/bin/bash\n"), expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByShebang_35", content: []byte("#!/bin/sh"), expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByShebang_36", content: []byte("#!/bin/python\n# foo\n# bar\n# baz"), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByShebang_37", content: []byte("#!/usr/bin/python2.7\n\n\n\n"), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByShebang_38", content: []byte("#!/usr/bin/python3\n\n\n\n"), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByShebang_39", content: []byte("#!/usr/bin/sbcl --script\n\n"), expected: []string{"Common Lisp"}},
+		{name: "TestGetLanguagesByShebang_40", content: []byte("#! perl"), expected: []string{"Perl", "Pod"}},
+
+		{name: "TestGetLanguagesByShebang_41", content: []byte("#!/bin/sh\n\n\nexec ruby $0 $@"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByShebang_42", content: []byte("#! /usr/bin/env A=003 B=149 C=150 D=xzd E=base64 F=tar G=gz H=head I=tail sh"), expected: []string{"Shell"}},
+		{name: "TestGetLanguagesByShebang_43", content: []byte("#!/usr/bin/env foo=bar bar=foo python -cos=__import__(\"os\");"), expected: []string{"Python"}},
+		{name: "TestGetLanguagesByShebang_44", content: []byte("#!/usr/bin/env osascript"), expected: []string{"AppleScript"}},
+		{name: "TestGetLanguagesByShebang_45", content: []byte("#!/usr/bin/osascript"), expected: []string{"AppleScript"}},
+
+		{name: "TestGetLanguagesByShebang_46", content: []byte("#!/usr/bin/env -vS ruby -wKU\nputs ?t+?e+?s+?t"), expected: []string{"Ruby"}},
+		{name: "TestGetLanguagesByShebang_47", content: []byte("#!/usr/bin/env --split-string sed -f\ny/a/A/"), expected: []string{"sed"}},
+		{name: "TestGetLanguagesByShebang_48", content: []byte("#!/usr/bin/env -S GH_TOKEN=ghp_*** deno run --allow-net\nconsole.log(1);"), expected: []string{"TypeScript"}},
 	}
 
 	for _, test := range tests {
