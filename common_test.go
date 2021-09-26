@@ -129,7 +129,7 @@ func (s *EnryTestSuite) TestGetLanguages() {
 		// With no content or filename, no language can be detected
 		{name: "TestGetLanguages_0", filename: "", content: []byte{}, expected: nil},
 		// The strategy that will match is GetLanguagesByExtension. Lacking content, it will return those results.
-		{name: "TestGetLanguages_1", filename: "foo.h", content: []byte{}, expected: []string{"C", "C++", "Objective-C"}},
+		{name: "TestGetLanguages_1", filename: "foo.h", content: []byte{}, expected: []string{"C"}},
 		// GetLanguagesByExtension will return an unambiguous match when there is a single result.
 		{name: "TestGetLanguages_2", filename: "foo.groovy", content: []byte{}, expected: []string{"Groovy"}},
 		// GetLanguagesByExtension will return "Rust", "RenderScript" for .rs,
@@ -193,7 +193,7 @@ func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
 		{name: "TestGetLanguagesByModelineLinguist_28", filename: filepath.Join(modelinesDir, "ruby10"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByModelineLinguist_29", filename: filepath.Join(modelinesDir, "ruby11"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByModelineLinguist_30", filename: filepath.Join(modelinesDir, "ruby12"), expected: []string{"Ruby"}},
-		{name: "TestGetLanguagesByModelineLinguist_31", filename: filepath.Join(s.samplesDir, "C/main.c"), expected: nil},
+		{name: "TestGetLanguagesByModelineLinguist_31", filename: filepath.Join(s.samplesDir, "C++/runtime-compiler.cc"), expected: nil},
 		{name: "TestGetLanguagesByModelineLinguist_32", filename: "", expected: nil},
 	}
 
@@ -425,7 +425,7 @@ func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 	}{
 		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "C"},
 		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: nil, expected: OtherLanguage},
-		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C/main.c"), candidates: []string{}, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C++/runtime-compiler.cc"), candidates: []string{}, expected: OtherLanguage},
 		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
@@ -463,7 +463,7 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 	}{
 		{name: "TestGetLanguagesByClassifier_1", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: defaultClassifier, expected: "C"},
 		{name: "TestGetLanguagesByClassifier_2", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: nil, classifier: defaultClassifier, expected: "C"},
-		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C/main.c"), candidates: []string{}, classifier: defaultClassifier, expected: "C"},
+		{name: "TestGetLanguagesByClassifier_3", filename: filepath.Join(s.samplesDir, "C++/runtime-compiler.cc"), candidates: []string{}, classifier: defaultClassifier, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_4", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"python", "ruby", "c++"}, classifier: defaultClassifier, expected: "C++"},
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, classifier: defaultClassifier, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, classifier: defaultClassifier, expected: "Python"},
@@ -573,8 +573,8 @@ func (s *EnryTestSuite) TestGetLanguageByAlias() {
 func (s *EnryTestSuite) TestLinguistCorpus() {
 	const filenamesDir = "filenames"
 	var cornerCases = map[string]bool{
-		"drop_stuff.sql": true, // https://github.com/src-d/enry/issues/194
-		"modeline.txt":   true, // Because of unsupported negative lookahead RE syntax (https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521)
+		"drop_stuff.sql":        true, // https://github.com/src-d/enry/issues/194
+		"textobj-rubyblock.vba": true, // Because of unsupported negative lookahead RE syntax (https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521)
 		// .es and .ice fail heuristics parsing, but do not fail any tests
 	}
 
