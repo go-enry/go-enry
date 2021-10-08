@@ -80,6 +80,8 @@ jobs:
       uses: repo-sync/pull-request@v2
       if: ${{ steps.commit.outputs.needs_pr == 'true' }}
       with:
+        source_branch: ${{ steps.branch.outputs.branch_name }}
+        pr_body: "Automated Linguist update :robot:"
         destination_branch: "master"
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: output-url
