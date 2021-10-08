@@ -47,13 +47,26 @@ jobs:
                      head -1)
         fi
 
-        if [[ -z $latest ]]; then
+        if [[ -z "$latest" ]]; then
           echo "could not determine latest Linguist version"
           exit 1
         fi
+
         echo "::set-output name=linguist_version::$latest"
         git checkout $latest
+      
+        commit=$(git rev-parse HEAD)
+        if [[ -z "$commit" ]]; then
+          echo "could not determine latest Linguist commit"
+          exit 1
+        fi
+
+        echo "::set-output name=linguist_commit::$commit"
+
         cd ..
+    - name: Update Linguist commit
+      run: |
+        sed --in-place --regexp-extended 's/(commit[[:space:]]+=[[:space:]])("[a-f0-9]{40}")/\1"${{ steps.linguist-release.outputs.linguist_commit }}"/' internal/code-generator/generator/generator_test.go
     - name: Generate code
       run: make code-generate
     - name: Commit changes
