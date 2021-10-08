@@ -6,6 +6,9 @@ on:
         description: 'Linguist tag override'
         required: False
         default: ''
+  schedule:
+    # Run once a day to check for new Linguist updates automatically
+    - cron:  '0 20 * * *'
 
 jobs:
   sync-linguist:
