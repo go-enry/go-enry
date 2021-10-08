@@ -11,7 +11,7 @@ jobs:
       id: branch
       run: |
         set -euo pipefail
-        IFS=$'\n\t'        
+        IFS=$'\n\t'     
         branch_name=feature/sync-linguist-$(date +%s)
         git checkout -b $branch_name
         echo "::set-output name=branch_name::$branch_name"
@@ -32,6 +32,11 @@ jobs:
                     grep -v "-" | \ 
                     sort --version-sort --reverse | \
                     head -1)
+        if [[ $? -ne 0 ]]; then
+          echo "Could not find latest tagged Linguist version"
+          exit 1
+        fi
+
         echo "::set-output name=linguist_version::$latest"
         git checkout $latest
         cd ..
