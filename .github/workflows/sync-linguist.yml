@@ -46,16 +46,22 @@ jobs:
       run: |
         set -euo pipefail
         IFS=$'\n\t'
+        echo "git current state:"
+        git status
+
         if [[ -n "$(git status --porcelain)" ]]; then
+          echo "Creating Linguist update commit"
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
           git commit -m "Updated Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
           git push --set-upstream origin ${{ steps.branch.outputs.branch_name }}
           echo "::set-output name=needs_pr::true"
-        else
-          echo "::set-output name=needs_pr::false"
+          exit 0
         fi
+          
+        echo "Linguist update unncessary"
+        echo "::set-output name=needs_pr::false"
     - name: Create Pull Request
       id: open-pr
       uses: repo-sync/pull-request@v2
@@ -67,6 +73,6 @@ jobs:
       if: ${{ steps.commit.needs_pr == 'true' }}
       run: echo ${{ steps.open-pr.outputs.pr_url }}
     - name: No PR Created
-      if: ${{ steps.commit.needs_pr == 'false' }}
+      if: ${{ steps.commit.needs_pr != 'true' }}
       run: echo "No changes for ${{ steps.linguist-release.outputs.linguist_version }}"
       
