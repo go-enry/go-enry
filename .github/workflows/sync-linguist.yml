@@ -16,11 +16,13 @@ jobs:
         fetch-depth: 0
     - name: check out latest release
       id: linguist-release
+      # the `grep -v "-"` is to exclude any pre-release versions.
+      # Linguist doesn't have any right now, but just in case.
       run: |
         set -e
         cd .linguist
         $latest=$(git tag --list | \
-                    grep -v "-" | \ # exclude any pre-release versions
+                    grep -v "-" | \ 
                     sort --version-sort --reverse | \
                     head -1)
         echo "::set-output name=linguist_version::$latest"
