@@ -32,7 +32,7 @@ jobs:
                     grep -v "-" | \
                     sort --version-sort --reverse | \
                     head -1)
-        if [[ -n $latest ]]; then
+        if [[ -z $latest ]]; then
           echo "could not determine latest Linguist version"
           exit 1
         fi
