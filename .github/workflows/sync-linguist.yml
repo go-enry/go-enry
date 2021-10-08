@@ -1,5 +1,11 @@
 name: Sync Linguist
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    inputs:
+      linguist_tag:
+        description: 'Linguist tag override'
+        required: False
+        default: ''
 
 jobs:
   sync-linguist:
@@ -28,10 +34,16 @@ jobs:
         set -euo pipefail
         IFS=$'\n\t'        
         cd .linguist
-        latest=$(git tag --list | \
-                    grep -v "-" | \
-                    sort --version-sort --reverse | \
-                    head -1)
+        if [[ -n "${{ github.event.inputs.linguist_tag }}" ]]; then
+          echo "Using tag override '${{ github.event.inputs.linguist_tag }}'"
+          latest="${{ github.event.inputs.linguist_tag }}"
+        else
+          latest=$(git tag --list | \
+                     grep -v "-" | \
+                     sort --version-sort --reverse | \
+                     head -1)
+        fi
+
         if [[ -z $latest ]]; then
           echo "could not determine latest Linguist version"
           exit 1
