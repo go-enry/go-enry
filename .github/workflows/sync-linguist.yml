@@ -21,7 +21,7 @@ jobs:
       run: |
         set -e
         cd .linguist
-        $latest=$(git tag --list | \
+        latest=$(git tag --list | \
                     grep -v "-" | \ 
                     sort --version-sort --reverse | \
                     head -1)
