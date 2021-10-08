@@ -29,14 +29,13 @@ jobs:
         IFS=$'\n\t'        
         cd .linguist
         latest=$(git tag --list | \
-                    grep -v "-" | \ 
+                    grep -v "-" | \
                     sort --version-sort --reverse | \
                     head -1)
-        if [[ $? -ne 0 ]]; then
-          echo "Could not find latest tagged Linguist version"
+        if [[ -n $latest ]]; then
+          echo "could not determine latest Linguist version"
           exit 1
         fi
-
         echo "::set-output name=linguist_version::$latest"
         git checkout $latest
         cd ..
