@@ -68,6 +68,7 @@ jobs:
           git add .
           git commit -m "Updated Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
           git push --set-upstream origin ${{ steps.branch.outputs.branch_name }}
+          echo "Changes committed. Will create PR."
           echo "::set-output name=needs_pr::true"
           exit 0
         fi
@@ -77,14 +78,14 @@ jobs:
     - name: Create Pull Request
       id: open-pr
       uses: repo-sync/pull-request@v2
-      if: ${{ steps.commit.needs_pr == 'true' }}
+      if: ${{ steps.commit.needs_pr == true }}
       with:
         destination_branch: "master"
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: output-url
-      if: ${{ steps.commit.needs_pr == 'true' }}
+      if: ${{ steps.commit.needs_pr == true }}
       run: echo ${{ steps.open-pr.outputs.pr_url }}
     - name: No PR Created
-      if: ${{ steps.commit.needs_pr != 'true' }}
+      if: ${{ steps.commit.needs_pr != true }}
       run: echo "No changes for ${{ steps.linguist-release.outputs.linguist_version }}"
       
