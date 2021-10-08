@@ -12,7 +12,7 @@ jobs:
       run: |
         set -euo pipefail
         IFS=$'\n\t'        
-        branch_name=$(feature/sync-linguist-$(date +%s))
+        branch_name=feature/sync-linguist-$(date +%s)
         git checkout -b $branch_name
         echo "::set-output name=branch_name::$branch_name"
     - uses: actions/checkout@v2
