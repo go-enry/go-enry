@@ -1,0 +1,58 @@
+name: Sync Linguist
+on: workflow_dispatch
+
+jobs:
+  sync-linguist:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-go@v2
+    - uses: actions/checkout@v2
+    - name: Create a branch
+      run: git checkout -b feature/sync-linguist-$(date +%s)
+    - uses: actions/checkout@v2
+      with:
+        repository: github/linguist
+        path: .linguist
+        fetch-depth: 0
+    - name: check out latest release
+      id: linguist-release
+      run: |
+        set -e
+        cd .linguist
+        $latest=$(git tag --list | \
+                    grep -v "-" | \ # exclude any pre-release versions
+                    sort --version-sort --reverse | \
+                    head -1)
+        echo "::set-output name=linguist_version::$latest"
+        git checkout $latest
+        cd ..
+    - name: Generate code
+      run: make code-generate
+    - name: Commit changes
+      id: commit
+      run: |
+        set -e
+        if [[ -n "$(git status --porcelain)" ]]; then
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Updated Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
+          git push
+          echo "::set-output name=needs_pr::true"
+        else
+          echo "::set-output name=needs_pr::false"
+        fi
+    - name: Create Pull Request
+      id: open-pr
+      uses: repo-sync/pull-request@v2
+      if: ${{ steps.commit.needs_pr == 'true' }}
+      with:
+        destination_branch: "master"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: output-url
+      if: ${{ steps.commit.needs_pr == 'true' }}
+      run: echo ${{ steps.open-pr.outputs.pr_url }}
+    - name: No PR Created
+      if: ${{ steps.commit.needs_pr == 'false' }}
+      run: echo "No changes for ${{ steps.linguist-release.outputs.linguist_version }}"
+      
