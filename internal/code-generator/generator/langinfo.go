@@ -58,5 +58,5 @@ func LanguageInfo(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit s
 }
 
 func executeLanguageInfoTemplate(out io.Writer, languages map[string]*languageInfo, tmplPath, tmplName, commit string) error {
-	return executeTemplate(out, tmplName, tmplPath, commit, nil, languages) // TODO: use function map to put language by id?
+	return executeTemplate(out, tmplName, tmplPath, commit, nil, languages)
 }
