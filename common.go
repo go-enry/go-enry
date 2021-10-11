@@ -3,6 +3,7 @@ package enry
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
@@ -522,11 +523,11 @@ type Type int
 
 // Type's values.
 const (
-	Unknown Type = iota
-	Data
-	Programming
-	Markup
-	Prose
+	Unknown     Type = Type(data.TypeUnknown)
+	Data             = Type(data.TypeData)
+	Programming      = Type(data.TypeProgramming)
+	Markup           = Type(data.TypeMarkup)
+	Prose            = Type(data.TypeProse)
 )
 
 // GetLanguageType returns the type of the given language.
@@ -557,4 +558,22 @@ func GetLanguageGroup(language string) string {
 	}
 
 	return ""
+}
+
+// GetLanguageInfo returns the LanguageInfo for a given language name, or an error if not found.
+func GetLanguageInfo(language string) (data.LanguageInfo, error) {
+	if info, ok := data.LanguageInfoByName[language]; ok {
+		return info, nil
+	}
+
+	return data.LanguageInfo{}, fmt.Errorf("language %q not found", language)
+}
+
+// GetLanguageInfo returns the LanguageInfo for a given language name, or an error if not found.
+func GetLanguageInfoByID(id int) (data.LanguageInfo, error) {
+	if info, ok := data.LanguageInfoByID[id]; ok {
+		return info, nil
+	}
+
+	return data.LanguageInfo{}, fmt.Errorf("language %q not found", id)
 }

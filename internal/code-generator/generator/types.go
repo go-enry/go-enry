@@ -2,9 +2,10 @@ package generator
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 var typeToTypeConst = map[string]int{
