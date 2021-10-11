@@ -5,95 +5,95 @@ package data
 type LanguageInfo struct {
   Name           string
   FSName         string
-	Type           Type
-	Color          string
-	Group          string
-	Aliases        []string
-	Extensions     []string
-	Interpreters   []string
-	Filenames      []string
-	MimeType       string
+  Type           Type
+  Color          string
+  Group          string
+  Aliases        []string
+  Extensions     []string
+  Interpreters   []string
+  Filenames      []string
+  MimeType       string
   TMScope        string
   AceMode        string
   CodemirrorMode string
   Wrap           bool
-	LanguageID     int
+  LanguageID     int
 }
 
 // LanguageInfoByName allows accessing LanguageInfo by a language's primary name.
 var LanguageInfoByName = map[string]LanguageInfo{
-	{{range $language, $info := . -}}
-	"{{$language}}": LanguageInfo{
+  {{range $language, $info := . -}}
+  "{{$language}}": LanguageInfo{
     Name: "{{$language}}",
     FSName: "{{$info.FSName}}",
-		Type: TypeForString("{{$info.Type}}"),
-		Color: "{{$info.Color}}",
-		Group: "{{$info.Group}}",
-		Aliases: []string{
-			{{range $alias := $info.Aliases -}}
-			"{{$alias}}",
-			{{end -}}
-		},
-		Extensions: []string{
-			{{range $extension := $info.Extensions -}}
-			"{{$extension}}",
-			{{end -}}
-		},
-		Interpreters: []string{
-			{{range $interpreter := $info.Interpreters -}}
-			"{{$interpreter}}",
-			{{end -}}
-		},
-		Filenames: []string{
-			{{range $filename := $info.Filenames -}}
-			"{{$filename}}",
-			{{end -}}
-		},
-		MimeType: "{{$info.MimeType}}",
+    Type: TypeForString("{{$info.Type}}"),
+    Color: "{{$info.Color}}",
+    Group: "{{$info.Group}}",
+    Aliases: []string{
+      {{range $alias := $info.Aliases -}}
+      "{{$alias}}",
+      {{end -}}
+    },
+    Extensions: []string{
+      {{range $extension := $info.Extensions -}}
+      "{{$extension}}",
+      {{end -}}
+    },
+    Interpreters: []string{
+      {{range $interpreter := $info.Interpreters -}}
+      "{{$interpreter}}",
+      {{end -}}
+    },
+    Filenames: []string{
+      {{range $filename := $info.Filenames -}}
+      "{{$filename}}",
+      {{end -}}
+    },
+    MimeType: "{{$info.MimeType}}",
     TMScope: "{{$info.TMScope}}",
     AceMode: "{{$info.AceMode}}",
     CodemirrorMode: "{{$info.CodemirrorMode}}",
     Wrap: {{$info.Wrap}},
-		LanguageID: {{$info.LanguageID}},
-	},
-	{{end -}}
+    LanguageID: {{$info.LanguageID}},
+  },
+  {{end -}}
 }
 
 // LanguageInfoByID allows accessing LanguageInfo by a language's ID.
 var LanguageInfoByID = map[int]LanguageInfo{
-	{{range $language, $info := . -}}
-	{{$info.LanguageID}}: LanguageInfo{
+  {{range $language, $info := . -}}
+  {{$info.LanguageID}}: LanguageInfo{
     Name: "{{$language}}",
     FSName: "{{$info.FSName}}",
-		Type: TypeForString("{{$info.Type}}"),
-		Color: "{{$info.Color}}",
-		Group: "{{$info.Group}}",
-		Aliases: []string{
-			{{range $alias := $info.Aliases -}}
-			"{{$alias}}",
-			{{end -}}
-		},
-		Extensions: []string{
-			{{range $extension := $info.Extensions -}}
-			"{{$extension}}",
-			{{end -}}
-		},
-		Interpreters: []string{
-			{{range $interpreter := $info.Interpreters -}}
-			"{{$interpreter}}",
-			{{end -}}
-		},
-		Filenames: []string{
-			{{range $filename := $info.Filenames -}}
-			"{{$filename}}",
-			{{end -}}
-		},
-		MimeType: "{{$info.MimeType}}",
+    Type: TypeForString("{{$info.Type}}"),
+    Color: "{{$info.Color}}",
+    Group: "{{$info.Group}}",
+    Aliases: []string{
+      {{range $alias := $info.Aliases -}}
+      "{{$alias}}",
+      {{end -}}
+    },
+    Extensions: []string{
+      {{range $extension := $info.Extensions -}}
+      "{{$extension}}",
+      {{end -}}
+    },
+    Interpreters: []string{
+      {{range $interpreter := $info.Interpreters -}}
+      "{{$interpreter}}",
+      {{end -}}
+    },
+    Filenames: []string{
+      {{range $filename := $info.Filenames -}}
+      "{{$filename}}",
+      {{end -}}
+    },
+    MimeType: "{{$info.MimeType}}",
     TMScope: "{{$info.TMScope}}",
     AceMode: "{{$info.AceMode}}",
     CodemirrorMode: "{{$info.CodemirrorMode}}",
     Wrap: {{$info.Wrap}},
-		LanguageID: {{$info.LanguageID}},
-	},
-	{{end -}}
+    LanguageID: {{$info.LanguageID}},
+  },
+  {{end -}}
 }
