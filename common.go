@@ -570,7 +570,7 @@ func GetLanguageInfo(language string) (data.LanguageInfo, error) {
 	return GetLanguageInfoByID(id)
 }
 
-// GetLanguageInfo returns the LanguageInfo for a given language name, or an error if not found.
+// GetLanguageInfoByID returns the LanguageInfo for a given language ID, or an error if not found.
 func GetLanguageInfoByID(id int) (data.LanguageInfo, error) {
 	if info, ok := data.LanguageInfoByID[id]; ok {
 		return info, nil
