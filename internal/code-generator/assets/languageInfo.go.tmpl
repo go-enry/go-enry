@@ -20,45 +20,6 @@ type LanguageInfo struct {
   LanguageID     int
 }
 
-// LanguageInfoByName allows accessing LanguageInfo by a language's primary name.
-var LanguageInfoByName = map[string]LanguageInfo{
-  {{range $language, $info := . -}}
-  "{{$language}}": LanguageInfo{
-    Name: "{{$language}}",
-    FSName: "{{$info.FSName}}",
-    Type: TypeForString("{{$info.Type}}"),
-    Color: "{{$info.Color}}",
-    Group: "{{$info.Group}}",
-    Aliases: []string{
-      {{range $alias := $info.Aliases -}}
-      "{{$alias}}",
-      {{end -}}
-    },
-    Extensions: []string{
-      {{range $extension := $info.Extensions -}}
-      "{{$extension}}",
-      {{end -}}
-    },
-    Interpreters: []string{
-      {{range $interpreter := $info.Interpreters -}}
-      "{{$interpreter}}",
-      {{end -}}
-    },
-    Filenames: []string{
-      {{range $filename := $info.Filenames -}}
-      "{{$filename}}",
-      {{end -}}
-    },
-    MimeType: "{{$info.MimeType}}",
-    TMScope: "{{$info.TMScope}}",
-    AceMode: "{{$info.AceMode}}",
-    CodemirrorMode: "{{$info.CodemirrorMode}}",
-    Wrap: {{$info.Wrap}},
-    LanguageID: {{$info.LanguageID}},
-  },
-  {{end -}}
-}
-
 // LanguageInfoByID allows accessing LanguageInfo by a language's ID.
 var LanguageInfoByID = map[int]LanguageInfo{
   {{range $language, $info := . -}}

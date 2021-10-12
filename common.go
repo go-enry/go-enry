@@ -562,11 +562,12 @@ func GetLanguageGroup(language string) string {
 
 // GetLanguageInfo returns the LanguageInfo for a given language name, or an error if not found.
 func GetLanguageInfo(language string) (data.LanguageInfo, error) {
-	if info, ok := data.LanguageInfoByName[language]; ok {
-		return info, nil
+	id, ok := GetLanguageID(language)
+	if !ok {
+		return data.LanguageInfo{}, fmt.Errorf("language %q not found", language)
 	}
 
-	return data.LanguageInfo{}, fmt.Errorf("language %q not found", language)
+	return GetLanguageInfoByID(id)
 }
 
 // GetLanguageInfo returns the LanguageInfo for a given language name, or an error if not found.
