@@ -27,8 +27,8 @@ type LanguageInfo struct {
   TMScope string
   // AceMode is the name of the Ace Mode used for highlighting whenever a file is edited.
   AceMode string
-  // CodemirrorMode is the name of the CodeMirror Mode used for highlighting whenever a file is edited.
-  CodemirrorMode string
+  // CodeMirrorMode is the name of the CodeMirror Mode used for highlighting whenever a file is edited.
+  CodeMirrorMode string
   // Wrap is a boolean flag to enable line wrapping in an editor.
   Wrap bool
   // LanguageID is the Linguist-assigned numeric ID for the language.
@@ -67,7 +67,7 @@ var LanguageInfoByID = map[int]LanguageInfo{
     MimeType: "{{$info.MimeType}}",
     TMScope: "{{$info.TMScope}}",
     AceMode: "{{$info.AceMode}}",
-    CodemirrorMode: "{{$info.CodemirrorMode}}",
+    CodeMirrorMode: "{{$info.CodeMirrorMode}}",
     Wrap: {{$info.Wrap}},
     LanguageID: {{$info.LanguageID}},
   },

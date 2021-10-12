@@ -21,7 +21,7 @@ type languageInfo struct {
 	MimeType       string   `yaml:"codemirror_mime_type,omitempty,flow"`
 	TMScope        string   `yaml:"tm_scope"`
 	AceMode        string   `yaml:"ace_mode"`
-	CodemirrorMode string   `yaml:"codemirror_mode"`
+	CodeMirrorMode string   `yaml:"codemirror_mode"`
 	Wrap           bool     `yaml:"wrap"`
 	LanguageID     *int     `yaml:"language_id,omitempty"`
 }
