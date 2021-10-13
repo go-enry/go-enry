@@ -134,7 +134,7 @@ func main() {
 
 	for _, file := range fileList {
 		if err := file.generate(file.fileToParse, file.samplesDir, file.outPath, file.tmplPath, file.tmplName, file.commit); err != nil {
-			log.Printf("Error generating template %q to %q: %+v", file.tmplPath, file.outPath, err)
+			log.Printf("error generating template %q to %q: %+v", file.tmplPath, file.outPath, err)
 		}
 	}
 }
