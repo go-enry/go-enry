@@ -16,6 +16,13 @@ jobs:
     steps:
     - uses: actions/setup-go@v2
     - uses: actions/checkout@v2
+    - name: Find previous Linguist commit
+      id: previous_linguist
+      run: |
+        set -euo pipefail
+        IFS=$'\n\t'
+        commit=$(sed --quiet --regexp-extended 's/[[:space:]]+commit[[:space:]]+=[[:space:]]"([a-f0-9]{40})"/\1/p' internal/code-generator/generator/generator_test.go)
+        echo "::set-output name=commit::$commit"
     - name: Create a branch
       id: branch
       run: |
@@ -98,7 +105,13 @@ jobs:
       with:
         source_branch: ${{ steps.branch.outputs.branch_name }}
         pr_title: "Update Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
-        pr_body: "Automated Linguist update :robot:"
+        pr_body: |
+          Automated Linguist update :robot:
+
+          This PR updates Linguist from [${{ steps.previous_linguist.outputs.commit }}](https://github.com/github/linguist/commit/${{ steps.previous_linguist.outputs.commit }}) to [${{ steps.linguist-release.outputs.linguist_version }}](https://github.com/github/linguist/releases/tag/${{  steps.linguist-release.outputs.linguist_version }}) ([${{ steps.linguist-release.outputs.linguist_commit }}](https://github.com/github/linguist/commit/${{ steps.linguist-release.outputs.linguist_commit }}))
+
+          * [Linguist release notes](https://github.com/github/linguist/releases/tag/${{ steps.linguist-release.outputs.linguist_version }}
+          * [Compare Linguist code changes](https://github.com/github/linguist/compare/${{ steps.previous_linguist.outputs.commit }}...${{ steps.linguist-release.outputs.linguist_version }})
         destination_branch: "master"
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: output-url
