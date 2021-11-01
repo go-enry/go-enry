@@ -110,7 +110,7 @@ jobs:
 
           This PR updates Linguist from [${{ steps.previous_linguist.outputs.commit }}](https://github.com/github/linguist/commit/${{ steps.previous_linguist.outputs.commit }}) to [${{ steps.linguist-release.outputs.linguist_version }}](https://github.com/github/linguist/releases/tag/${{  steps.linguist-release.outputs.linguist_version }}) ([${{ steps.linguist-release.outputs.linguist_commit }}](https://github.com/github/linguist/commit/${{ steps.linguist-release.outputs.linguist_commit }}))
 
-          * [Linguist release notes](https://github.com/github/linguist/releases/tag/${{ steps.linguist-release.outputs.linguist_version }}
+          * [Linguist release notes](https://github.com/github/linguist/releases/tag/${{ steps.linguist-release.outputs.linguist_version }})
           * [Compare Linguist code changes](https://github.com/github/linguist/compare/${{ steps.previous_linguist.outputs.commit }}...${{ steps.linguist-release.outputs.linguist_version }})
         destination_branch: "master"
         github_token: ${{ secrets.GITHUB_TOKEN }}
