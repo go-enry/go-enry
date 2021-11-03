@@ -3,6 +3,8 @@
 // with colliding extensions, based on regexps from Linguist data.
 package rule
 
+import "github.com/go-enry/go-enry/v2/regex"
+
 // Heuristic consist of (a number of) rules where each, if matches,
 // identifes content as belonging to a programming language(s).
 type Heuristic interface {
@@ -48,6 +50,10 @@ func Or(l languages, r Matcher) Heuristic {
 
 // Match implements rule.Matcher.
 func (r or) Match(data []byte) bool {
+	if isNotSupportedGolangRegExp(r.pattern) {
+		return false
+	}
+
 	return r.pattern.Match(data)
 }
 
@@ -65,6 +71,10 @@ func And(l languages, m ...Matcher) Heuristic {
 // Match implements data.Matcher.
 func (r and) Match(data []byte) bool {
 	for _, p := range r.patterns {
+		if isNotSupportedGolangRegExp(p) {
+			continue
+		}
+
 		if !p.Match(data) {
 			return false
 		}
@@ -86,6 +96,10 @@ func Not(l languages, r ...Matcher) Heuristic {
 // Match implements data.Matcher.
 func (r not) Match(data []byte) bool {
 	for _, p := range r.Patterns {
+		if isNotSupportedGolangRegExp(p) {
+			continue
+		}
+
 		if p.Match(data) {
 			return false
 		}
@@ -106,4 +120,12 @@ func Always(l languages) Heuristic {
 // Match implements Matcher.
 func (r always) Match(data []byte) bool {
 	return true
+}
+
+func isNotSupportedGolangRegExp(m Matcher) bool {
+	if v, ok := m.(regex.EnryRegexp); ok && v == nil {
+		return true
+	}
+
+	return false
 }

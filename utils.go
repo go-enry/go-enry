@@ -3,7 +3,6 @@ package enry
 import (
 	"bytes"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -63,7 +62,7 @@ func IsDotFile(path string) bool {
 	return strings.HasPrefix(base, ".") && base != "."
 }
 
-var isVendorRegExp *regexp.Regexp
+var isVendorRegExp regex.EnryRegexp
 
 // IsVendor returns whether or not path is a vendor path.
 func IsVendor(path string) bool {
@@ -242,5 +241,5 @@ func init() {
 	sb.WriteString(")")
 
 	// Compile the whole thing as the isVendorRegExp
-	isVendorRegExp = regexp.MustCompile(sb.String())
+	isVendorRegExp = regex.MustCompile(sb.String())
 }

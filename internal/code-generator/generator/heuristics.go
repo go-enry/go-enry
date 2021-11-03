@@ -4,15 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
 const (
-	multilinePrefix = "(?m)"
-	orPipe          = "|"
+	orPipe = "|"
 )
 
 // GenHeuristics generates language identification heuristics in Go.
@@ -72,24 +70,17 @@ func loadRule(namedPatterns map[string]StringArray, rule *Rule) *LanguagePattern
 		}
 		result = &LanguagePattern{"And", rule.Languages, "", subPatterns}
 	} else if len(rule.Pattern) != 0 { // OrPattern
-		conjunction := strings.Join(rule.Pattern, orPipe)
-		pattern := convertToValidRegexp(conjunction)
+		pattern := strings.Join(rule.Pattern, orPipe)
 		result = &LanguagePattern{"Or", rule.Languages, pattern, nil}
 	} else if rule.NegativePattern != "" { // NotPattern
-		pattern := convertToValidRegexp(rule.NegativePattern)
-		result = &LanguagePattern{"Not", rule.Languages, pattern, nil}
+		result = &LanguagePattern{"Not", rule.Languages, rule.NegativePattern, nil}
 	} else if rule.NamedPattern != "" { // Named OrPattern
-		conjunction := strings.Join(namedPatterns[rule.NamedPattern], orPipe)
-		pattern := convertToValidRegexp(conjunction)
+		pattern := strings.Join(namedPatterns[rule.NamedPattern], orPipe)
 		result = &LanguagePattern{"Or", rule.Languages, pattern, nil}
 	} else { // AlwaysPattern
 		result = &LanguagePattern{"Always", rule.Languages, "", nil}
 	}
 
-	if isUnsupportedRegexpSyntax(result.Pattern) {
-		log.Printf("skipping rule: language:'%q', rule:'%q'\n", rule.Languages, result.Pattern)
-		return nil
-	}
 	return result
 }
 
@@ -156,24 +147,4 @@ func parseYaml(file string) (*Heuristics, error) {
 	}
 
 	return h, nil
-}
-
-// isUnsupportedRegexpSyntax filters regexp syntax that is not supported by RE2.
-// In particular, we stumbled up on usage of next cases:
-// - lookbehind & lookahead
-// - named & numbered capturing group/after text matching
-// - backreference
-// - possessive quantifier
-// For referece on supported syntax see https://github.com/google/re2/wiki/Syntax
-func isUnsupportedRegexpSyntax(reg string) bool {
-	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) ||
-		strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
-		// See https://github.com/github/linguist/pull/4243#discussion_r246105067
-		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
-}
-
-// convertToValidRegexp converts Ruby regexp syntaxt to RE2 equivalent.
-// Does not work with Ruby regexp literals.
-func convertToValidRegexp(rubyRegexp string) string {
-	return multilinePrefix + rubyRegexp
 }

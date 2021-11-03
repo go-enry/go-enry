@@ -160,7 +160,7 @@ The `enry` library is based on the data from `github/linguist` version **v7.16.1
 
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
-- [Heuristics for ".txt" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521) in Vim Help File could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
+- [Heuristics for ".txt" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521) in Vim Help File could not be parsed, due to unsupported negative lookahead in RE2 regexp engine. 
 
 - [Heuristics for ".sol" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L464) in Solidity could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
 
@@ -181,6 +181,8 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 - `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as Linguist does
 
 In all the cases above that have an issue number - we plan to update enry to match Linguist behavior.
+
+> All the heuristics issues related to the regexp's incompatibilities can be avoided using the `oniguruma` support. 
 
 ## Benchmarks
 

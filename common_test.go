@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/go-enry/go-enry/v2/data"
+	"github.com/go-enry/go-enry/v2/regex"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,10 +46,11 @@ func (s *EnryTestSuite) TestRegexpEdgeCases() {
 		content, err := ioutil.ReadFile(filename)
 		require.NoError(s.T(), err)
 
-		lang := GetLanguage(r.filename, content)
-		s.T().Logf("File:%s, lang:%s", filename, lang)
-
 		expLang, _ := data.LanguageByAlias(r.lang)
+
+		lang := GetLanguage(r.filename, content)
+		s.T().Logf("File:%s, lang:%s expected:%s", filename, lang, expLang)
+
 		require.EqualValues(s.T(), expLang, lang)
 	}
 }
@@ -618,6 +620,57 @@ func (s *EnryTestSuite) TestLinguistCorpus() {
 	})
 
 	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
+}
+
+func (s *EnryTestSuite) TestLinguistGenericFixtures() {
+	if regex.Name != "oniguruma" {
+		s.T().Skip("requires Ruby regexp support")
+	}
+
+	const filenamesDir = "filenames"
+
+	var total, failed, ok, multiple int
+	var expected string
+	filepath.Walk(filepath.Join(s.testFixturesDir, "Generic"), func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() {
+			if f.Name() != filenamesDir {
+				expected, _ = data.LanguageByAlias(f.Name())
+			}
+
+			return nil
+		}
+
+		filename := filepath.Base(path)
+		content, _ := ioutil.ReadFile(path)
+
+		total++
+		result := GetLanguagesByContent(filename, content, nil)
+
+		var obtained, status string
+		switch len(result) {
+		case 0:
+			obtained = ""
+		case 1:
+			obtained = result[0]
+		default:
+			obtained = ""
+			multiple++
+		}
+
+		if expected == obtained {
+			status = "ok"
+			ok++
+		} else {
+			status = "failed"
+			failed++
+		}
+
+		assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status))
+
+		return nil
+	})
+
+	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, multiple: %d\n", total, ok, failed, multiple)
 }
 
 func (s *EnryTestSuite) TestGetLanguageID() {

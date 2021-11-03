@@ -1,3 +1,4 @@
+//go:build oniguruma
 // +build oniguruma
 
 package regex
@@ -7,6 +8,13 @@ import (
 )
 
 type EnryRegexp = *rubex.Regexp
+
+var Name = "oniguruma"
+
+// MustCompileRuby same as MustCompile.
+func MustCompileRuby(str string) EnryRegexp {
+	return MustCompile(str)
+}
 
 func MustCompile(str string) EnryRegexp {
 	return rubex.MustCompileASCII(str)
