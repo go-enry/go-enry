@@ -87,8 +87,13 @@ var (
 
 	// id.go generation
 	idFile     = "data/id.go"
-	idTmplPath = "internal/code-generator/assets/id.go.tmpl"
+	idTmplPath = filepath.Join(assetsDir, "id.go.tmpl")
 	idTmpl     = "id.go.tmpl"
+
+	// languageInfo.go generation
+	languageInfoFile     = filepath.Join("data", "languageInfo.go")
+	langaugeInfoTmplPath = filepath.Join(assetsDir, "languageInfo.go.tmpl")
+	langaugeInfoTmpl     = "languageInfo.go.tmpl"
 
 	commitPath = filepath.Join(".linguist", ".git", "HEAD")
 )
@@ -124,11 +129,12 @@ func main() {
 		{generator.Colors, languagesYAML, "", colorsFile, colorsTmplPath, colorsTmpl, commit},
 		{generator.Groups, languagesYAML, "", groupsFile, groupsTmplPath, groupsTmpl, commit},
 		{generator.ID, languagesYAML, "", idFile, idTmplPath, idTmpl, commit},
+		{generator.LanguageInfo, languagesYAML, "", languageInfoFile, langaugeInfoTmplPath, langaugeInfoTmpl, commit},
 	}
 
 	for _, file := range fileList {
 		if err := file.generate(file.fileToParse, file.samplesDir, file.outPath, file.tmplPath, file.tmplName, file.commit); err != nil {
-			log.Println(err)
+			log.Printf("error generating template %q to %q: %+v", file.tmplPath, file.outPath, err)
 		}
 	}
 }

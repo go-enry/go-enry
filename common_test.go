@@ -642,3 +642,56 @@ func (s *EnryTestSuite) TestGetLanguageID() {
 		assert.Equal(s.T(), test.found, found, fmt.Sprintf("%v: found = %t, expected: %t", test.name, found, test.found))
 	}
 }
+
+func (s *EnryTestSuite) TestGetLanguageInfo() {
+	tests := []struct {
+		name       string
+		language   string
+		expectedID int
+		error      bool
+	}{
+		{name: "TestGetLanguageID_1", language: "1C Enterprise", expectedID: 0},
+		{name: "TestGetLanguageID_2", language: "BestLanguageEver", error: true},
+		{name: "TestGetLanguageID_3", language: "C++", expectedID: 43},
+		{name: "TestGetLanguageID_5", language: "Objective-C", expectedID: 257},
+		{name: "TestGetLanguageID_6", language: "golang", error: true}, // Aliases are not supported
+		{name: "TestGetLanguageID_7", language: "Go", expectedID: 132},
+		{name: "TestGetLanguageID_8", language: "Makefile", expectedID: 220},
+	}
+
+	for _, test := range tests {
+		info, err := GetLanguageInfo(test.language)
+		if test.error {
+			assert.Error(s.T(), err, "%v: expected error for %q", test.name, test.language)
+		} else {
+			assert.NoError(s.T(), err)
+			assert.Equal(s.T(), test.expectedID, info.LanguageID, fmt.Sprintf("%v: id = %v, expected: %v", test.name, info.LanguageID, test.expectedID))
+		}
+	}
+}
+
+func (s *EnryTestSuite) TestGetLanguageInfoByID() {
+	tests := []struct {
+		name         string
+		id           int
+		expectedName string
+		error        bool
+	}{
+		{name: "TestGetLanguageID_1", id: 0, expectedName: "1C Enterprise"},
+		{name: "TestGetLanguageID_2", id: -1, error: true},
+		{name: "TestGetLanguageID_3", id: 43, expectedName: "C++"},
+		{name: "TestGetLanguageID_5", id: 257, expectedName: "Objective-C"},
+		{name: "TestGetLanguageID_7", id: 132, expectedName: "Go"},
+		{name: "TestGetLanguageID_8", id: 220, expectedName: "Makefile"},
+	}
+
+	for _, test := range tests {
+		info, err := GetLanguageInfoByID(test.id)
+		if test.error {
+			assert.Error(s.T(), err, "%v: expected error for %q", test.name, test.id)
+		} else {
+			assert.NoError(s.T(), err)
+			assert.Equal(s.T(), test.expectedName, info.Name, fmt.Sprintf("%v: id = %v, expected: %v", test.name, test.id, test.expectedName))
+		}
+	}
+}

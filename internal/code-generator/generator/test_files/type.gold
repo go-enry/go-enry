@@ -3,6 +3,48 @@
 
 package data
 
+// Type represent language's type. Either data, programming, markup, prose, or unknown.
+type Type int
+
+// Type's values.
+const (
+	TypeUnknown Type = iota
+	TypeData
+	TypeProgramming
+	TypeMarkup
+	TypeProse
+)
+
+func (t Type) String() string {
+	switch t {
+	case TypeData:
+		return "data"
+	case TypeProgramming:
+		return "programming"
+	case TypeMarkup:
+		return "markup"
+	case TypeProse:
+		return "prose"
+	default:
+		return "unknown"
+	}
+}
+
+func TypeForString(s string) Type {
+	switch s {
+	case "data":
+		return TypeData
+	case "programming":
+		return TypeProgramming
+	case "markup":
+		return TypeMarkup
+	case "prose":
+		return TypeProse
+	default:
+		return TypeUnknown
+	}
+}
+
 var LanguagesType = map[string]int{
 	"1C Enterprise":                      2,
 	"4D":                                 2,
