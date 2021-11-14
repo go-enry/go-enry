@@ -252,7 +252,7 @@ func (s *EnryTestSuite) TestGetLanguagesByFilename() {
 		{name: "TestGetLanguagesByFilename_4", filename: "Makefile.frag", expected: []string{"Makefile"}},
 		{name: "TestGetLanguagesByFilename_5", filename: "makefile", expected: []string{"Makefile"}},
 		{name: "TestGetLanguagesByFilename_6", filename: "Vagrantfile", expected: []string{"Ruby"}},
-		{name: "TestGetLanguagesByFilename_7", filename: "_vimrc", expected: []string{"Vim script"}},
+		{name: "TestGetLanguagesByFilename_7", filename: "_vimrc", expected: []string{"Vim Script"}},
 		{name: "TestGetLanguagesByFilename_8", filename: "pom.xml", expected: []string{"Maven POM"}},
 		{name: "TestGetLanguagesByFilename_9", filename: "", expected: nil},
 	}
