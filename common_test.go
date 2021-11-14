@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/go-enry/go-enry/v2/data"
@@ -259,7 +260,10 @@ func (s *EnryTestSuite) TestGetLanguagesByFilename() {
 
 	for _, test := range tests {
 		languages := GetLanguagesByFilename(test.filename, test.content, test.candidates)
-		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
+		assert.Equal(s.T(), len(test.expected), len(languages), fmt.Sprintf("%v: number of languages = %v, expected: %v", test.name, len(languages), len(test.expected)))
+		for i := range languages { // case-insensitive name comparison
+			assert.True(s.T(), strings.EqualFold(test.expected[i], languages[i]), fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
+		}
 	}
 }
 
