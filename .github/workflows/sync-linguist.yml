@@ -73,9 +73,13 @@ jobs:
         echo "::set-output name=short_commit::${commit::8}"
 
         cd ..
-    - name: Update Linguist commit
+    - name: Update Linguist information
       run: |
+        set -euo pipefail
+        IFS=$'\n\t'
+
         sed --in-place --regexp-extended 's/(commit[[:space:]]+=[[:space:]])("[a-f0-9]{40}")/\1"${{ steps.linguist-release.outputs.commit }}"/' internal/code-generator/generator/generator_test.go
+        sed --in-place --regexp-extended 's/version \*\*v.+\*\*\./version \*\*${{ steps.linguist-release.outputs.linguist_version }}\*\*\./' README.md
     - name: Generate code
       run: make code-generate
     - name: Commit changes
