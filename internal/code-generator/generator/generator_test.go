@@ -19,7 +19,7 @@ import (
 var (
 	linguistURL          = "https://github.com/github/linguist.git"
 	linguistClonedEnvVar = "ENRY_TEST_REPO"
-	commit               = "50d3abb3a504e0c8b9bef762afa1c1061fd0d72e"
+	commit               = "80f3531e8a1014a23f4606458e5a528053ed3cac"
 	samplesDir           = "samples"
 	languagesFile        = filepath.Join("lib", "linguist", "languages.yml")
 
