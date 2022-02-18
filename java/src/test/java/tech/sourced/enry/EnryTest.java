@@ -120,7 +120,7 @@ public class EnryTest {
                 "extern int foo(void *bar);";
 
         String[] result = Enry.getLanguages("foo.h", code.getBytes());
-        String[] expected = {"C", "C++", "Objective-C"};
+        String[] expected = {"C"};
         assertArrayEquals(expected, result);
     }
 
