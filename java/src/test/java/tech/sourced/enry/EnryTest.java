@@ -169,6 +169,14 @@ public class EnryTest {
         );
     }
 
+    @Test
+    public void isTest() {
+        assertTrue(Enry.isTest("test_foo.py"));
+        assertTrue(Enry.isTest("test/java/foo.java"));
+        assertFalse(Enry.isTest("foo.py"));
+        assertFalse(Enry.isTest("src/java/foo.java"));
+    }
+
     void assertGuess(String language, boolean safe, Guess guess) {
         assertEquals(language, guess.language);
         assertEquals(safe, guess.safe);
