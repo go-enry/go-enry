@@ -172,7 +172,7 @@ public class EnryTest {
     @Test
     public void isTest() {
         assertTrue(Enry.isTest("test_foo.py"));
-        assertTrue(Enry.isTest("test/java/foo.java"));
+        assertTrue(Enry.isTest("test/java/tech/sourced/enry/EnryTest.java"));
         assertFalse(Enry.isTest("foo.py"));
         assertFalse(Enry.isTest("src/java/foo.java"));
     }
