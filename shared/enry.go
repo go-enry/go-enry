@@ -136,6 +136,11 @@ func GetColor(language string) string {
 	return enry.GetColor(language)
 }
 
+//export IsTest
+func IsTest(path string) bool {
+	return enry.IsTest(path)
+}
+
 func strSliceCopy(result *[]*C.char, slice []string) {
 	for _, str := range slice {
 		*result = append(*result, C.CString(str))
