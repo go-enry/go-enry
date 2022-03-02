@@ -5,6 +5,7 @@ package main
 
 import "C"
 import "github.com/go-enry/go-enry/v2"
+import "github.com/go-enry/go-enry/v2/data"
 
 //export GetLanguage
 func GetLanguage(filename string, content []byte) string {
@@ -139,6 +140,11 @@ func GetColor(language string) string {
 //export IsTest
 func IsTest(path string) bool {
 	return enry.IsTest(path)
+}
+
+//export GetLanguageType
+func GetLanguageType(language string) string {
+	return data.Type(enry.GetLanguageType(language)).String()
 }
 
 func strSliceCopy(result *[]*C.char, slice []string) {

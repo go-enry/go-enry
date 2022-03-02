@@ -247,4 +247,14 @@ public class Enry {
     public static synchronized boolean isTest(String path) {
         return toJavaBool(nativeLib.IsTest(toGoString(path)));
     }
+
+    /**
+     * Returns type for given language.
+     *
+     * @param language of the file
+     * @return type (data, programming, markup, prose)
+     */
+    public static synchronized String getLanguageType(String language) {
+        return toJavaString(nativeLib.GetLanguageType(toGoString(language)));
+    }
 }

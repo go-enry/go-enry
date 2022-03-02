@@ -177,6 +177,11 @@ public class EnryTest {
         assertFalse(Enry.isTest("src/java/foo.java"));
     }
 
+    @Test
+    public void getLanguageType() {
+        assertEquals("data", Enry.getLanguageType("CSV"));
+    }
+
     void assertGuess(String language, boolean safe, Guess guess) {
         assertEquals(language, guess.language);
         assertEquals(safe, guess.safe);
