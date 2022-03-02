@@ -36,7 +36,7 @@ var VendorMatchers = []regex.EnryRegexp{
 	regex.MustCompile(`(^|/)\.indent\.pro`),
 	regex.MustCompile(`(\.|-)min\.(js|css)$`),
 	regex.MustCompile(`([^\s]*)import\.(css|less|scss|styl)$`),
-	regex.MustCompile(`(^|/)bootstrap([^.]*)\.(js|css|less|scss|styl)$`),
+	regex.MustCompile(`(^|/)bootstrap([^/.]*)\.(js|css|less|scss|styl)$`),
 	regex.MustCompile(`(^|/)custom\.bootstrap([^\s]*)(js|css|less|scss|styl)$`),
 	regex.MustCompile(`(^|/)font-?awesome\.(css|less|scss|styl)$`),
 	regex.MustCompile(`(^|/)font-?awesome/.*\.(css|less|scss|styl)$`),
