@@ -156,7 +156,7 @@ Generated Rust bindings using a C static library are available at https://github
 
 ## Divergences from Linguist
 
-The `enry` library is based on the data from `github/linguist` version **v7.18.0**.
+The `enry` library is based on the data from `github/linguist` version **v7.19.0**.
 
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
@@ -171,6 +171,8 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 - [Heuristics for ".inc" extension](https://github.com/github/linguist/blob/f0e2d0d7f1ce600b2a5acccaef6b149c87d8b99c/lib/linguist/heuristics.yml#L222) in NASL could not be parsed, due to unsupported possessive quantifier in RE2 regexp engine.
 
 - [Heuristics for ".as" extension](https://github.com/github/linguist/blob/223c00bb80eff04788e29010f98c5778993d2b2a/lib/linguist/heuristics.yml#L67) in ActionScript could not be parsed, due to unsupported positive lookahead in RE2 regexp engine.
+
+- [Heuristics for ".csc", ".gsc" and ".gsh" extension](https://github.com/github/linguist/blob/7469c7982d93f2ad922230d712f586a353dc1a42/lib/linguist/heuristics.yml#L650-L651) in GSC could not be parsed, due to unsupported non-backtracking subexpressions in RE2 regexp engine.
 
 - As of [Linguist v5.3.2](https://github.com/github/linguist/releases/tag/v5.3.2) it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
