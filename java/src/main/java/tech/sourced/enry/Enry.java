@@ -237,4 +237,24 @@ public class Enry {
     public static synchronized String getColor(String language) {
         return toJavaString(nativeLib.GetColor(toGoString(language)));
     }
+
+    /**
+     * Reports whether the given path is a test path or not.
+     *
+     * @param path of the file or directory
+     * @return whether it's test or not
+     */
+    public static synchronized boolean isTest(String path) {
+        return toJavaBool(nativeLib.IsTest(toGoString(path)));
+    }
+
+    /**
+     * Returns type for given language.
+     *
+     * @param language of the file
+     * @return type (data, programming, markup, prose)
+     */
+    public static synchronized String getLanguageType(String language) {
+        return toJavaString(nativeLib.GetLanguageType(toGoString(language)));
+    }
 }

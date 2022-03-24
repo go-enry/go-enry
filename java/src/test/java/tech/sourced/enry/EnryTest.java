@@ -120,7 +120,7 @@ public class EnryTest {
                 "extern int foo(void *bar);";
 
         String[] result = Enry.getLanguages("foo.h", code.getBytes());
-        String[] expected = {"C", "C++", "Objective-C"};
+        String[] expected = {"C"};
         assertArrayEquals(expected, result);
     }
 
@@ -167,6 +167,19 @@ public class EnryTest {
                 "#00ADD8",
                 Enry.getColor("Go")
         );
+    }
+
+    @Test
+    public void isTest() {
+        assertTrue(Enry.isTest("test_foo.py"));
+        assertTrue(Enry.isTest("test/java/tech/sourced/enry/EnryTest.java"));
+        assertFalse(Enry.isTest("foo.py"));
+        assertFalse(Enry.isTest("src/java/foo.java"));
+    }
+
+    @Test
+    public void getLanguageType() {
+        assertEquals("data", Enry.getLanguageType("CSV"));
     }
 
     void assertGuess(String language, boolean safe, Guess guess) {
