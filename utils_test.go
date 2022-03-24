@@ -370,6 +370,9 @@ func TestIsGenerated(t *testing.T) {
 		{"Generated/Haxe/Main.java", true, true},
 		{"Generated/Haxe/Main.cs", true, true},
 		{"Generated/Haxe/Main.php", true, true},
+
+		//Poetry lock file
+		{"Dummy/poetry.lock", false, true},
 	}
 
 	for _, tt := range testCases {

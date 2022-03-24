@@ -93,6 +93,9 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 
 	// GraphQL relay
 	nameContains("__generated__/"),
+
+	// Poetry lock
+	nameEndsWith("poetry.lock"),
 }
 
 // GeneratedCodeMatcher checks whether the file with the given data is
