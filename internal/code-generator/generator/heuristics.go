@@ -39,7 +39,7 @@ func GenHeuristics(fileToParse, _, outPath, tmplPath, tmplName, commit string) e
 
 // loadHeuristics transforms parsed YAML to map[".ext"]->IR for code generation.
 func loadHeuristics(yaml *Heuristics) (map[string][]*LanguagePattern, error) {
-	var patterns = make(map[string][]*LanguagePattern)
+	patterns := make(map[string][]*LanguagePattern)
 	for _, disambiguation := range yaml.Disambiguations {
 		var rules []*LanguagePattern
 		for _, rule := range disambiguation.Rules {
@@ -161,13 +161,14 @@ func parseYaml(file string) (*Heuristics, error) {
 // isUnsupportedRegexpSyntax filters regexp syntax that is not supported by RE2.
 // In particular, we stumbled up on usage of next cases:
 // - lookbehind & lookahead
+// - non-backtracking subexpressions
 // - named & numbered capturing group/after text matching
 // - backreference
 // - possessive quantifier
 // For referece on supported syntax see https://github.com/google/re2/wiki/Syntax
 func isUnsupportedRegexpSyntax(reg string) bool {
 	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) ||
-		strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
+		strings.Contains(reg, `(?>`) || strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
 		// See https://github.com/github/linguist/pull/4243#discussion_r246105067
 		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
 }

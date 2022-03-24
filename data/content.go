@@ -697,12 +697,7 @@ var ContentHeuristics = map[string]*Heuristics{
 			regexp.MustCompile(`(?m)^(\s*namespace\s*[\w\.]+\s*{|\s*\/\/)`),
 		),
 	},
-	".csc": &Heuristics{
-		rule.Or(
-			rule.MatchingLanguages("GSC"),
-			regexp.MustCompile(`(?m)^\s*#\s*(?:using|insert|include|define|namespace)[ \t]+\w|^\s*(?>(?:autoexec|private)\s+){0,2}function\s+(?>(?:autoexec|private)\s+){0,2}\w+\s*\(|\b(?:level|self)[ \t]+thread[ \t]+(?:\[\[[ \t]*(?>\w+\.)*\w+[ \t]*\]\]|\w+)[ \t]*\([^\r\n\)]*\)[ \t]*;|^[ \t]*#[ \t]*(?:precache|using_animtree)[ \t]*\(`),
-		),
-	},
+	".csc": &Heuristics{},
 	".csl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
@@ -879,18 +874,8 @@ var ContentHeuristics = map[string]*Heuristics{
 			regexp.MustCompile(`(?m)^\[indent=[0-9]+\]`),
 		),
 	},
-	".gsc": &Heuristics{
-		rule.Or(
-			rule.MatchingLanguages("GSC"),
-			regexp.MustCompile(`(?m)^\s*#\s*(?:using|insert|include|define|namespace)[ \t]+\w|^\s*(?>(?:autoexec|private)\s+){0,2}function\s+(?>(?:autoexec|private)\s+){0,2}\w+\s*\(|\b(?:level|self)[ \t]+thread[ \t]+(?:\[\[[ \t]*(?>\w+\.)*\w+[ \t]*\]\]|\w+)[ \t]*\([^\r\n\)]*\)[ \t]*;|^[ \t]*#[ \t]*(?:precache|using_animtree)[ \t]*\(`),
-		),
-	},
-	".gsh": &Heuristics{
-		rule.Or(
-			rule.MatchingLanguages("GSC"),
-			regexp.MustCompile(`(?m)^\s*#\s*(?:using|insert|include|define|namespace)[ \t]+\w|^\s*(?>(?:autoexec|private)\s+){0,2}function\s+(?>(?:autoexec|private)\s+){0,2}\w+\s*\(|\b(?:level|self)[ \t]+thread[ \t]+(?:\[\[[ \t]*(?>\w+\.)*\w+[ \t]*\]\]|\w+)[ \t]*\([^\r\n\)]*\)[ \t]*;|^[ \t]*#[ \t]*(?:precache|using_animtree)[ \t]*\(`),
-		),
-	},
+	".gsc": &Heuristics{},
+	".gsh": &Heuristics{},
 	".h": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Objective-C"),
