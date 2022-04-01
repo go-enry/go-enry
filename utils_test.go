@@ -91,6 +91,7 @@ func TestIsImage(t *testing.T) {
 		{name: "TestIsImage_3", path: "image.jpg", expected: true},
 		{name: "TestIsImage_4", path: "image.jpeg", expected: true},
 		{name: "TestIsImage_5", path: "image.gif", expected: true},
+		{name: "TestIsImage_6", path: "image.svg", expected: true},
 	}
 
 	for _, test := range tests {
