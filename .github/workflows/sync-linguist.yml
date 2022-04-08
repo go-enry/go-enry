@@ -24,14 +24,6 @@ jobs:
         commit=$(sed --quiet --regexp-extended 's/[[:space:]]+commit[[:space:]]+=[[:space:]]"([a-f0-9]{40})"/\1/p' internal/code-generator/generator/generator_test.go)
         echo "::set-output name=commit::$commit"
         echo "::set-output name=short_commit::${commit::8}"
-    - name: Create a branch
-      id: branch
-      run: |
-        set -euo pipefail
-        IFS=$'\n\t'     
-        branch_name=feature/sync-linguist-$(date +%s)
-        git checkout -b $branch_name
-        echo "::set-output name=branch_name::$branch_name"
     - uses: actions/checkout@v2
       with:
         repository: github/linguist
@@ -90,13 +82,23 @@ jobs:
         echo "git current state:"
         git status
 
+        branch_name="feature/sync-linguist-${{ steps.previous_linguist.outputs.short_commit }}"
+        if git rev-parse --quiet --verify $branch_name; then
+          echo "Linuist update branch $branch_name already exists"
+          echo "::set-output name=needs_pr::true"
+          exit 0
+        fi
+
         if [[ -n "$(git status --porcelain)" ]]; then
+          echo "Creating branch $branch_name for PR"
+          git checkout -b $branch_name
+          echo "::set-output name=branch_name::$branch_name"
           echo "Creating Linguist update commit"
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
           git commit -m "Updated Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
-          git push --set-upstream origin ${{ steps.branch.outputs.branch_name }}
+          git push --set-upstream origin $branch_name
           echo "Changes committed. Will create PR."
           echo "::set-output name=needs_pr::true"
           exit 0
@@ -109,7 +111,7 @@ jobs:
       uses: repo-sync/pull-request@v2
       if: ${{ steps.commit.outputs.needs_pr == 'true' }}
       with:
-        source_branch: ${{ steps.branch.outputs.branch_name }}
+        source_branch: ${{ steps.commit.outputs.branch_name }}
         pr_title: "Update Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
         pr_body: |
           Automated Linguist update :robot:
