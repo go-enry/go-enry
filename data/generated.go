@@ -74,7 +74,7 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 	nameEndsWith("package-lock.json"),
 
 	// Yarn plugnplay
-	nameMatches(`(^|\/)\.pnp\.(c|m)?js$`),
+	nameMatches(`(^|\/)\.pnp\..*$`),
 
 	// Godeps
 	nameContains("Godeps/"),
