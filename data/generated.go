@@ -96,9 +96,6 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 
 	// Poetry lock
 	nameEndsWith("poetry.lock"),
-
-	// go mod sum file
-	nameEndsWith("go.sum"),
 }
 
 // GeneratedCodeMatcher checks whether the file with the given data is
