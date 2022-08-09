@@ -129,7 +129,7 @@ type Patterns struct {
 // See https://github.com/go-yaml/yaml/issues/100
 type StringArray []string
 
-// UnmarshalYAML allowes to parse element always as a []string
+// UnmarshalYAML allows to parse element always as a []string
 func (sa *StringArray) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var multi []string
 	if err := unmarshal(&multi); err != nil {
