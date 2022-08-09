@@ -54,7 +54,7 @@ var (
 )
 
 func main() {
-	flag.BoolVar(&distribution, "distribution", false, "generate enry-distribuition.csv and linguist-distribution.csv")
+	flag.BoolVar(&distribution, "distribution", false, "generate enry-distribution.csv and linguist-distribution.csv")
 	flag.StringVar(&outDir, "outdir", "", "path to leave csv files")
 	flag.Parse()
 
