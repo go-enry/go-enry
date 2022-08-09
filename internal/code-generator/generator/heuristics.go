@@ -165,7 +165,7 @@ func parseYaml(file string) (*Heuristics, error) {
 // - named & numbered capturing group/after text matching
 // - backreference
 // - possessive quantifier
-// For referece on supported syntax see https://github.com/google/re2/wiki/Syntax
+// For reference on supported syntax see https://github.com/google/re2/wiki/Syntax
 func isUnsupportedRegexpSyntax(reg string) bool {
 	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) ||
 		strings.Contains(reg, `(?>`) || strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
