@@ -160,7 +160,7 @@ func init() {
 	//			return false
 	//		}
 	//
-	// Or concatentate all these regexps using groups i.e.
+	// Or concatenate all these regexps using groups i.e.
 	//
 	//		`(regexp1)|(regexp2)|(regexp3)|...`
 	//
