@@ -2,7 +2,7 @@
 
 ## Usage
 
-`enry-java` package is available thorugh [maven central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22enry-java%22),
+`enry-java` package is available through [maven central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22enry-java%22),
 so it be used easily added as a dependency in various package management systems.
 Examples of how to handle it for most commons systems are included below,
 for other systems just look at maven central's dependency information.
