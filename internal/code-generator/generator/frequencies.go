@@ -108,7 +108,7 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 	}, nil
 }
 
-// readSamples collects ./samples/ filenames from the Linguist codebase, skiping symlinks.
+// readSamples collects ./samples/ filenames from the Linguist codebase, skipping symlinks.
 func readSamples(samplesLangDir string) ([]string, error) {
 	const specialSubDir = "filenames"
 	var samples []string
