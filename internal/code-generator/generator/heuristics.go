@@ -173,7 +173,7 @@ func isUnsupportedRegexpSyntax(reg string) bool {
 		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
 }
 
-// convertToValidRegexp converts Ruby regexp syntaxt to RE2 equivalent.
+// convertToValidRegexp converts Ruby regexp syntax to RE2 equivalent.
 // Does not work with Ruby regexp literals.
 func convertToValidRegexp(rubyRegexp string) string {
 	return multilinePrefix + rubyRegexp
