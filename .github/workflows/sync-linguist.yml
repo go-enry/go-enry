@@ -104,7 +104,7 @@ jobs:
           exit 0
         fi
           
-        echo "Linguist update unncessary"
+        echo "Linguist update unnecessary"
         echo "::set-output name=needs_pr::false"
     - name: Create Pull Request
       id: open-pr
