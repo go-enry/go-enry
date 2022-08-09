@@ -5,7 +5,7 @@ import "github.com/go-enry/go-enry/v2/data/rule"
 // Heuristics implements a rule-based content matching engine.
 
 // Heuristics is a number of sequntially applied rule.Heuristic where a
-// matching one disambiguages language(s) for a single file extension.
+// matching one disambiguates language(s) for a single file extension.
 type Heuristics []rule.Heuristic
 
 // Match returns languages identified by the matching rule of the heuristic.
