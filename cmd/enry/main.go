@@ -29,7 +29,7 @@ func main() {
 	breakdownFlag := flag.Bool("breakdown", false, "")
 	jsonFlag := flag.Bool("json", false, "")
 	showVersion := flag.Bool("version", false, "Show the enry version information")
-	allLangs := flag.Bool("all", false, "Show all files, including those identifed as non-programming languages")
+	allLangs := flag.Bool("all", false, "Show all files, including those identified as non-programming languages")
 	countMode := flag.String("mode", "byte", "the method used to count file size. Available options are: file, line and byte")
 	limitKB := flag.Int64("limit", 16*1024, "Analyse first N KB of the file (-1 means no limit)")
 	flag.Parse()
