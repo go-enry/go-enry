@@ -1,7 +1,7 @@
 /*
 	Package enry implements multiple strategies for programming language identification.
 
-	Identification is made based on file name and file content using a seriece
+	Identification is made based on file name and file content using a service
 	of strategies to narrow down possible option.
 	Each strategy is available as a separate API call, as well as a main enty point
 
