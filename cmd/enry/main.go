@@ -97,7 +97,7 @@ func main() {
 			return nil
 		}
 
-		// TODO(bzz): provide API that mimics lingust CLI output for
+		// TODO(bzz): provide API that mimics linguist CLI output for
 		// - running ByExtension & ByFilename
 		// - reading the file, if that did not work
 		// - GetLanguage([]Strategy)
