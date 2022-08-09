@@ -40,7 +40,7 @@ type or struct {
 }
 
 // Or rule matches, if a single matching pattern exists.
-// It recives only one pattern as it relies on compile-time optimization that
+// It receives only one pattern as it relies on compile-time optimization that
 // represtes union with | inside a single regexp.
 func Or(l languages, r Matcher) Heuristic {
 	return or{l, r}
