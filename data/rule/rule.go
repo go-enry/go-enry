@@ -4,7 +4,7 @@
 package rule
 
 // Heuristic consist of (a number of) rules where each, if matches,
-// identifes content as belonging to a programming language(s).
+// identifies content as belonging to a programming language(s).
 type Heuristic interface {
 	Matcher
 	Languages() []string
