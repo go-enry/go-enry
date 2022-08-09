@@ -255,7 +255,7 @@ All benchmark scripts are in [_benchmarks_](https://github.com/go-enry/go-enry/b
 
 #### Dependencies
 
-As benchmarks depend on Ruby and Github-Linguist gem make sure you have:
+As benchmarks depend on Ruby and GitHub-Linguist gem make sure you have:
 
 - Ruby (e.g using [`rbenv`](https://github.com/rbenv/rbenv)), [`bundler`](https://bundler.io/) installed
 - Docker
