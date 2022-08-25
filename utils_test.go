@@ -17,6 +17,7 @@ func TestIsVendor(t *testing.T) {
 		expected bool
 	}{
 		{"cache/", true},
+		{"something_cache/", false},
 		{"random/cache/", true},
 		{"cache", false},
 		{"dependencies/", true},
@@ -27,6 +28,7 @@ func TestIsVendor(t *testing.T) {
 		{"random/dist/", true},
 		{"random/dist", false},
 		{"deps/", true},
+		{"foodeps/", false},
 		{"configure", true},
 		{"a/configure", true},
 		{"config.guess", true},
@@ -43,6 +45,7 @@ func TestIsVendor(t *testing.T) {
 		{"foo/bar/MochiKit.js", true},
 		{"foo/bar/dojo.js", true},
 		{"foo/env/whatever", true},
+		{"some/python/venv/", false},
 		{"foo/.imageset/bar", true},
 		{"Vagrantfile", true},
 	}
