@@ -213,23 +213,23 @@ func init() {
 	sb := &strings.Builder{}
 
 	// Start with group 1 - those that started with `^`
-	sb.WriteString("(?:^(?:")
+	sb.WriteString("(?:^(?:(?:")
 	sb.WriteString(caretStrings[0])
 	for _, matcher := range caretStrings[1:] {
 		sb.WriteString(")|(?:")
 		sb.WriteString(matcher)
 	}
-	sb.WriteString("))")
+	sb.WriteString(")))")
 	sb.WriteString("|")
 
 	// Now add group 2 - those that started with `(^|/)`
-	sb.WriteString("(?:(?:^|/)(?:")
+	sb.WriteString("(?:(?:^|/)(?:(?:")
 	sb.WriteString(caretSegmentStrings[0])
 	for _, matcher := range caretSegmentStrings[1:] {
 		sb.WriteString(")|(?:")
 		sb.WriteString(matcher)
 	}
-	sb.WriteString("))")
+	sb.WriteString(")))")
 	sb.WriteString("|")
 
 	// Finally add the rest
