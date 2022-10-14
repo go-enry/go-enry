@@ -2,9 +2,7 @@ package enry
 
 import (
 	"bytes"
-	"fmt"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/go-enry/go-enry/v2/data"
@@ -72,89 +70,9 @@ func IsDotFile(path string) bool {
 // 	return false
 // }
 
-var allVendorRegExp regex.EnryRegexp
-
 // IsVendor returns whether or not path is a vendor path.
 func IsVendor(path string) bool {
-	return allVendorRegExp.MatchString(path)
-}
-
-func init() {
-	// We now collate all regexps from VendorMatchers to a single large regexp
-	// which is at least twice as fast to test than simply iterating & matching.
-	//
-	// ---
-	//
-	// We could test each matcher from VendorMatchers in turn i.e.
-	//
-	//  	func IsVendor(filename string) bool {
-	// 			for _, matcher := range data.VendorMatchers {
-	// 				if matcher.MatchString(filename) {
-	//					return true
-	//				}
-	//			}
-	//			return false
-	//		}
-	//
-	// Or naïvely concatentate all these regexps using groups i.e.
-	//
-	//		`(regexp1)|(regexp2)|(regexp3)|...`
-	//
-	// However, both of these are relatively slow and don't take advantage
-	// of the inherent structure within our regexps.
-	//
-	// Imperical observation: by looking at the regexps, we only have 3 types.
-	//  1. Those that start with `^`
-	//  2. Those that start with `(^|/)`
-	//  3. All the rest
-	//
-	// If we collate our regexps into these 3 groups - that will significantly
-	// reduce the likelihood of backtracking within the regexp trie matcher.
-	//
-	// A further improvement is to use non-capturing groups (?:) as otherwise
-	// the regexp parser, whilst matching, will have to allocate slices for
-	// matching positions. (A future improvement left out could be to
-	// enforce non-capturing groups within the sub-regexps.)
-
-	matchers := data.VendorMatchers
-	sort.SliceStable(matchers, func(i, j int) bool {
-		return matchers[i].String() < matchers[j].String()
-	})
-
-	var caretPrefixed, caretOrSlashPrefixed, theRest []string
-	// Check prefix, add to the respective group slices
-	for _, matcher := range matchers {
-		str := matcher.String()
-		if strings.HasPrefix(str, "^") {
-			caretPrefixed = append(caretPrefixed, str[1:])
-		} else if strings.HasPrefix(str, "(^|/)") {
-			caretOrSlashPrefixed = append(caretOrSlashPrefixed, str[5:])
-		} else {
-			theRest = append(theRest, str)
-		}
-	}
-	var sb strings.Builder
-	// group 1 - start with `^`
-	appendGroupWithCommonPrefix(&sb, "^", caretPrefixed)
-	sb.WriteString("|")
-	// group 2 - start with `(^|/)`
-	appendGroupWithCommonPrefix(&sb, "(?:^|/)", caretOrSlashPrefixed)
-	sb.WriteString("|")
-	// grou 3, all rest.
-	appendGroupWithCommonPrefix(&sb, "", theRest)
-	allVendorRegExp = regex.MustCompile(sb.String())
-}
-
-func appendGroupWithCommonPrefix(sb *strings.Builder, commonPrefix string, res []string) {
-	sb.WriteString("(?:")
-	if commonPrefix != "" {
-		sb.WriteString(fmt.Sprintf("%s(?:(?:", commonPrefix))
-	}
-	sb.WriteString(strings.Join(res, ")|(?:"))
-	if commonPrefix != "" {
-		sb.WriteString("))")
-	}
-	sb.WriteString(")")
+	return data.FastVendorMatcher.MatchString(path)
 }
 
 // IsTest returns whether or not path is a test path.
