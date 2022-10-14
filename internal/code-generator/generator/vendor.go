@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/go-enry/go-enry/v2/internal/code-generator/regexp"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,6 +24,16 @@ func Vendor(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string)
 	var regexps []string
 	if err := yaml.Unmarshal(data, &regexps); err != nil {
 		return fmt.Errorf("failed to parse YAML %s, %q", fileToParse, err)
+	}
+
+	// check chosen RE library syntax support
+	for _, re := range regexps {
+		if isUnsupportedRegexpSyntax(re) { // RE2 syntax check
+			_, err := regexp.Compile(re)
+			if err != nil {
+				return fmt.Errorf("unsupport regexp syntaxis in %s: %q", fileToParse, err)
+			}
+		}
 	}
 
 	buf := &bytes.Buffer{}
