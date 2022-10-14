@@ -158,8 +158,8 @@ func parseYaml(file string) (*Heuristics, error) {
 	return h, nil
 }
 
-// isUnsupportedRegexpSyntax filters regexp syntax that is not supported by RE2.
-// In particular, we stumbled up on usage of next cases:
+// isUnsupportedRegexpSyntax detects regexp syntax that is not supported by RE2.
+// In particular, we stumbled up on usage of the next cases by Linguist:
 // - lookbehind & lookahead
 // - non-backtracking subexpressions
 // - named & numbered capturing group/after text matching
