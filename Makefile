@@ -9,6 +9,7 @@ DARWIN_SHARED_LIB=$(DARWIN_DIR)/libenry.dylib
 STATIC_LIB=$(RESOURCES_DIR)/libenry.a
 HEADER_FILE=libenry.h
 NATIVE_LIB=./shared/enry.go
+BUILDTAGS=$(if $(GO_TAGS),-tags "$(GO_TAGS)",)
 
 $(LINGUIST_PATH):
 	git clone https://github.com/github/linguist.git $@
@@ -23,8 +24,8 @@ clean: clean-linguist clean-shared
 
 code-generate: $(LINGUIST_PATH)
 	mkdir -p data && \
-	go run internal/code-generator/main.go
-	ENRY_TEST_REPO="$${PWD}/.linguist" go test  -v \
+	go run ${BUILDTAGS} internal/code-generator/main.go
+	ENRY_TEST_REPO="$${PWD}/.linguist" go test ${BUILDTAGS}  -v \
 		-run Test_GeneratorTestSuite \
 		./internal/code-generator/generator \
 		-testify.m TestUpdateGeneratorTestSuiteGold \

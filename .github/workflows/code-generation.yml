@@ -1,0 +1,53 @@
+on: [push, pull_request]
+name: Code Generation
+jobs:
+  RE2:
+    strategy:
+      matrix:
+        go-version: [1.18.x]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go-version }}
+    - uses: actions/checkout@v2
+    - name: Find previous Linguist commit
+      id: previous_linguist
+      run: |
+        set -euo pipefail
+        IFS=$'\n\t'
+        commit=$(sed --quiet --regexp-extended 's/[[:space:]]+commit[[:space:]]+=[[:space:]]"([a-f0-9]{40})"/\1/p' internal/code-generator/generator/generator_test.go)
+        echo "::set-output name=commit::$commit"
+    - uses: actions/checkout@v2
+      with:
+        repository: github/linguist
+        path: .linguist
+        fetch-depth: 100
+    - run: cd .linguist && git checkout ${{ steps.previous_linguist.outputs.commit }}
+    - name: Generate code
+      run: make code-generate
+      env:
+        ENRY_DEBUG: 1
+
+  oniguruma:
+    strategy:
+      matrix:
+        go-version: [1.18.x]
+    runs-on: ubuntu-latest
+    env:
+      ONIGURUMA_VERSION: 6.9.4
+    steps:
+    - name: Install libonig5
+      run: |
+        wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
+        sudo dpkg -i "libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
+        wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
+        sudo dpkg -i "libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go-version }}
+    - uses: actions/checkout@v2
+    - name: Generate code
+      run: make code-generate
+      env:
+        GO_TAGS: oniguruma
