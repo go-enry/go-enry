@@ -11,48 +11,53 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+//TODO(bzz): port all from test/test_file_blob.rb test_vendored()
+//https://github.com/github/linguist/blob/86adc140d3e8903980565a2984f5532edf4ae875/test/test_file_blob.rb#L270-L583
+var vendorTests = []struct {
+	path     string
+	expected bool
+}{
+	{"cache/", true},
+	{"something_cache/", false},
+	{"random/cache/", true},
+	{"cache", false},
+	{"dependencies/", true},
+	{"Dependencies/", true},
+	{"dependency/", false},
+	{"dist/", true},
+	{"dist", false},
+	{"random/dist/", true},
+	{"random/dist", false},
+	{"deps/", true},
+	{"foodeps/", false},
+	{"configure", true},
+	{"a/configure", true},
+	{"config.guess", true},
+	{"config.guess/", false},
+	{".vscode/", true},
+	{"doc/_build/", true},
+	{"a/docs/_build/", true},
+	{"a/dasdocs/_build-vsdoc.js", true},
+	{"a/dasdocs/_build-vsdoc.j", false},
+	{"foo/bar", false},
+	{".sublime-project", true},
+	{"foo/vendor/foo", true},
+	{"leaflet.draw-src.js", true},
+	{"foo/bar/MochiKit.js", true},
+	{"foo/bar/dojo.js", true},
+	{"foo/env/whatever", true},
+	{"some/python/venv/", false},
+	{"foo/.imageset/bar", true},
+	{"Vagrantfile", true},
+	{"src/bootstrap-custom.js", true},
+	// {"/css/bootstrap.rtl.css", true}, // from linguist v7.23
+}
+
 func TestIsVendor(t *testing.T) {
-	tests := []struct {
-		path     string
-		expected bool
-	}{
-		{"cache/", true},
-		{"something_cache/", false},
-		{"random/cache/", true},
-		{"cache", false},
-		{"dependencies/", true},
-		{"Dependencies/", true},
-		{"dependency/", false},
-		{"dist/", true},
-		{"dist", false},
-		{"random/dist/", true},
-		{"random/dist", false},
-		{"deps/", true},
-		{"foodeps/", false},
-		{"configure", true},
-		{"a/configure", true},
-		{"config.guess", true},
-		{"config.guess/", false},
-		{".vscode/", true},
-		{"doc/_build/", true},
-		{"a/docs/_build/", true},
-		{"a/dasdocs/_build-vsdoc.js", true},
-		{"a/dasdocs/_build-vsdoc.j", false},
-		{"foo/bar", false},
-		{".sublime-project", true},
-		{"foo/vendor/foo", true},
-		{"leaflet.draw-src.js", true},
-		{"foo/bar/MochiKit.js", true},
-		{"foo/bar/dojo.js", true},
-		{"foo/env/whatever", true},
-		{"some/python/venv/", false},
-		{"foo/.imageset/bar", true},
-		{"Vagrantfile", true},
-	}
-	for _, tt := range tests {
+	for _, tt := range vendorTests {
 		t.Run(tt.path, func(t *testing.T) {
 			if got := IsVendor(tt.path); got != tt.expected {
-				t.Errorf("IsVendor() = %v, expected %v", got, tt.expected)
+				t.Errorf("IsVendor(%q) = %v, expected %v", tt.path, got, tt.expected)
 			}
 		})
 	}
@@ -60,10 +65,9 @@ func TestIsVendor(t *testing.T) {
 
 func BenchmarkIsVendor(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		IsVendor(".vscode/")
-		IsVendor("cache/")
-		IsVendor("foo/bar")
-		IsVendor("foo/bar/MochiKit.js")
+		for _, t := range vendorTests {
+			IsVendor(t.path)
+		}
 	}
 }
 

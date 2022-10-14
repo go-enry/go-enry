@@ -2,8 +2,8 @@ package enry
 
 import (
 	"bytes"
+	"fmt"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -63,16 +63,113 @@ func IsDotFile(path string) bool {
 	return strings.HasPrefix(base, ".") && base != "."
 }
 
-var isVendorRegExp *regexp.Regexp
+// func IsVendor(filename string) bool {
+// 	for _, matcher := range data.VendorMatchers {
+// 		if matcher.MatchString(filename) {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
+
+var allVendorRegExp regex.EnryRegexp
 
 // IsVendor returns whether or not path is a vendor path.
 func IsVendor(path string) bool {
-	return isVendorRegExp.MatchString(path)
+	return allVendorRegExp.MatchString(path)
+}
+
+func init() {
+	// We now collate all regexps from VendorMatchers to a single large regexp
+	// which is at least twice as fast to test than simply iterating & matching.
+	//
+	// ---
+	//
+	// We could test each matcher from VendorMatchers in turn i.e.
+	//
+	//  	func IsVendor(filename string) bool {
+	// 			for _, matcher := range data.VendorMatchers {
+	// 				if matcher.MatchString(filename) {
+	//					return true
+	//				}
+	//			}
+	//			return false
+	//		}
+	//
+	// Or naïvely concatentate all these regexps using groups i.e.
+	//
+	//		`(regexp1)|(regexp2)|(regexp3)|...`
+	//
+	// However, both of these are relatively slow and don't take advantage
+	// of the inherent structure within our regexps.
+	//
+	// Imperical observation: by looking at the regexps, we only have 3 types.
+	//  1. Those that start with `^`
+	//  2. Those that start with `(^|/)`
+	//  3. All the rest
+	//
+	// If we collate our regexps into these 3 groups - that will significantly
+	// reduce the likelihood of backtracking within the regexp trie matcher.
+	//
+	// A further improvement is to use non-capturing groups (?:) as otherwise
+	// the regexp parser, whilst matching, will have to allocate slices for
+	// matching positions. (A future improvement left out could be to
+	// enforce non-capturing groups within the sub-regexps.)
+
+	matchers := data.VendorMatchers
+	sort.SliceStable(matchers, func(i, j int) bool {
+		return matchers[i].String() < matchers[j].String()
+	})
+
+	var caretPrefixed, caretOrSlashPrefixed, theRest []string
+	// Check prefix, add to the respective group slices
+	for _, matcher := range matchers {
+		str := matcher.String()
+		if strings.HasPrefix(str, "^") {
+			caretPrefixed = append(caretPrefixed, str[1:])
+		} else if strings.HasPrefix(str, "(^|/)") {
+			caretOrSlashPrefixed = append(caretOrSlashPrefixed, str[5:])
+		} else {
+			theRest = append(theRest, str)
+		}
+	}
+	var sb strings.Builder
+	// group 1 - start with `^`
+	appendGroupWithCommonPrefix(&sb, "^", caretPrefixed)
+	sb.WriteString("|")
+	// group 2 - start with `(^|/)`
+	appendGroupWithCommonPrefix(&sb, "(?:^|/)", caretOrSlashPrefixed)
+	sb.WriteString("|")
+	// grou 3, all rest.
+	appendGroupWithCommonPrefix(&sb, "", theRest)
+	allVendorRegExp = regex.MustCompile(sb.String())
+}
+
+func appendGroupWithCommonPrefix(sb *strings.Builder, commonPrefix string, res []string) {
+	sb.WriteString("(?:")
+	if commonPrefix != "" {
+		sb.WriteString(fmt.Sprintf("%s(?:(?:", commonPrefix))
+	}
+	sb.WriteString(strings.Join(res, ")|(?:"))
+	if commonPrefix != "" {
+		sb.WriteString("))")
+	}
+	sb.WriteString(")")
 }
 
 // IsTest returns whether or not path is a test path.
 func IsTest(path string) bool {
 	return matchRegexSlice(data.TestMatchers, path)
+}
+
+func matchRegexSlice(exprs []regex.EnryRegexp, str string) bool {
+	for _, expr := range exprs {
+		if expr.MatchString(str) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // IsBinary detects if data is a binary value based on:
@@ -102,16 +199,6 @@ func GetColor(language string) string {
 	return "#cccccc"
 }
 
-func matchRegexSlice(exprs []regex.EnryRegexp, str string) bool {
-	for _, expr := range exprs {
-		if expr.MatchString(str) {
-			return true
-		}
-	}
-
-	return false
-}
-
 // IsGenerated returns whether the file with the given path and content is a
 // generated file.
 func IsGenerated(path string, content []byte) bool {
@@ -134,113 +221,4 @@ func IsGenerated(path string, content []byte) bool {
 	}
 
 	return false
-}
-
-func init() {
-	// We now collate the individual regexps that make up the VendorMatchers to
-	// produce a single large regexp which is around twice as fast to test than
-	// simply iterating through all the regexps or naïvely collating the
-	// regexps.
-	//
-	// ---
-	//
-	// data.VendorMatchers here is a slice containing individual regexps that
-	// match a vendor file therefore if we want to test if a filename is a
-	// Vendor we need to test whether that filename matches one or more of
-	// those regexps.
-	//
-	// Now we could test each matcher in turn using a shortcircuiting test i.e.
-	//
-	//  	func IsVendor(filename string) bool {
-	// 			for _, matcher := range data.VendorMatchers {
-	// 				if matcher.Match(filename) {
-	//					return true
-	//				}
-	//			}
-	//			return false
-	//		}
-	//
-	// Or concatentate all these regexps using groups i.e.
-	//
-	//		`(regexp1)|(regexp2)|(regexp3)|...`
-	//
-	// However both of these are relatively slow and they don't take advantage
-	// of the inherent structure within our regexps...
-	//
-	// If we look at our regexps there are essentially three types of regexp:
-	//
-	// 1. Those that start with `^`
-	// 2. Those that start with `(^|/)`
-	// 3. Others
-	//
-	// If we collate our regexps into these groups that will significantly
-	// reduce the likelihood of backtracking within the regexp trie matcher.
-	//
-	// A further improvement is to use non-capturing groups as otherwise the
-	// regexp parser, whilst matching, will have to allocate slices for
-	// matching positions. (A future improvement here could be in the use of
-	// enforcing non-capturing groups within the sub-regexps too.)
-	//
-	// Finally if we sort the segments we can help the matcher build a more
-	// efficient matcher and trie.
-
-	// alias the VendorMatchers to simplify things
-	matchers := data.VendorMatchers
-
-	// Create three temporary string slices for our three groups above - prefixes removed
-	caretStrings := make([]string, 0, 10)
-	caretSegmentStrings := make([]string, 0, 10)
-	matcherStrings := make([]string, 0, len(matchers))
-
-	// Walk the matchers and check their string representation for each group prefix, remove it and add to the respective group slices
-	for _, matcher := range matchers {
-		str := matcher.String()
-		if str[0] == '^' {
-			caretStrings = append(caretStrings, str[1:])
-		} else if str[0:5] == "(^|/)" {
-			caretSegmentStrings = append(caretSegmentStrings, str[5:])
-		} else {
-			matcherStrings = append(matcherStrings, str)
-		}
-	}
-
-	// Sort the strings within each group - a potential further improvement could be in simplifying within these groups
-	sort.Strings(caretSegmentStrings)
-	sort.Strings(caretStrings)
-	sort.Strings(matcherStrings)
-
-	// Now build the collated regexp
-	sb := &strings.Builder{}
-
-	// Start with group 1 - those that started with `^`
-	sb.WriteString("(?:^(?:(?:")
-	sb.WriteString(caretStrings[0])
-	for _, matcher := range caretStrings[1:] {
-		sb.WriteString(")|(?:")
-		sb.WriteString(matcher)
-	}
-	sb.WriteString(")))")
-	sb.WriteString("|")
-
-	// Now add group 2 - those that started with `(^|/)`
-	sb.WriteString("(?:(?:^|/)(?:(?:")
-	sb.WriteString(caretSegmentStrings[0])
-	for _, matcher := range caretSegmentStrings[1:] {
-		sb.WriteString(")|(?:")
-		sb.WriteString(matcher)
-	}
-	sb.WriteString(")))")
-	sb.WriteString("|")
-
-	// Finally add the rest
-	sb.WriteString("(?:")
-	sb.WriteString(matcherStrings[0])
-	for _, matcher := range matcherStrings[1:] {
-		sb.WriteString(")|(?:")
-		sb.WriteString(matcher)
-	}
-	sb.WriteString(")")
-
-	// Compile the whole thing as the isVendorRegExp
-	isVendorRegExp = regexp.MustCompile(sb.String())
 }
