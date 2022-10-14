@@ -237,12 +237,12 @@ To stay in sync, enry needs to be updated when a new release of the linguist inc
 - [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
 - [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
 
-There is no automation for detecting the changes in the linguist project, so this process above has to be done manually from time to time.
+There now is automation for detecting the changes in the upstream Linguist project: every day Github CI runs [a job](.github/workflows/sync-linguist.yml) that will create a PR to this repo for each new Linguist release. It will include all the steps from the above.
 
-When submitting a pull request syncing up to a new release, please make sure it only contains the changes in
+When submitting a pull request syncing up to a new release manually, please make sure it only contains the changes in
 the generated files (in [data](https://github.com/go-enry/go-enry/blob/master/data) subdirectory).
 
-Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](#divergences-from-linguist) is very much appreciated as it simplifies the maintenance (review/release notes/etc).
+Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](#divergences-from-linguist) is encouraged and very much appreciated, as it simplifies the maintenance (review/release notes/etc).
 
 ## Misc
 
