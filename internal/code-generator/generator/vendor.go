@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"sort"
 	"strings"
 	"text/template"
@@ -21,23 +22,24 @@ func Vendor(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string)
 		return err
 	}
 
-	var regexps []string
+	var regexps, validRegexps []string
 	if err := yaml.Unmarshal(data, &regexps); err != nil {
 		return fmt.Errorf("failed to parse YAML %s, %q", fileToParse, err)
 	}
 
-	// check chosen RE library syntax support
+	// check chosen RE lib syntax support
 	for _, re := range regexps {
 		if isUnsupportedRegexpSyntax(re) { // RE2 syntax check
-			_, err := regexp.Compile(re)
-			if err != nil {
-				return fmt.Errorf("unsupport regexp syntaxis in %s: %q", fileToParse, err)
+			if _, err := regexp.Compile(re); err != nil { // doesn't compile \w chosen RE lib
+				log.Printf("skipping rule: %q, unsupported syntax in %s: %q", re, fileToParse, err)
+				continue
 			}
 		}
+		validRegexps = append(validRegexps, re)
 	}
 
 	buf := &bytes.Buffer{}
-	if err := executeVendorTemplate(buf, regexps, tmplPath, tmplName, commit); err != nil {
+	if err := executeVendorTemplate(buf, validRegexps, tmplPath, tmplName, commit); err != nil {
 		return err
 	}
 
