@@ -212,8 +212,8 @@ To run the tests use:
 
     go test ./...
 
-Setting `ENRY_TEST_REPO` to the path to existing checkout of Linguist will avoid cloning it and sepeed tests up.
-Setting `ENRY_DEBUG=1` will provide insight in the Bayesian classifier building done by `make code-generate`.
+Setting `ENRY_TEST_REPO` to a path to the existing checkout of the Linguist will avoid cloning it and speeds tests up.
+Setting `ENRY_DEBUG=1` will provide insight into the Bayesian classifier built during `make code-generate`.
 
 ### Sync with github/linguist upstream
 
