@@ -212,8 +212,8 @@ To run the tests use:
 
     go test ./...
 
-Setting `ENRY_TEST_REPO` to the path to existing checkout of Linguist will avoid cloning it and sepeed tests up.
-Setting `ENRY_DEBUG=1` will provide insight in the Bayesian classifier building done by `make code-generate`.
+Setting `ENRY_TEST_REPO` to a path to the existing checkout of the Linguist will avoid cloning it and speeds tests up.
+Setting `ENRY_DEBUG=1` will provide insight into the Bayesian classifier built during `make code-generate`.
 
 ### Sync with github/linguist upstream
 
@@ -237,12 +237,12 @@ To stay in sync, enry needs to be updated when a new release of the linguist inc
 - [vendor.yml](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)
 - [documentation.yml](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml)
 
-There is no automation for detecting the changes in the linguist project, so this process above has to be done manually from time to time.
+There now is automation for detecting the changes in the upstream Linguist project: every day Github CI runs [a job](.github/workflows/sync-linguist.yml) that will create a PR to this repo for each new Linguist release. It will include all the steps from the above.
 
-When submitting a pull request syncing up to a new release, please make sure it only contains the changes in
+When submitting a pull request syncing up to a new release manually, please make sure it only contains the changes in
 the generated files (in [data](https://github.com/go-enry/go-enry/blob/master/data) subdirectory).
 
-Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](#divergences-from-linguist) is very much appreciated as it simplifies the maintenance (review/release notes/etc).
+Separating all the necessary "manual" code changes to a different PR that includes some background description and an update to the documentation on ["divergences from linguist"](#divergences-from-linguist) is encouraged and very much appreciated, as it simplifies the maintenance (review/release notes/etc).
 
 ## Misc
 
