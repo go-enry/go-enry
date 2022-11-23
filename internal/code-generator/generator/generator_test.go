@@ -125,28 +125,28 @@ func (s *GeneratorTestSuite) maybeCloneLinguist() {
 	isLinguistCloned := s.tmpLinguistDir != ""
 	if !isLinguistCloned {
 		s.tmpLinguistDir, err = ioutil.TempDir("", "linguist-")
-		assert.NoError(s.T(), err)
+		require.NoError(s.T(), err)
 
 		s.T().Logf("Cloning Linguist repo to '%s' as %s was not set\n",
 			s.tmpLinguistDir, linguistClonedEnvVar)
 		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, s.tmpLinguistDir)
 		err = cmd.Run()
-		assert.NoError(s.T(), err)
+		require.NoError(s.T(), err)
 		s.isCleanupNeeded = true
 	}
 
 	cwd, err := os.Getwd()
-	assert.NoError(s.T(), err)
+	require.NoError(s.T(), err)
 
 	err = os.Chdir(s.tmpLinguistDir)
-	assert.NoError(s.T(), err)
+	require.NoError(s.T(), err)
 
 	cmd := exec.Command("git", "checkout", commit)
 	err = cmd.Run()
-	assert.NoError(s.T(), err)
+	require.NoError(s.T(), err)
 
 	err = os.Chdir(cwd)
-	assert.NoError(s.T(), err)
+	require.NoError(s.T(), err)
 }
 
 func (s *GeneratorTestSuite) SetupSuite() {

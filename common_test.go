@@ -78,7 +78,7 @@ func (s *enryBaseTestSuite) SetupSuite() {
 func (s *enryBaseTestSuite) TearDownSuite() {
 	if s.isCleanupNeeded {
 		err := os.RemoveAll(s.tmpLinguistDir)
-		assert.NoError(s.T(), err)
+		require.NoError(s.T(), err)
 	}
 }
 
