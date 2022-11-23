@@ -19,10 +19,48 @@ import (
 const linguistURL = "https://github.com/github/linguist.git"
 const linguistClonedEnvVar = "ENRY_TEST_REPO"
 
+func maybeCloneLinguist() (string, bool, error) {
+	var err error
+	linguistTmpDir := os.Getenv(linguistClonedEnvVar)
+	isCleanupNeeded := false
+	isLinguistCloned := linguistTmpDir != ""
+	if !isLinguistCloned {
+		linguistTmpDir, err = ioutil.TempDir("", "linguist-")
+		if err != nil {
+			return "", false, err
+		}
+
+		isCleanupNeeded = true
+		cmd := exec.Command("git", "clone", linguistURL, linguistTmpDir)
+		if err := cmd.Run(); err != nil {
+			return linguistTmpDir, isCleanupNeeded, err
+		}
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return linguistTmpDir, isCleanupNeeded, err
+	}
+
+	if err = os.Chdir(linguistTmpDir); err != nil {
+		return linguistTmpDir, isCleanupNeeded, err
+	}
+
+	cmd := exec.Command("git", "checkout", data.LinguistCommit)
+	if err := cmd.Run(); err != nil {
+		return linguistTmpDir, isCleanupNeeded, err
+	}
+
+	if err = os.Chdir(cwd); err != nil {
+		return linguistTmpDir, isCleanupNeeded, err
+	}
+	return linguistTmpDir, isCleanupNeeded, nil
+}
+
 type EnryTestSuite struct {
 	suite.Suite
-	tmpLinguist     string
-	needToClone     bool
+	tmpLinguistDir  string
+	isCleanupNeeded bool
 	samplesDir      string
 	testFixturesDir string
 }
@@ -41,7 +79,7 @@ func (s *EnryTestSuite) TestRegexpEdgeCases() {
 	}
 
 	for _, r := range regexpEdgeCases {
-		filename := filepath.Join(s.tmpLinguist, "samples", r.lang, r.filename)
+		filename := filepath.Join(s.tmpLinguistDir, "samples", r.lang, r.filename)
 
 		content, err := ioutil.ReadFile(filename)
 		require.NoError(s.T(), err)
@@ -60,40 +98,16 @@ func Test_EnryTestSuite(t *testing.T) {
 
 func (s *EnryTestSuite) SetupSuite() {
 	var err error
-	s.tmpLinguist = os.Getenv(linguistClonedEnvVar)
-	s.needToClone = s.tmpLinguist == ""
-	if s.needToClone {
-		s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
-		require.NoError(s.T(), err)
-		s.T().Logf("Cloning Linguist repo to '%s' as %s was not set\n",
-			s.tmpLinguist, linguistClonedEnvVar)
-		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguist)
-		err = cmd.Run()
-		require.NoError(s.T(), err)
-	}
-	s.samplesDir = filepath.Join(s.tmpLinguist, "samples")
-	s.T().Logf("using samples from %s", s.samplesDir)
-
-	s.testFixturesDir = filepath.Join(s.tmpLinguist, "test", "fixtures")
-	s.T().Logf("using test fixtures from %s", s.samplesDir)
-
-	cwd, err := os.Getwd()
+	s.tmpLinguistDir, s.isCleanupNeeded, err = maybeCloneLinguist()
 	assert.NoError(s.T(), err)
 
-	err = os.Chdir(s.tmpLinguist)
-	assert.NoError(s.T(), err)
-
-	cmd := exec.Command("git", "checkout", data.LinguistCommit)
-	err = cmd.Run()
-	assert.NoError(s.T(), err)
-
-	err = os.Chdir(cwd)
-	assert.NoError(s.T(), err)
+	s.samplesDir = filepath.Join(s.tmpLinguistDir, "samples")
+	s.testFixturesDir = filepath.Join(s.tmpLinguistDir, "test", "fixtures")
 }
 
 func (s *EnryTestSuite) TearDownSuite() {
-	if s.needToClone {
-		err := os.RemoveAll(s.tmpLinguist)
+	if s.isCleanupNeeded {
+		err := os.RemoveAll(s.tmpLinguistDir)
 		assert.NoError(s.T(), err)
 	}
 }
@@ -153,7 +167,7 @@ func (s *EnryTestSuite) TestGetLanguages() {
 }
 
 func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
-	var modelinesDir = filepath.Join(s.tmpLinguist, "test", "fixtures", "Data", "Modelines")
+	var modelinesDir = filepath.Join(s.tmpLinguistDir, "test", "fixtures", "Data", "Modelines")
 
 	tests := []struct {
 		name       string
