@@ -129,7 +129,7 @@ func (s *GeneratorTestSuite) maybeCloneLinguist() {
 
 		s.T().Logf("Cloning Linguist repo to '%s' as %s was not set\n",
 			s.tmpLinguistDir, linguistClonedEnvVar)
-		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguistDir)
+		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, s.tmpLinguistDir)
 		err = cmd.Run()
 		assert.NoError(s.T(), err)
 		s.isCleanupNeeded = true

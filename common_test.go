@@ -32,7 +32,7 @@ func maybeCloneLinguist() (string, bool, error) {
 		}
 
 		isCleanupNeeded = true
-		cmd := exec.Command("git", "clone", linguistURL, linguistTmpDir)
+		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, linguistTmpDir)
 		if err := cmd.Run(); err != nil {
 			return linguistTmpDir, isCleanupNeeded, err
 		}
