@@ -19,6 +19,7 @@ import (
 const linguistURL = "https://github.com/github/linguist.git"
 const linguistClonedEnvVar = "ENRY_TEST_REPO"
 
+// not a part of the test Suite as benchmark does not use testify
 func maybeCloneLinguist() (string, bool, error) {
 	var err error
 	linguistTmpDir := os.Getenv(linguistClonedEnvVar)
@@ -57,7 +58,7 @@ func maybeCloneLinguist() (string, bool, error) {
 	return linguistTmpDir, isCleanupNeeded, nil
 }
 
-type EnryTestSuite struct {
+type enryBaseTestSuite struct {
 	suite.Suite
 	tmpLinguistDir  string
 	isCleanupNeeded bool
@@ -65,7 +66,31 @@ type EnryTestSuite struct {
 	testFixturesDir string
 }
 
-func (s *EnryTestSuite) TestRegexpEdgeCases() {
+func (s *enryBaseTestSuite) SetupSuite() {
+	var err error
+	s.tmpLinguistDir, s.isCleanupNeeded, err = maybeCloneLinguist()
+	require.NoError(s.T(), err)
+
+	s.samplesDir = filepath.Join(s.tmpLinguistDir, "samples")
+	s.testFixturesDir = filepath.Join(s.tmpLinguistDir, "test", "fixtures")
+}
+
+func (s *enryBaseTestSuite) TearDownSuite() {
+	if s.isCleanupNeeded {
+		err := os.RemoveAll(s.tmpLinguistDir)
+		assert.NoError(s.T(), err)
+	}
+}
+
+type enryTestSuite struct {
+	enryBaseTestSuite
+}
+
+func Test_EnryTestSuite(t *testing.T) {
+	suite.Run(t, new(enryTestSuite))
+}
+
+func (s *enryTestSuite) TestRegexpEdgeCases() {
 	var regexpEdgeCases = []struct {
 		lang     string
 		filename string
@@ -92,27 +117,7 @@ func (s *EnryTestSuite) TestRegexpEdgeCases() {
 	}
 }
 
-func Test_EnryTestSuite(t *testing.T) {
-	suite.Run(t, new(EnryTestSuite))
-}
-
-func (s *EnryTestSuite) SetupSuite() {
-	var err error
-	s.tmpLinguistDir, s.isCleanupNeeded, err = maybeCloneLinguist()
-	assert.NoError(s.T(), err)
-
-	s.samplesDir = filepath.Join(s.tmpLinguistDir, "samples")
-	s.testFixturesDir = filepath.Join(s.tmpLinguistDir, "test", "fixtures")
-}
-
-func (s *EnryTestSuite) TearDownSuite() {
-	if s.isCleanupNeeded {
-		err := os.RemoveAll(s.tmpLinguistDir)
-		assert.NoError(s.T(), err)
-	}
-}
-
-func (s *EnryTestSuite) TestGetLanguage() {
+func (s *enryTestSuite) TestGetLanguage() {
 	tests := []struct {
 		name     string
 		filename string
@@ -134,7 +139,7 @@ func (s *EnryTestSuite) TestGetLanguage() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguages() {
+func (s *enryTestSuite) TestGetLanguages() {
 	tests := []struct {
 		name     string
 		filename string
@@ -166,7 +171,7 @@ func (s *EnryTestSuite) TestGetLanguages() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
+func (s *enryTestSuite) TestGetLanguagesByModelineLinguist() {
 	var modelinesDir = filepath.Join(s.tmpLinguistDir, "test", "fixtures", "Data", "Modelines")
 
 	tests := []struct {
@@ -226,7 +231,7 @@ func (s *EnryTestSuite) TestGetLanguagesByModelineLinguist() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByModeline() {
+func (s *enryTestSuite) TestGetLanguagesByModeline() {
 	const (
 		wrongVim  = `# vim: set syntax=ruby ft  =python filetype=perl :`
 		rightVim  = `/* vim: set syntax=python ft   =python filetype=python */`
@@ -253,7 +258,7 @@ func (s *EnryTestSuite) TestGetLanguagesByModeline() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByFilename() {
+func (s *enryTestSuite) TestGetLanguagesByFilename() {
 	tests := []struct {
 		name       string
 		filename   string
@@ -281,7 +286,7 @@ func (s *EnryTestSuite) TestGetLanguagesByFilename() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByShebang() {
+func (s *enryTestSuite) TestGetLanguagesByShebang() {
 	const (
 		multilineExecHack = `#!/bin/sh
 # Next line is comment in Tcl, but not in sh... \
@@ -366,7 +371,7 @@ println("The shell script says ",vm.arglist.concat(" "));`
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByExtension() {
+func (s *enryTestSuite) TestGetLanguagesByExtension() {
 	tests := []struct {
 		name       string
 		filename   string
@@ -387,7 +392,7 @@ func (s *EnryTestSuite) TestGetLanguagesByExtension() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByManpage() {
+func (s *enryTestSuite) TestGetLanguagesByManpage() {
 	tests := []struct {
 		name       string
 		filename   string
@@ -411,7 +416,7 @@ func (s *EnryTestSuite) TestGetLanguagesByManpage() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByXML() {
+func (s *enryTestSuite) TestGetLanguagesByXML() {
 	tests := []struct {
 		name       string
 		filename   string
@@ -434,7 +439,7 @@ func (s *EnryTestSuite) TestGetLanguagesByXML() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
+func (s *enryTestSuite) TestGetLanguagesByClassifier() {
 	test := []struct {
 		name       string
 		filename   string
@@ -471,7 +476,7 @@ func (s *EnryTestSuite) TestGetLanguagesByClassifier() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
+func (s *enryTestSuite) TestGetLanguagesBySpecificClassifier() {
 	test := []struct {
 		name       string
 		filename   string
@@ -504,7 +509,7 @@ func (s *EnryTestSuite) TestGetLanguagesBySpecificClassifier() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguageExtensions() {
+func (s *enryTestSuite) TestGetLanguageExtensions() {
 	tests := []struct {
 		name     string
 		language string
@@ -521,7 +526,7 @@ func (s *EnryTestSuite) TestGetLanguageExtensions() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguageType() {
+func (s *enryTestSuite) TestGetLanguageType() {
 	tests := []struct {
 		name     string
 		language string
@@ -544,7 +549,7 @@ func (s *EnryTestSuite) TestGetLanguageType() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguageGroup() {
+func (s *enryTestSuite) TestGetLanguageGroup() {
 	tests := []struct {
 		name     string
 		language string
@@ -562,7 +567,7 @@ func (s *EnryTestSuite) TestGetLanguageGroup() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguageByAlias() {
+func (s *enryTestSuite) TestGetLanguageByAlias() {
 	tests := []struct {
 		name         string
 		alias        string
@@ -588,57 +593,7 @@ func (s *EnryTestSuite) TestGetLanguageByAlias() {
 	}
 }
 
-func (s *EnryTestSuite) TestLinguistCorpus() {
-	const filenamesDir = "filenames"
-	var cornerCases = map[string]bool{
-		"drop_stuff.sql":        true, // https://github.com/src-d/enry/issues/194
-		"textobj-rubyblock.vba": true, // Because of unsupported negative lookahead RE syntax (https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521)
-		// .es and .ice fail heuristics parsing, but do not fail any tests
-	}
-
-	var total, failed, ok, other int
-	var expected string
-	filepath.Walk(s.samplesDir, func(path string, f os.FileInfo, err error) error {
-		if f.IsDir() {
-			if f.Name() != filenamesDir {
-				expected, _ = data.LanguageByAlias(f.Name())
-			}
-
-			return nil
-		}
-
-		filename := filepath.Base(path)
-		content, _ := ioutil.ReadFile(path)
-
-		total++
-		obtained := GetLanguage(filename, content)
-		if obtained == OtherLanguage {
-			obtained = "Other"
-			other++
-		}
-
-		var status string
-		if expected == obtained {
-			status = "ok"
-			ok++
-		} else {
-			status = "failed"
-			failed++
-		}
-
-		if _, ok := cornerCases[filename]; ok {
-			s.T().Logf("\t\t[considered corner case] %s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status)
-		} else {
-			assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status))
-		}
-
-		return nil
-	})
-
-	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
-}
-
-func (s *EnryTestSuite) TestGetLanguageID() {
+func (s *enryTestSuite) TestGetLanguageID() {
 	tests := []struct {
 		name       string
 		language   string
@@ -661,7 +616,7 @@ func (s *EnryTestSuite) TestGetLanguageID() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguageInfo() {
+func (s *enryTestSuite) TestGetLanguageInfo() {
 	tests := []struct {
 		name       string
 		language   string
@@ -688,7 +643,7 @@ func (s *EnryTestSuite) TestGetLanguageInfo() {
 	}
 }
 
-func (s *EnryTestSuite) TestGetLanguageInfoByID() {
+func (s *enryTestSuite) TestGetLanguageInfoByID() {
 	tests := []struct {
 		name         string
 		id           int
