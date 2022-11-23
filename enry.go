@@ -14,3 +14,17 @@
 package enry // import "github.com/go-enry/go-enry/v2"
 
 //go:generate make code-generate
+
+import "github.com/go-enry/go-enry/v2/data"
+
+// Type represent language's type. Either data, programming, markup, prose, or unknown.
+type Type int
+
+// Type's values.
+const (
+	Unknown     Type = Type(data.TypeUnknown)
+	Data             = Type(data.TypeData)
+	Programming      = Type(data.TypeProgramming)
+	Markup           = Type(data.TypeMarkup)
+	Prose            = Type(data.TypeProse)
+)
