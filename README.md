@@ -61,7 +61,7 @@ To make a guess only based on the content of the file or a text snippet, use
 
 ### By file
 
-The most accurate guess would be one when both, the file name and the content are available:
+The most accurate guess would be when both, a file name and it's content are available:
 
 - `GetLanguagesByContent` only uses file extension and a set of regexp-based content heuristics.
 - `GetLanguages` uses the full set of matching strategies and is expected to be most accurate.
