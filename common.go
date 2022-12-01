@@ -38,7 +38,7 @@ var defaultClassifier classifier = &naiveBayes{
 }
 
 // GetLanguage applies a sequence of strategies based on the given filename and content
-// to find out the most probably language to return.
+// to find out the most probable language to return.
 func GetLanguage(filename string, content []byte) (language string) {
 	languages := GetLanguages(filename, content)
 	return firstLanguage(languages)
@@ -508,28 +508,6 @@ func GetLanguageExtensions(language string) []string {
 	return data.ExtensionsByLanguage[language]
 }
 
-// GetLanguageID returns the ID for the language. IDs are assigned by GitHub.
-// The input must be the canonical language name. Aliases are not supported.
-//
-// NOTE: The zero value (0) is a valid language ID, so this API mimics the Go
-// map API. Use the second return value to check if the language was found.
-func GetLanguageID(language string) (int, bool) {
-	id, ok := data.IDByLanguage[language]
-	return id, ok
-}
-
-// Type represent language's type. Either data, programming, markup, prose, or unknown.
-type Type int
-
-// Type's values.
-const (
-	Unknown     Type = Type(data.TypeUnknown)
-	Data             = Type(data.TypeData)
-	Programming      = Type(data.TypeProgramming)
-	Markup           = Type(data.TypeMarkup)
-	Prose            = Type(data.TypeProse)
-)
-
 // GetLanguageType returns the type of the given language.
 func GetLanguageType(language string) (langType Type) {
 	intType, ok := data.LanguagesType[language]
@@ -538,6 +516,15 @@ func GetLanguageType(language string) (langType Type) {
 		langType = Unknown
 	}
 	return langType
+}
+
+// GetLanguageGroup returns language group or empty string if language does not have group.
+func GetLanguageGroup(language string) string {
+	if group, ok := data.LanguagesGroup[language]; ok {
+		return group
+	}
+
+	return ""
 }
 
 // GetLanguageByAlias returns either the language related to the given alias and ok set to true
@@ -551,13 +538,14 @@ func GetLanguageByAlias(alias string) (lang string, ok bool) {
 	return
 }
 
-// GetLanguageGroup returns language group or empty string if language does not have group.
-func GetLanguageGroup(language string) string {
-	if group, ok := data.LanguagesGroup[language]; ok {
-		return group
-	}
-
-	return ""
+// GetLanguageID returns the ID for the language. IDs are assigned by GitHub.
+// The input must be the canonical language name. Aliases are not supported.
+//
+// NOTE: The zero value (0) is a valid language ID, so this API mimics the Go
+// map API. Use the second return value to check if the language was found.
+func GetLanguageID(language string) (int, bool) {
+	id, ok := data.IDByLanguage[language]
+	return id, ok
 }
 
 // GetLanguageInfo returns the LanguageInfo for a given language name, or an error if not found.

@@ -97,9 +97,9 @@ var (
 
 type GeneratorTestSuite struct {
 	suite.Suite
-	tmpLinguistDir   string
-	isLinguistCloned bool
-	testCases        []testCase
+	tmpLinguistDir  string
+	isCleanupNeeded bool
+	testCases       []testCase
 }
 
 type testCase struct {
@@ -122,27 +122,31 @@ func Test_GeneratorTestSuite(t *testing.T) {
 func (s *GeneratorTestSuite) maybeCloneLinguist() {
 	var err error
 	s.tmpLinguistDir = os.Getenv(linguistClonedEnvVar)
-	s.isLinguistCloned = s.tmpLinguistDir != ""
-	if !s.isLinguistCloned {
+	isLinguistCloned := s.tmpLinguistDir != ""
+	if !isLinguistCloned {
 		s.tmpLinguistDir, err = ioutil.TempDir("", "linguist-")
-		assert.NoError(s.T(), err)
-		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguistDir)
+		require.NoError(s.T(), err)
+
+		s.T().Logf("Cloning Linguist repo to '%s' as %s was not set\n",
+			s.tmpLinguistDir, linguistClonedEnvVar)
+		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, s.tmpLinguistDir)
 		err = cmd.Run()
-		assert.NoError(s.T(), err)
-
-		cwd, err := os.Getwd()
-		assert.NoError(s.T(), err)
-
-		err = os.Chdir(s.tmpLinguistDir)
-		assert.NoError(s.T(), err)
-
-		cmd = exec.Command("git", "checkout", commit)
-		err = cmd.Run()
-		assert.NoError(s.T(), err)
-
-		err = os.Chdir(cwd)
-		assert.NoError(s.T(), err)
+		require.NoError(s.T(), err)
+		s.isCleanupNeeded = true
 	}
+
+	cwd, err := os.Getwd()
+	require.NoError(s.T(), err)
+
+	err = os.Chdir(s.tmpLinguistDir)
+	require.NoError(s.T(), err)
+
+	cmd := exec.Command("git", "checkout", commit)
+	err = cmd.Run()
+	require.NoError(s.T(), err)
+
+	err = os.Chdir(cwd)
+	require.NoError(s.T(), err)
 }
 
 func (s *GeneratorTestSuite) SetupSuite() {
@@ -280,11 +284,9 @@ func (s *GeneratorTestSuite) SetupSuite() {
 }
 
 func (s *GeneratorTestSuite) TearDownSuite() {
-	if s.isLinguistCloned {
+	if s.isCleanupNeeded {
 		err := os.RemoveAll(s.tmpLinguistDir)
-		if err != nil {
-			s.T().Logf("Failed to clean up %s after the test.\n", s.tmpLinguistDir)
-		}
+		assert.NoError(s.T(), err)
 	}
 }
 

@@ -6,11 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
-
-	"github.com/go-enry/go-enry/v2/data"
 )
 
 type sample struct {
@@ -23,69 +20,27 @@ var (
 	overcomeLanguage  string
 	overcomeLanguages []string
 	samples           []*sample
-	samplesDir        string
-	cloned            bool
 )
 
 func TestMain(m *testing.M) {
 	flag.BoolVar(&slow, "slow", false, "run benchmarks per sample for strategies too")
 	flag.Parse()
 
-	if err := cloneLinguist(linguistURL); err != nil {
+	tmpLinguistDir, cleanupNeeded, err := maybeCloneLinguist()
+	if err != nil {
 		log.Fatal(err)
 	}
-	if cloned {
-		defer os.RemoveAll(filepath.Dir(samplesDir))
+	if cleanupNeeded {
+		defer os.RemoveAll(tmpLinguistDir)
 	}
 
-	var err error
+	samplesDir := filepath.Join(tmpLinguistDir, "samples")
 	samples, err = getSamples(samplesDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	os.Exit(m.Run())
-}
-
-func cloneLinguist(linguistURL string) error {
-	repoLinguist := os.Getenv(linguistClonedEnvVar)
-	cloned = repoLinguist == ""
-	if cloned {
-		var err error
-		repoLinguist, err = ioutil.TempDir("", "linguist-")
-		if err != nil {
-			return err
-		}
-	}
-
-	samplesDir = filepath.Join(repoLinguist, "samples")
-
-	if cloned {
-		cmd := exec.Command("git", "clone", linguistURL, repoLinguist)
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-	}
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	if err = os.Chdir(repoLinguist); err != nil {
-		return err
-	}
-
-	cmd := exec.Command("git", "checkout", data.LinguistCommit)
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	if err = os.Chdir(cwd); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func getSamples(dir string) ([]*sample, error) {
