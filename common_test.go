@@ -371,6 +371,25 @@ println("The shell script says ",vm.arglist.concat(" "));`
 	}
 }
 
+func (s *enryTestSuite) TestGetLanguageByContent() {
+	tests := []struct {
+		name     string
+		filename string
+		content  []byte
+		expected string
+	}{
+		{name: "TestGetLanguageByContent_0", filename: "", expected: ""},
+		{name: "TestGetLanguageByContent_1", filename: "foo.cpp", content: []byte("int main() { return 0; }"), expected: ""},                      // as .cpp is unambiguous ¯\_(ツ)_/¯
+		{name: "TestGetLanguageByContent_2", filename: "foo.h", content: []byte("int main() { return 0; }"), expected: "C"},                       // C, as it does not match any of the heuristics for C++ or Objective-C
+		{name: "TestGetLanguageByContent_3", filename: "foo.h", content: []byte("#include <string>\n int main() { return 0; }"), expected: "C++"}, // '#include <string>' matches regex heuristic
+	}
+
+	for _, test := range tests {
+		languages, _ := GetLanguageByContent(test.filename, test.content)
+		assert.Equal(s.T(), test.expected, languages, fmt.Sprintf("%v: languages = %v, expected: %v", test.name, languages, test.expected))
+	}
+}
+
 func (s *enryTestSuite) TestGetLanguagesByExtension() {
 	tests := []struct {
 		name       string
