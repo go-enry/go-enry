@@ -998,8 +998,9 @@ func LanguageByAlias(langOrAlias string) (lang string, ok bool) {
 
 // convertToAliasKey converts language name to a key in LanguageByAliasMap.
 // Following
-//  - internal.code-generator.generator.convertToAliasKey()
-//  - GetLanguageByAlias()
+//   - internal.code-generator.generator.convertToAliasKey()
+//   - GetLanguageByAlias()
+//
 // conventions.
 // It is here to avoid dependency on "generate" and "enry" packages.
 func convertToAliasKey(langName string) string {

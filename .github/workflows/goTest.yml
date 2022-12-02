@@ -4,12 +4,12 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.16.x, 1.17.x]
+        go-version: [1.18.x, 1.19.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install Go
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ matrix.go-version }}
     - name: Set git on win to use LF
@@ -26,7 +26,7 @@ jobs:
   test-oniguruma:
     strategy:
       matrix:
-        go-version: [1.16.x, 1.17.x]
+        go-version: [1.18.x, 1.19.x]
     runs-on: ubuntu-latest
     env:
       ONIGURUMA_VERSION: 6.9.4
@@ -39,7 +39,7 @@ jobs:
         sudo dpkg -i "libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
 
     - name: Install Go
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ matrix.go-version }}
 
