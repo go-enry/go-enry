@@ -232,7 +232,7 @@ func isCompiledCoffeeScript(path, ext string, content []byte) bool {
 			}
 		})
 
-		// Require a score of 3. This is fairly abritrary. Consider tweaking later.
+		// Require a score of 3. This is fairly arbitrary. Consider tweaking later.
 		// See: https://github.com/github/linguist/blob/master/lib/linguist/generated.rb#L176-L213
 		return score >= 3
 	}

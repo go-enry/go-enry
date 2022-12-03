@@ -119,7 +119,7 @@ func TestTemplateMatcherVars(t *testing.T) {
 	require.NotEmpty(t, buf)
 
 	// TODO(bzz) add more advanced test using go/ast package, to verify the
-	// strucutre of generated code:
+	// structure of generated code:
 	//  - check key literal exists in map for each extension:
 
 	src, err := format.Source(buf.Bytes())

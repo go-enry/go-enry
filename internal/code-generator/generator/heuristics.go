@@ -129,7 +129,7 @@ type Patterns struct {
 // See https://github.com/go-yaml/yaml/issues/100
 type StringArray []string
 
-// UnmarshalYAML allowes to parse element always as a []string
+// UnmarshalYAML allows to parse element always as a []string
 func (sa *StringArray) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var multi []string
 	if err := unmarshal(&multi); err != nil {
@@ -165,7 +165,7 @@ func parseYaml(file string) (*Heuristics, error) {
 // - named & numbered capturing group/after text matching
 // - backreference
 // - possessive quantifier
-// For referece on supported syntax see https://github.com/google/re2/wiki/Syntax
+// For reference on supported syntax see https://github.com/google/re2/wiki/Syntax
 func isUnsupportedRegexpSyntax(reg string) bool {
 	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) ||
 		strings.Contains(reg, `(?>`) || strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
@@ -173,7 +173,7 @@ func isUnsupportedRegexpSyntax(reg string) bool {
 		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
 }
 
-// convertToValidRegexp converts Ruby regexp syntaxt to RE2 equivalent.
+// convertToValidRegexp converts Ruby regexp syntax to RE2 equivalent.
 // Does not work with Ruby regexp literals.
 func convertToValidRegexp(rubyRegexp string) string {
 	return multilinePrefix + rubyRegexp

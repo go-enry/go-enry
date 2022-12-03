@@ -84,7 +84,7 @@ jobs:
 
         branch_name="feature/sync-linguist-${{ steps.previous_linguist.outputs.short_commit }}"
         if git rev-parse --quiet --verify $branch_name; then
-          echo "Linuist update branch $branch_name already exists"
+          echo "Linguist update branch $branch_name already exists"
           echo "::set-output name=needs_pr::true"
           exit 0
         fi
@@ -104,7 +104,7 @@ jobs:
           exit 0
         fi
           
-        echo "Linguist update unncessary"
+        echo "Linguist update unnecessary"
         echo "::set-output name=needs_pr::false"
     - name: Create Pull Request
       id: open-pr

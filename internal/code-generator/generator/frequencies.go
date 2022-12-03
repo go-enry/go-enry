@@ -108,7 +108,7 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 	}, nil
 }
 
-// readSamples collects ./samples/ filenames from the Linguist codebase, skiping symlinks.
+// readSamples collects ./samples/ filenames from the Linguist codebase, skipping symlinks.
 func readSamples(samplesLangDir string) ([]string, error) {
 	const specialSubDir = "filenames"
 	var samples []string
@@ -141,7 +141,7 @@ func readSamples(samplesLangDir string) ([]string, error) {
 
 // isKnownSymlinkInLinguist checks if the file name is on the list of known symlinks.
 // On Windows, there is no symlink support in Git [1] and those become regular text files,
-// so we have to skip these files manually, maintaing a list here :/
+// so we have to skip these files manually, maintaining a list here :/
 //  1. https://github.com/git-for-windows/git/wiki/Symbolic-Links
 //
 // $ find -L .linguist/samples -xtype l
