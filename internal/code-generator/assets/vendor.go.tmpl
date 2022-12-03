@@ -7,3 +7,6 @@ var VendorMatchers = []regex.EnryRegexp{
 	regex.MustCompile(`{{ $regexp }}`),
 	{{end -}}
 }
+
+// FastVendorMatcher is equivalent to matching any of the VendorMatchers.
+var FastVendorMatcher = regex.MustCompile(`{{ optimize . }}`)

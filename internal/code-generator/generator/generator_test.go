@@ -19,7 +19,7 @@ import (
 var (
 	linguistURL          = "https://github.com/github/linguist.git"
 	linguistClonedEnvVar = "ENRY_TEST_REPO"
-	commit               = "4ffcdbcbb60a74cbfbd37656bcc3fcea4eca8e26"
+	commit               = "d7799da826e01acdb8f84694d33116dccaabe9c2"
 	samplesDir           = "samples"
 	languagesFile        = filepath.Join("lib", "linguist", "languages.yml")
 
@@ -97,9 +97,9 @@ var (
 
 type GeneratorTestSuite struct {
 	suite.Suite
-	tmpLinguist string
-	cloned      bool
-	testCases   []testCase
+	tmpLinguistDir  string
+	isCleanupNeeded bool
+	testCases       []testCase
 }
 
 type testCase struct {
@@ -121,28 +121,32 @@ func Test_GeneratorTestSuite(t *testing.T) {
 
 func (s *GeneratorTestSuite) maybeCloneLinguist() {
 	var err error
-	s.tmpLinguist = os.Getenv(linguistClonedEnvVar)
-	s.cloned = s.tmpLinguist == ""
-	if s.cloned {
-		s.tmpLinguist, err = ioutil.TempDir("", "linguist-")
-		assert.NoError(s.T(), err)
-		cmd := exec.Command("git", "clone", linguistURL, s.tmpLinguist)
+	s.tmpLinguistDir = os.Getenv(linguistClonedEnvVar)
+	isLinguistCloned := s.tmpLinguistDir != ""
+	if !isLinguistCloned {
+		s.tmpLinguistDir, err = ioutil.TempDir("", "linguist-")
+		require.NoError(s.T(), err)
+
+		s.T().Logf("Cloning Linguist repo to '%s' as %s was not set\n",
+			s.tmpLinguistDir, linguistClonedEnvVar)
+		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, s.tmpLinguistDir)
 		err = cmd.Run()
-		assert.NoError(s.T(), err)
-
-		cwd, err := os.Getwd()
-		assert.NoError(s.T(), err)
-
-		err = os.Chdir(s.tmpLinguist)
-		assert.NoError(s.T(), err)
-
-		cmd = exec.Command("git", "checkout", commit)
-		err = cmd.Run()
-		assert.NoError(s.T(), err)
-
-		err = os.Chdir(cwd)
-		assert.NoError(s.T(), err)
+		require.NoError(s.T(), err)
+		s.isCleanupNeeded = true
 	}
+
+	cwd, err := os.Getwd()
+	require.NoError(s.T(), err)
+
+	err = os.Chdir(s.tmpLinguistDir)
+	require.NoError(s.T(), err)
+
+	cmd := exec.Command("git", "checkout", commit)
+	err = cmd.Run()
+	require.NoError(s.T(), err)
+
+	err = os.Chdir(cwd)
+	require.NoError(s.T(), err)
 }
 
 func (s *GeneratorTestSuite) SetupSuite() {
@@ -150,7 +154,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 	s.testCases = []testCase{
 		{
 			name:        "Extensions()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    extensionTestTmplPath,
 			tmplName:    extensionTestTmplName,
@@ -160,7 +164,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Heuristics()",
-			fileToParse: filepath.Join(s.tmpLinguist, heuristicsTestFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, heuristicsTestFile),
 			samplesDir:  "",
 			tmplPath:    contentTestTmplPath,
 			tmplName:    contentTestTmplName,
@@ -170,7 +174,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Vendor()",
-			fileToParse: filepath.Join(s.tmpLinguist, vendorTestFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, vendorTestFile),
 			samplesDir:  "",
 			tmplPath:    vendorTestTmplPath,
 			tmplName:    vendorTestTmplName,
@@ -180,7 +184,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Documentation()",
-			fileToParse: filepath.Join(s.tmpLinguist, documentationTestFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, documentationTestFile),
 			samplesDir:  "",
 			tmplPath:    documentationTestTmplPath,
 			tmplName:    documentationTestTmplName,
@@ -190,7 +194,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Types()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    typeTestTmplPath,
 			tmplName:    typeTestTmplName,
@@ -200,7 +204,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Interpreters()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    interpreterTestTmplPath,
 			tmplName:    interpreterTestTmplName,
@@ -210,8 +214,8 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Filenames()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
-			samplesDir:  filepath.Join(s.tmpLinguist, samplesDir),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
+			samplesDir:  filepath.Join(s.tmpLinguistDir, samplesDir),
 			tmplPath:    filenameTestTmplPath,
 			tmplName:    filenameTestTmplName,
 			commit:      commit,
@@ -220,7 +224,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Aliases()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    aliasTestTmplPath,
 			tmplName:    aliasTestTmplName,
@@ -230,7 +234,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:       "Frequencies()",
-			samplesDir: filepath.Join(s.tmpLinguist, samplesDir),
+			samplesDir: filepath.Join(s.tmpLinguistDir, samplesDir),
 			tmplPath:   frequenciesTestTmplPath,
 			tmplName:   frequenciesTestTmplName,
 			commit:     commit,
@@ -248,7 +252,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "MimeType()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    mimeTypeTestTmplPath,
 			tmplName:    mimeTypeTestTmplName,
@@ -258,7 +262,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Colors()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    colorsTestTmplPath,
 			tmplName:    colorsTestTmplName,
@@ -268,7 +272,7 @@ func (s *GeneratorTestSuite) SetupSuite() {
 		},
 		{
 			name:        "Groups()",
-			fileToParse: filepath.Join(s.tmpLinguist, languagesFile),
+			fileToParse: filepath.Join(s.tmpLinguistDir, languagesFile),
 			samplesDir:  "",
 			tmplPath:    groupsTestTmplPath,
 			tmplName:    groupsTestTmplName,
@@ -280,11 +284,9 @@ func (s *GeneratorTestSuite) SetupSuite() {
 }
 
 func (s *GeneratorTestSuite) TearDownSuite() {
-	if s.cloned {
-		err := os.RemoveAll(s.tmpLinguist)
-		if err != nil {
-			s.T().Logf("Failed to clean up %s after the test.\n", s.tmpLinguist)
-		}
+	if s.isCleanupNeeded {
+		err := os.RemoveAll(s.tmpLinguistDir)
+		assert.NoError(s.T(), err)
 	}
 }
 
@@ -331,7 +333,7 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 
 func (s *GeneratorTestSuite) TestTokenizerOnATS() {
 	const suspiciousSample = "samples/ATS/csv_parse.hats"
-	sFile := filepath.Join(s.tmpLinguist, suspiciousSample)
+	sFile := filepath.Join(s.tmpLinguistDir, suspiciousSample)
 	content, err := ioutil.ReadFile(sFile)
 	require.NoError(s.T(), err)
 
