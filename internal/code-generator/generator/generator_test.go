@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-enry/go-enry/v2/internal/code-generator/generator/diff"
 	"github.com/go-enry/go-enry/v2/internal/tokenizer"
 
 	"github.com/stretchr/testify/assert"
@@ -327,7 +326,7 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 		// assert.Equal(s.T(), expected, actual, "Test %s", test.name)
 		if expected != actual {
 			assert.Fail(s.T(), fmt.Sprintf("%s output is different from %q", test.name, test.wantOut))
-			diff, err := diff.Diff(gold, out)
+			diff, err := text_diff(gold, out)
 			if err != nil {
 				s.T().Logf("Failed produce a diff between expected and actual: %s", err.Error())
 				s.T().Logf("Expected %q", expected[:400])
