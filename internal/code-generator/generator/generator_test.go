@@ -2,6 +2,7 @@ package generator
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -321,11 +322,17 @@ func (s *GeneratorTestSuite) TestGenerationFiles() {
 
 		expected := normalizeSpaces(string(gold))
 		actual := normalizeSpaces(string(out))
-		assert.Equal(s.T(), expected, actual, "Test %s", test.name)
+		// this produces large unreadable output, so we do it 'manually' instead
+		// assert.Equal(s.T(), expected, actual, "Test %s", test.name)
 		if expected != actual {
-			s.T().Logf("%s generated is different from %q", test.name, test.wantOut)
-			s.T().Logf("Expected %q", expected[:400])
-			s.T().Logf("Actual %q", actual[:400])
+			assert.Fail(s.T(), fmt.Sprintf("%s output is different from %q", test.name, test.wantOut))
+			diff, err := text_diff(gold, out)
+			if err != nil {
+				s.T().Logf("Failed produce a diff between expected and actual: %s", err.Error())
+				s.T().Logf("Expected %q", expected[:400])
+				s.T().Logf("Actual %q", actual[:400])
+			}
+			s.T().Logf("\n%s", diff)
 		}
 
 	}
