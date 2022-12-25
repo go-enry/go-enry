@@ -47,6 +47,6 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Test
-      run: go test ./...
+      run: go test -tags ${GO_TAGS} ./...
       env:
         GO_TAGS: oniguruma
