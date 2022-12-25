@@ -70,25 +70,24 @@ func loadRule(namedPatterns map[string]StringArray, rule *Rule) *LanguagePattern
 			subp := loadRule(namedPatterns, r)
 			subPatterns = append(subPatterns, subp)
 		}
-		result = &LanguagePattern{"And", rule.Languages, "", subPatterns}
+		result = &LanguagePattern{"And", rule.Languages, "", subPatterns, true}
 	} else if len(rule.Pattern) != 0 { // OrPattern
-		conjunction := strings.Join(rule.Pattern, orPipe)
-		pattern := convertToValidRegexp(conjunction)
-		result = &LanguagePattern{"Or", rule.Languages, pattern, nil}
+		pattern := strings.Join(rule.Pattern, orPipe)
+		// TODO(bzz): handle len(Languages)==0 better e.g. by emiting rule.Rule
+		// instead of an ugly `rule.Or( rule.MatchingLanguages(""), ... )`
+		result = &LanguagePattern{"Or", rule.Languages, pattern, nil, isRE2(pattern)}
 	} else if rule.NegativePattern != "" { // NotPattern
-		pattern := convertToValidRegexp(rule.NegativePattern)
-		result = &LanguagePattern{"Not", rule.Languages, pattern, nil}
+		pattern := rule.NegativePattern
+		result = &LanguagePattern{"Not", rule.Languages, pattern, nil, isRE2(pattern)}
 	} else if rule.NamedPattern != "" { // Named OrPattern
-		conjunction := strings.Join(namedPatterns[rule.NamedPattern], orPipe)
-		pattern := convertToValidRegexp(conjunction)
-		result = &LanguagePattern{"Or", rule.Languages, pattern, nil}
+		pattern := strings.Join(namedPatterns[rule.NamedPattern], orPipe)
+		result = &LanguagePattern{"Or", rule.Languages, pattern, nil, isRE2(pattern)}
 	} else { // AlwaysPattern
-		result = &LanguagePattern{"Always", rule.Languages, "", nil}
+		result = &LanguagePattern{"Always", rule.Languages, "", nil, true}
 	}
 
-	if isUnsupportedRegexpSyntax(result.Pattern) {
-		log.Printf("skipping rule: language:'%q', rule:'%q'\n", rule.Languages, result.Pattern)
-		return nil
+	if !isRE2(result.Pattern) {
+		log.Printf("RE2 incompatible rule: language:'%q', rule:'%q'\n", rule.Languages, result.Pattern)
 	}
 	return result
 }
@@ -100,6 +99,7 @@ type LanguagePattern struct {
 	Langs   []string
 	Pattern string
 	Rules   []*LanguagePattern
+	IsRE2   bool
 }
 
 type Heuristics struct {
@@ -125,7 +125,7 @@ type Patterns struct {
 }
 
 // StringArray is workaround for parsing named_pattern,
-// wich is sometimes arry and sometimes not.
+// wich is sometimes an array and sometimes is not.
 // See https://github.com/go-yaml/yaml/issues/100
 type StringArray []string
 
@@ -173,8 +173,6 @@ func isUnsupportedRegexpSyntax(reg string) bool {
 		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
 }
 
-// convertToValidRegexp converts Ruby regexp syntax to RE2 equivalent.
-// Does not work with Ruby regexp literals.
-func convertToValidRegexp(rubyRegexp string) string {
-	return multilinePrefix + rubyRegexp
+func isRE2(s string) bool {
+	return !isUnsupportedRegexpSyntax(s)
 }
