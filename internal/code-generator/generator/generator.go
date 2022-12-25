@@ -40,25 +40,20 @@ func executeTemplate(w io.Writer, name, path, commit string, fmap template.FuncM
 		val = strings.ReplaceAll(val, "`", "`+\"`\"+`")
 		return fmt.Sprintf("`%s`", val)
 	}
-
-	const headerTmpl = "header.go.tmpl"
-	headerPath := filepath.Join(filepath.Dir(path), headerTmpl)
-
-	h := template.Must(template.New(headerTmpl).Funcs(template.FuncMap{
-		"getCommit": getCommit,
-		"stringVal": stringVal,
-	}).ParseFiles(headerPath))
-
-	buf := bytes.NewBuffer(nil)
-	if err := h.Execute(buf, data); err != nil {
-		return err
-	}
-
 	if fmap == nil {
 		fmap = make(template.FuncMap)
 	}
 	fmap["getCommit"] = getCommit
 	fmap["stringVal"] = stringVal
+
+	const headerTmpl = "header.go.tmpl"
+	headerPath := filepath.Join(filepath.Dir(path), headerTmpl)
+
+	h := template.Must(template.New(headerTmpl).Funcs(fmap).ParseFiles(headerPath))
+	buf := bytes.NewBuffer(nil)
+	if err := h.Execute(buf, data); err != nil {
+		return err
+	}
 
 	t := template.Must(template.New(name).Funcs(fmap).ParseFiles(path))
 	if err := t.Execute(buf, data); err != nil {
