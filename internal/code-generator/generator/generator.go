@@ -45,6 +45,7 @@ func executeTemplate(w io.Writer, name, path, commit string, fmap template.FuncM
 	}
 	fmap["getCommit"] = getCommit
 	fmap["stringVal"] = stringVal
+	fmap["isRE2"] = isRE2
 
 	const headerTmpl = "header.go.tmpl"
 	headerPath := filepath.Join(filepath.Dir(path), headerTmpl)

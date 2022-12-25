@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"sort"
 	"strings"
 	"text/template"
@@ -23,6 +24,12 @@ func Vendor(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string)
 	var regexps []string
 	if err := yaml.Unmarshal(data, &regexps); err != nil {
 		return fmt.Errorf("failed to parse YAML %s, %q", fileToParse, err)
+	}
+
+	for _, re := range regexps {
+		if !isRE2(re) {
+			log.Printf("RE2 incompatible syntax for vendor:'%s'\n", re)
+		}
 	}
 
 	buf := &bytes.Buffer{}
@@ -84,6 +91,9 @@ func collateAllMatchers(regexps []string) string {
 	var caretPrefixed, caretOrSlashPrefixed, theRest []string
 	// Check prefix, add to the respective group slices
 	for _, re := range regexps {
+		if !isRE2(re) {
+			continue
+		}
 		if strings.HasPrefix(re, caret) {
 			caretPrefixed = append(caretPrefixed, re[len(caret):])
 		} else if strings.HasPrefix(re, caretOrSlash) {

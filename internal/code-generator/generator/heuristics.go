@@ -90,7 +90,7 @@ func loadRule(namedPatterns map[string]StringArray, rule *Rule) *LanguagePattern
 	}
 
 	if !isRE2(result.Pattern) {
-		log.Printf("RE2 incompatible rule: language:'%s', rule:'%s'\n", rule.Languages, result.Pattern)
+		log.Printf("RE2 incompatible syntax for heuristic language:'%s', rule:'%s'\n", rule.Languages, result.Pattern)
 	}
 	return result
 }
