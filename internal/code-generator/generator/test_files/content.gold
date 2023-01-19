@@ -650,15 +650,15 @@ var ContentHeuristics = map[string]*Heuristics{
 	".bf": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Beef"),
-			regexp.MustCompile(`(?m)(?-m)^\s*using\s+(System|Beefy)(\.(.*))?;\s*$`),
+			regex.MustCompileMultiline(`(?-m)^\s*using\s+(System|Beefy)(\.(.*))?;\s*$`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("HyPhy"),
-			regexp.MustCompile(`(?m)(?-m)^\s*#include\s+".*";\s*$|\sfprintf\s*\(`),
+			regex.MustCompileMultiline(`(?-m)^\s*#include\s+".*";\s*$|\sfprintf\s*\(`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Brainfuck"),
-			regexp.MustCompile(`(?m)(>\+>|>\+<)`),
+			regex.MustCompileMultiline(`(>\+>|>\+<)`),
 		),
 	},
 	".bi": &Heuristics{
@@ -726,7 +726,7 @@ var ContentHeuristics = map[string]*Heuristics{
 		),
 		rule.Or(
 			rule.MatchingLanguages("C#"),
-			regex.MustCompileMultiline(`^(\s*namespace\s*[\w\.]+\s*{|\s*\/\/)`),
+			regex.MustCompileMultiline(`^\s*(using\s+[A-Z][\s\w.]+;|namespace\s*[\w\.]+\s*({|;)|\/\/)`),
 		),
 	},
 	".csc": &Heuristics{
@@ -881,11 +881,11 @@ var ContentHeuristics = map[string]*Heuristics{
 	".g": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("GAP"),
-			regexp.MustCompile(`(?m)\s*(Declare|BindGlobal|KeyDependentOperation|Install(Method|GlobalFunction)|SetPackageInfo)`),
+			regex.MustCompileMultiline(`\s*(Declare|BindGlobal|KeyDependentOperation|Install(Method|GlobalFunction)|SetPackageInfo)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("G-code"),
-			regexp.MustCompile(`(?m)^[MG][0-9]+\n`),
+			regex.MustCompileMultiline(`^[MG][0-9]+\n`),
 		),
 	},
 	".gd": &Heuristics{
@@ -1380,7 +1380,7 @@ var ContentHeuristics = map[string]*Heuristics{
 		),
 		rule.Or(
 			rule.MatchingLanguages("IDL"),
-			regex.MustCompileMultiline(`^\s*function[ \w,]+$`),
+			regex.MustCompileMultiline(`^\s*(?i:function|pro|compile_opt) \w[ \w,:]*$`),
 		),
 	},
 	".properties": &Heuristics{
@@ -1513,11 +1513,11 @@ var ContentHeuristics = map[string]*Heuristics{
 	".scd": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("SuperCollider"),
-			regexp.MustCompile(`(?m)(?i:\^(this|super)\.|^\s*(~\w+\s*=\.|SynthDef\b))`),
+			regex.MustCompileMultiline(`(?i:\^(this|super)\.|^\s*(~\w+\s*=\.|SynthDef\b))`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Markdown"),
-			regexp.MustCompile(`(?m)^#+\s+(NAME|SYNOPSIS|DESCRIPTION)`),
+			regex.MustCompileMultiline(`^#+\s+(NAME|SYNOPSIS|DESCRIPTION)`),
 		),
 	},
 	".sol": &Heuristics{
@@ -1599,7 +1599,7 @@ var ContentHeuristics = map[string]*Heuristics{
 	".tag": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Java Server Pages"),
-			regexp.MustCompile(`(?m)<%[@!=\s]?\s*(taglib|tag|include|attribute|variable)\s`),
+			regex.MustCompileMultiline(`<%[@!=\s]?\s*(taglib|tag|include|attribute|variable)\s`),
 		),
 	},
 	".toc": &Heuristics{
@@ -1644,6 +1644,28 @@ var ContentHeuristics = map[string]*Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Vim Help File"),
 			regex.MustCompileRuby(`(?:(?:^|[ \t])(?:vi|Vi(?=m))(?:m[<=>]?[0-9]+|m)?|[ \t]ex)(?=:(?=[ \t]*set?[ \t][^\r\n:]+:)|:(?![ \t]*set?[ \t]))(?:(?:[ \t]*:[ \t]*|[ \t])\w*(?:[ \t]*=(?:[^\\\s]|\\.)*)?)*[ \t:](?:filetype|ft|syntax)[ \t]*=(help)(?=$|\s|:)`),
+		),
+		rule.Or(
+			rule.MatchingLanguages("Adblock Filter List"),
+			regex.MustCompileRuby(`(?x)\A
+\[
+(?<version>
+  (?:
+    [Aa]d[Bb]lock
+    (?:[ \t][Pp]lus)?
+    |
+    u[Bb]lock
+    (?:[ \t][Oo]rigin)?
+    |
+    [Aa]d[Gg]uard
+  )
+  (?:[ \t] \d+(?:\.\d+)*+)?
+)
+(?:
+  [ \t]?;[ \t]?
+  \g<version>
+)*+
+\]`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Text"),
