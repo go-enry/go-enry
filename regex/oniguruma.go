@@ -7,6 +7,8 @@ import (
 	rubex "github.com/go-enry/go-oniguruma"
 )
 
+const Name = Oniguruma
+
 type EnryRegexp = *rubex.Regexp
 
 func MustCompile(s string) EnryRegexp {

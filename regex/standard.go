@@ -7,6 +7,8 @@ import (
 	"regexp"
 )
 
+const Name = RE2
+
 type EnryRegexp = *regexp.Regexp
 
 func MustCompile(str string) EnryRegexp {
@@ -21,9 +23,13 @@ func MustCompileMultiline(s string) EnryRegexp {
 }
 
 // MustCompileRuby used for expressions with syntax not supported by RE2.
+// Now it's confusing as we use the result as [data/rule.Matcher] and
+//
+//	(*Matcher)(nil) != nil
+//
+// What is a better way for an expression to indicate unsupported syntax?
+// e.g. add .IsValidSyntax() to both, Matcher interface and EnryRegexp implementations?
 func MustCompileRuby(s string) EnryRegexp {
-	// TODO(bzz): find a bettee way?
-	// This will only trigger a panic on .Match() for the clients
 	return nil
 }
 

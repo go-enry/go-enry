@@ -72,9 +72,12 @@ func loadRule(namedPatterns map[string]StringArray, rule *Rule) *LanguagePattern
 		}
 		result = &LanguagePattern{"And", rule.Languages, "", subPatterns, true}
 	} else if len(rule.Pattern) != 0 { // OrPattern
+		// FIXME(bzz): this optimization should only be applied if each pattern isRE2!
 		pattern := strings.Join(rule.Pattern, orPipe)
-		// TODO(bzz): handle len(Languages)==0 better e.g. by emiting rule.Rule
-		// instead of an ugly `rule.Or( rule.MatchingLanguages(""), ... )`
+
+		// TODO(bzz): handle the common case Or(len(Languages)==0) better
+		// e.g. by emiting `rule.Rule(...)` instead of
+		// an (ugly) `rule.Or( rule.MatchingLanguages(""), ... )`
 		result = &LanguagePattern{"Or", rule.Languages, pattern, nil, isRE2(pattern)}
 	} else if rule.NegativePattern != "" { // NotPattern
 		pattern := rule.NegativePattern
@@ -87,7 +90,7 @@ func loadRule(namedPatterns map[string]StringArray, rule *Rule) *LanguagePattern
 	}
 
 	if !isRE2(result.Pattern) {
-		log.Printf("RE2 incompatible rule: language:'%q', rule:'%q'\n", rule.Languages, result.Pattern)
+		log.Printf("RE2 incompatible rule: language:'%s', rule:'%s'\n", rule.Languages, result.Pattern)
 	}
 	return result
 }

@@ -3,6 +3,15 @@
 // with colliding extensions, based on regexps from Linguist data.
 package rule
 
+import "github.com/go-enry/go-enry/v2/regex"
+
+// Matcher checks if the data matches (number of) pattern(s).
+// Every heuristic rule below implements this interface.
+// A regexp.Regexp satisfies this interface and can be used instead.
+type Matcher interface {
+	Match(data []byte) bool
+}
+
 // Heuristic consist of (a number of) rules where each, if matches,
 // identifies content as belonging to a programming language(s).
 type Heuristic interface {
@@ -10,15 +19,7 @@ type Heuristic interface {
 	Languages() []string
 }
 
-// Matcher checks if the data matches (number of) pattern.
-// Every heuristic rule below implements this interface.
-// A regexp.Regexp satisfies this interface and can be used instead.
-type Matcher interface {
-	Match(data []byte) bool
-}
-
-// languages struct incapsulate data common to every Matcher: all languages
-// that it identifies.
+// languages base struct with all the languages that a Matcher identifies.
 type languages struct {
 	langs []string
 }
@@ -33,6 +34,10 @@ func MatchingLanguages(langs ...string) languages {
 	return languages{langs}
 }
 
+func noLanguages() languages {
+	return MatchingLanguages([]string{}...)
+}
+
 // Implements a Heuristic.
 type or struct {
 	languages
@@ -40,14 +45,19 @@ type or struct {
 }
 
 // Or rule matches, if a single matching pattern exists.
-// It receives only one pattern as it relies on compile-time optimization that
-// represtes union with | inside a single regexp.
-func Or(l languages, r Matcher) Heuristic {
-	return or{l, r}
+// It receives only one pattern as it relies on optimization that
+// represtes union with | inside a single regexp during code generation.
+func Or(l languages, p Matcher) Heuristic {
+	//FIXME(bzz): this will not be the case as only some of the patterns may
+	// be non-RE2 => we shouldn't collate them not to loose the (accuracty of) whole rule
+	return or{l, p}
 }
 
 // Match implements rule.Matcher.
 func (r or) Match(data []byte) bool {
+	if runOnRE2AndRegexNotAccepted(r.pattern) {
+		return false
+	}
 	return r.pattern.Match(data)
 }
 
@@ -65,6 +75,9 @@ func And(l languages, m ...Matcher) Heuristic {
 // Match implements data.Matcher.
 func (r and) Match(data []byte) bool {
 	for _, p := range r.patterns {
+		if runOnRE2AndRegexNotAccepted(p) {
+			continue
+		}
 		if !p.Match(data) {
 			return false
 		}
@@ -86,6 +99,9 @@ func Not(l languages, r ...Matcher) Heuristic {
 // Match implements data.Matcher.
 func (r not) Match(data []byte) bool {
 	for _, p := range r.Patterns {
+		if runOnRE2AndRegexNotAccepted(p) {
+			continue
+		}
 		if p.Match(data) {
 			return false
 		}
@@ -106,4 +122,10 @@ func Always(l languages) Heuristic {
 // Match implements Matcher.
 func (r always) Match(data []byte) bool {
 	return true
+}
+
+// checks if regular expression syntax isn't accepted by RE2 engine
+func runOnRE2AndRegexNotAccepted(re Matcher) bool {
+	v, ok := re.(regex.EnryRegexp)
+	return ok && v == nil
 }
