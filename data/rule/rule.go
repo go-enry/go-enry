@@ -124,7 +124,9 @@ func (r always) Match(data []byte) bool {
 	return true
 }
 
-// checks if regular expression syntax isn't accepted by RE2 engine
+// Checks if a regex syntax isn't accepted by RE2 engine.
+// It's nil by construction from regex.MustCompileRuby but
+// is used here as a Matcher interface wich itself is non-nil.
 func runOnRE2AndRegexNotAccepted(re Matcher) bool {
 	v, ok := re.(regex.EnryRegexp)
 	return ok && v == nil
