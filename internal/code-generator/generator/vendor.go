@@ -41,33 +41,13 @@ func Vendor(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string)
 }
 
 func executeVendorTemplate(out io.Writer, regexps []string, tmplPath, tmplName, commit string) error {
-	funcs := template.FuncMap{"optimize": collateAllMatchers}
+	funcs := template.FuncMap{"collateAllRegexps": collateAllRegexps}
 	return executeTemplate(out, tmplName, tmplPath, commit, funcs, regexps)
 }
 
-func collateAllMatchers(regexps []string) string {
-	// We now collate all regexps from VendorMatchers to a single large regexp
+// collateAllRegexps all regexps to a single large regexp.
+func collateAllRegexps(regexps []string) string {
 	// which is at least twice as fast to test than simply iterating & matching.
-	//
-	// ---
-	//
-	// We could test each matcher from VendorMatchers in turn i.e.
-	//
-	//  	func IsVendor(filename string) bool {
-	// 			for _, matcher := range data.VendorMatchers {
-	// 				if matcher.MatchString(filename) {
-	//					return true
-	//				}
-	//			}
-	//			return false
-	//		}
-	//
-	// Or naïvely concatentate all these regexps using groups i.e.
-	//
-	//		`(regexp1)|(regexp2)|(regexp3)|...`
-	//
-	// However, both of these are relatively slow and don't take advantage
-	// of the inherent structure within our regexps.
 	//
 	// Imperical observation: by looking at the regexps, we only have 3 types.
 	//  1. Those that start with `^`
@@ -88,12 +68,9 @@ func collateAllMatchers(regexps []string) string {
 
 	sort.Strings(regexps)
 
+	// Check prefix, group expressions
 	var caretPrefixed, caretOrSlashPrefixed, theRest []string
-	// Check prefix, add to the respective group slices
 	for _, re := range regexps {
-		if !isRE2(re) {
-			continue
-		}
 		if strings.HasPrefix(re, caret) {
 			caretPrefixed = append(caretPrefixed, re[len(caret):])
 		} else if strings.HasPrefix(re, caretOrSlash) {
@@ -102,6 +79,7 @@ func collateAllMatchers(regexps []string) string {
 			theRest = append(theRest, re)
 		}
 	}
+
 	var sb strings.Builder
 	appendGroupWithCommonPrefix(&sb, "^", caretPrefixed)
 	sb.WriteString("|")

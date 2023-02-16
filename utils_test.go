@@ -7,57 +7,62 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/go-enry/go-enry/v2/regex"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-//TODO(bzz): port all from test/test_file_blob.rb test_vendored()
-//https://github.com/github/linguist/blob/86adc140d3e8903980565a2984f5532edf4ae875/test/test_file_blob.rb#L270-L583
+// TODO(bzz): port all from test/test_file_blob.rb test_vendored()
+// https://github.com/github/linguist/blob/86adc140d3e8903980565a2984f5532edf4ae875/test/test_file_blob.rb#L270-L583
 var vendorTests = []struct {
-	path     string
-	expected bool
+	skipOnRE2 bool // some rules are (present in code but) missing at runtime on RE2
+	path      string
+	expected  bool
 }{
-	{"cache/", true},
-	{"something_cache/", false},
-	{"random/cache/", true},
-	{"cache", false},
-	{"dependencies/", true},
-	{"Dependencies/", true},
-	{"dependency/", false},
-	{"dist/", true},
-	{"dist", false},
-	{"random/dist/", true},
-	{"random/dist", false},
-	{"deps/", true},
-	{"foodeps/", false},
-	{"configure", true},
-	{"a/configure", true},
-	{"config.guess", true},
-	{"config.guess/", false},
-	{".vscode/", true},
-	{"doc/_build/", true},
-	{"a/docs/_build/", true},
-	{"a/dasdocs/_build-vsdoc.js", true},
-	{"a/dasdocs/_build-vsdoc.j", false},
-	{"foo/bar", false},
-	{".sublime-project", true},
-	{"foo/vendor/foo", true},
-	{"leaflet.draw-src.js", true},
-	{"foo/bar/MochiKit.js", true},
-	{"foo/bar/dojo.js", true},
-	{"foo/env/whatever", true},
-	{"some/python/venv/", false},
-	{"foo/.imageset/bar", true},
-	{"Vagrantfile", true},
-	{"src/bootstrap-custom.js", true},
-	// {"/css/bootstrap.rtl.css", true}, // from linguist v7.23
+	{path: "cache/", expected: true},
+	{false, "something_cache/", false},
+	{false, "random/cache/", true},
+	{false, "cache", false},
+	{false, "dependencies/", true},
+	{false, "Dependencies/", true},
+	{false, "dependency/", false},
+	{false, "dist/", true},
+	{false, "dist", false},
+	{false, "random/dist/", true},
+	{false, "random/dist", false},
+	{false, "deps/", true},
+	{false, "foodeps/", false},
+	{false, "configure", true},
+	{false, "a/configure", true},
+	{false, "config.guess", true},
+	{false, "config.guess/", false},
+	{false, ".vscode/", true},
+	{false, "doc/_build/", true},
+	{false, "a/docs/_build/", true},
+	{false, "a/dasdocs/_build-vsdoc.js", true},
+	{false, "a/dasdocs/_build-vsdoc.j", false},
+	{false, "foo/bar", false},
+	{false, ".sublime-project", true},
+	{false, "foo/vendor/foo", true},
+	{false, "leaflet.draw-src.js", true},
+	{false, "foo/bar/MochiKit.js", true},
+	{false, "foo/bar/dojo.js", true},
+	{false, "foo/env/whatever", true},
+	{false, "some/python/venv/", false},
+	{false, "foo/.imageset/bar", true},
+	{false, "Vagrantfile", true},
+	{true, "src/bootstrap-custom.js", true},
+	// {true, "/css/bootstrap.rtl.css", true}, // from linguist v7.23
 }
 
 func TestIsVendor(t *testing.T) {
-	for _, tt := range vendorTests {
-		t.Run(tt.path, func(t *testing.T) {
-			if got := IsVendor(tt.path); got != tt.expected {
-				t.Errorf("IsVendor(%q) = %v, expected %v", tt.path, got, tt.expected)
+	for _, test := range vendorTests {
+		t.Run(test.path, func(t *testing.T) {
+			if got := IsVendor(test.path); got != test.expected {
+				if regex.Name == regex.RE2 && test.skipOnRE2 {
+					return // skip
+				}
+				t.Errorf("IsVendor(%q) = %v, expected %v (usuing %s)", test.path, got, test.expected, regex.Name)
 			}
 		})
 	}

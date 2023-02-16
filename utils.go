@@ -63,7 +63,21 @@ func IsDotFile(path string) bool {
 
 // IsVendor returns whether or not path is a vendor path.
 func IsVendor(path string) bool {
-	return data.FastVendorMatcher.MatchString(path)
+	// fast path: single collatated regex, if the engine supports its syntax
+	if data.FastVendorMatcher != nil {
+		return data.FastVendorMatcher.MatchString(path)
+	}
+
+	// slow path: skip individual rules with unsupported syntax
+	for _, matcher := range data.VendorMatchers {
+		if matcher == nil {
+			continue
+		}
+		if matcher.MatchString(path) {
+			return true
+		}
+	}
+	return false
 }
 
 // IsTest returns whether or not path is a test path.
