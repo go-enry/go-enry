@@ -656,6 +656,7 @@ var LanguagesByExtension = map[string][]string{
 	".mjml":                {"XML"},
 	".mjs":                 {"JavaScript"},
 	".mk":                  {"Makefile"},
+	".markdown":            {"Markdown"},
 	".mkd":                 {"Markdown"},
 	".mkdn":                {"Markdown"},
 	".mkdown":              {"Markdown"},
