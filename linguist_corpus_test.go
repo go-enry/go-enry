@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/go-enry/go-enry/v2/data"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -45,25 +44,23 @@ func (s *linguistCorpusSuite) TestLinguistSamples() {
 		content, _ := ioutil.ReadFile(path)
 
 		total++
-		obtained := GetLanguage(filename, content)
-		if obtained == OtherLanguage {
-			obtained = "Other"
+		got := GetLanguage(filename, content)
+		if got == OtherLanguage {
+			got = "Other"
 			other++
 		}
 
-		var status string
-		if expected == obtained {
-			status = "ok"
+		if expected == got {
 			ok++
 		} else {
-			status = "failed"
 			failed++
 		}
 
+		errMsg := fmt.Sprintf("file: %q\texpected: %q\tgot: %q\n", path, expected, got)
 		if _, ok := cornerCases[filename]; ok {
-			s.T().Logf("\t\t[considered corner case] %s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status)
+			s.T().Logf(fmt.Sprintf("\t\t[corner case] %s", errMsg))
 		} else {
-			assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status))
+			s.Equal(expected, got, errMsg)
 		}
 		return nil
 	})
