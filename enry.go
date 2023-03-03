@@ -1,15 +1,15 @@
 /*
-	Package enry implements multiple strategies for programming language identification.
+Package enry identifies programming languages.
 
-	Identification is made based on file name and file content using a service
-	of strategies to narrow down possible option.
-	Each strategy is available as a separate API call, as well as a main enty point
+Identification is based on file name and content using a series
+of strategies to narrow down possible options.
+Each strategy is available as a separate API call, as well as though the main enty point:
 
-		GetLanguage(filename string, content []byte) (language string)
+	GetLanguage(filename string, content []byte) (language string)
 
-	It is a port of the https://github.com/github/linguist from Ruby.
-	Upstream Linguist YAML files are used to generate datastructures for data
-	package.
+It is a port of the https://github.com/github/linguist from Ruby.
+Upstream Linguist YAML files are used to generate datastructures for data
+package.
 */
 package enry // import "github.com/go-enry/go-enry/v2"
 

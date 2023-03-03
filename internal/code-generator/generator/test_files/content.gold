@@ -4,9 +4,8 @@
 package data
 
 import (
-	"regexp"
-
 	"github.com/go-enry/go-enry/v2/data/rule"
+	"github.com/go-enry/go-enry/v2/regex"
 )
 
 var ContentHeuristics = map[string]*Heuristics{
@@ -15,31 +14,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".1in": &Heuristics{
@@ -47,26 +46,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -78,26 +77,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -109,26 +108,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -140,31 +139,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".3": &Heuristics{
@@ -172,31 +171,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".3in": &Heuristics{
@@ -204,26 +203,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -235,26 +234,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -266,26 +265,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -297,26 +296,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -328,26 +327,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -359,26 +358,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -390,31 +389,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".5": &Heuristics{
@@ -422,31 +421,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".6": &Heuristics{
@@ -454,31 +453,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".7": &Heuristics{
@@ -486,31 +485,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".8": &Heuristics{
@@ -518,31 +517,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".9": &Heuristics{
@@ -550,31 +549,31 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
+			regex.MustCompileMultiline(`^\.(?:[A-Za-z]{2}(?:\s|$)|\\")`),
 		),
 	},
 	".al": &Heuristics{
@@ -582,38 +581,43 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("AL"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)\b(?i:(CODEUNIT|PAGE|PAGEEXTENSION|PAGECUSTOMIZATION|DOTNET|ENUM|ENUMEXTENSION|VALUE|QUERY|REPORT|TABLE|TABLEEXTENSION|XMLPORT|PROFILE|CONTROLADDIN))\b`),
+				regex.MustCompileMultiline(`\b(?i:(CODEUNIT|PAGE|PAGEEXTENSION|PAGECUSTOMIZATION|DOTNET|ENUM|ENUMEXTENSION|VALUE|QUERY|REPORT|TABLE|TABLEEXTENSION|XMLPORT|PROFILE|CONTROLADDIN))\b`),
 			),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Perl"),
 		),
 	},
-	".as": &Heuristics{},
+	".as": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("ActionScript"),
+			regex.MustCompileRuby(`^\s*(?:package(?:\s+[\w.]+)?\s+(?:{|$)|import\s+[\w.*]+\s*;|(?=.*?(?:intrinsic|extends))(intrinsic\s+)?class\s+[\w<>.]+(?:\s+extends\s+[\w<>.]+)?|(?:(?:public|protected|private|static)\s+)*(?:(?:var|const|local)\s+\w+\s*:\s*[\w<>.]+(?:\s*=.*)?\s*;|function\s+\w+\s*\((?:\s*\w+\s*:\s*[\w<>.]+\s*(,\s*\w+\s*:\s*[\w<>.]+\s*)*)?\)))`),
+		),
+	},
 	".asc": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Public Key"),
-			regexp.MustCompile(`(?m)^(----[- ]BEGIN|ssh-(rsa|dss)) `),
+			regex.MustCompileMultiline(`^(----[- ]BEGIN|ssh-(rsa|dss)) `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("AsciiDoc"),
-			regexp.MustCompile(`(?m)^[=-]+(\s|\n)|{{[A-Za-z]`),
+			regex.MustCompileMultiline(`^[=-]+(\s|\n)|{{[A-Za-z]`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("AGS Script"),
-			regexp.MustCompile(`(?m)^(\/\/.+|((import|export)\s+)?(function|int|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)\s*[;\(])`),
+			regex.MustCompileMultiline(`^(\/\/.+|((import|export)\s+)?(function|int|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)\s*[;\(])`),
 		),
 	},
 	".asm": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Motorola 68K Assembly"),
-			regexp.MustCompile(`(?m)(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
+			regex.MustCompileMultiline(`(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
 		),
 	},
 	".asy": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("LTspice Symbol"),
-			regexp.MustCompile(`(?m)^SymbolType[ \t]`),
+			regex.MustCompileMultiline(`^SymbolType[ \t]`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Asymptote"),
@@ -622,193 +626,211 @@ var ContentHeuristics = map[string]*Heuristics{
 	".bas": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("FreeBasic"),
-			regexp.MustCompile(`(?m)^[ \t]*#(?:define|endif|endmacro|ifn?def|if|include|lang|macro)\s`),
+			regex.MustCompileMultiline(`^[ \t]*#(?:define|endif|endmacro|ifn?def|if|include|lang|macro)\s`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("BASIC"),
-			regexp.MustCompile(`(?m)^\s*\d+`),
+			regex.MustCompileMultiline(`^\s*\d+`),
 		),
 	},
 	".bb": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("BlitzBasic"),
-			regexp.MustCompile(`(?m)(<^\s*; |End Function)`),
+			regex.MustCompileMultiline(`(<^\s*; |End Function)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("BitBake"),
-			regexp.MustCompile(`(?m)^\s*(# |include|require)\b`),
+			regex.MustCompileMultiline(`^\s*(# |include|require)\b`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Clojure"),
-			regexp.MustCompile(`(?m)\((def|defn|defmacro|let)\s`),
+			regex.MustCompileMultiline(`\((def|defn|defmacro|let)\s`),
 		),
 	},
 	".bi": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("FreeBasic"),
-			regexp.MustCompile(`(?m)^[ \t]*#(?:define|endif|endmacro|ifn?def|if|include|lang|macro)\s`),
+			regex.MustCompileMultiline(`^[ \t]*#(?:define|endif|endmacro|ifn?def|if|include|lang|macro)\s`),
 		),
 	},
-	".bs": &Heuristics{},
+	".bs": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("Bikeshed"),
+			regex.MustCompileRuby(`^(?i:<pre\s+class)\s*=\s*('|\"|\b)metadata\b\1[^>\r\n]*>`),
+		),
+		rule.Or(
+			rule.MatchingLanguages("BrighterScript"),
+			regex.MustCompileRuby(`(?i:^\s*(?=^sub\s)(?:sub\s*\w+\(.*?\))|(?::\s*sub\(.*?\))$)|(?i:^\s*(end\ssub)$)|(?i:^\s*(?=^function\s)(?:function\s*\w+\(.*?\)\s*as\s*\w*)|(?::\s*function\(.*?\)\s*as\s*\w*)$)|(?i:^\s*(end\sfunction)$)`),
+		),
+	},
 	".builds": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)^(\s*)(?i:<Project|<Import|<Property|<?xml|xmlns)`),
+			regex.MustCompileMultiline(`^(\s*)(?i:<Project|<Import|<Property|<?xml|xmlns)`),
 		),
 	},
 	".ch": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("xBase"),
-			regexp.MustCompile(`(?m)^\s*#\s*(?i:if|ifdef|ifndef|define|command|xcommand|translate|xtranslate|include|pragma|undef)\b`),
+			regex.MustCompileMultiline(`^\s*#\s*(?i:if|ifdef|ifndef|define|command|xcommand|translate|xtranslate|include|pragma|undef)\b`),
 		),
 	},
 	".cl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Common Lisp"),
-			regexp.MustCompile(`(?m)^\s*\((?i:defun|in-package|defpackage) `),
+			regex.MustCompileMultiline(`^\s*\((?i:defun|in-package|defpackage) `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Cool"),
-			regexp.MustCompile(`(?m)^class`),
+			regex.MustCompileMultiline(`^class`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("OpenCL"),
-			regexp.MustCompile(`(?m)\/\* |\/\/ |^\}`),
+			regex.MustCompileMultiline(`\/\* |\/\/ |^\}`),
 		),
 	},
 	".cls": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("TeX"),
-			regexp.MustCompile(`(?m)^\s*\\(?:NeedsTeXFormat|ProvidesClass){`),
+			regex.MustCompileMultiline(`^\s*\\(?:NeedsTeXFormat|ProvidesClass){`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("ObjectScript"),
-			regexp.MustCompile(`(?m)^Class\s`),
+			regex.MustCompileMultiline(`^Class\s`),
 		),
 	},
 	".cmp": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Gerber Image"),
-			regexp.MustCompile(`(?m)^[DGMT][0-9]{2}\*\r?\n`),
+			regex.MustCompileMultiline(`^[DGMT][0-9]{2}\*\r?\n`),
 		),
 	},
 	".cs": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Smalltalk"),
-			regexp.MustCompile(`(?m)![\w\s]+methodsFor: `),
+			regex.MustCompileMultiline(`![\w\s]+methodsFor: `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("C#"),
-			regexp.MustCompile(`(?m)^(\s*namespace\s*[\w\.]+\s*{|\s*\/\/)`),
+			regex.MustCompileMultiline(`^(\s*namespace\s*[\w\.]+\s*{|\s*\/\/)`),
 		),
 	},
-	".csc": &Heuristics{},
+	".csc": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("GSC"),
+			regex.MustCompileRuby(`^\s*#\s*(?:using|insert|include|define|namespace)[ \t]+\w|^\s*(?>(?:autoexec|private)\s+){0,2}function\s+(?>(?:autoexec|private)\s+){0,2}\w+\s*\(|\b(?:level|self)[ \t]+thread[ \t]+(?:\[\[[ \t]*(?>\w+\.)*\w+[ \t]*\]\]|\w+)[ \t]*\([^\r\n\)]*\)[ \t]*;|^[ \t]*#[ \t]*(?:precache|using_animtree)[ \t]*\(`),
+		),
+	},
 	".csl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)(?i:^\s*(\<\?xml|xmlns))`),
+			regex.MustCompileMultiline(`(?i:^\s*(\<\?xml|xmlns))`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Kusto"),
-			regexp.MustCompile(`(?m)(^\|\s*(where|extend|project|limit|summarize))|(^\.\w+)`),
+			regex.MustCompileMultiline(`(^\|\s*(where|extend|project|limit|summarize))|(^\.\w+)`),
 		),
 	},
 	".d": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("D"),
-			regexp.MustCompile(`(?m)^module\s+[\w.]*\s*;|import\s+[\w\s,.:]*;|\w+\s+\w+\s*\(.*\)(?:\(.*\))?\s*{[^}]*}|unittest\s*(?:\(.*\))?\s*{[^}]*}`),
+			regex.MustCompileMultiline(`^module\s+[\w.]*\s*;|import\s+[\w\s,.:]*;|\w+\s+\w+\s*\(.*\)(?:\(.*\))?\s*{[^}]*}|unittest\s*(?:\(.*\))?\s*{[^}]*}`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("DTrace"),
-			regexp.MustCompile(`(?m)^(\w+:\w*:\w*:\w*|BEGIN|END|provider\s+|(tick|profile)-\w+\s+{[^}]*}|#pragma\s+D\s+(option|attributes|depends_on)\s|#pragma\s+ident\s)`),
+			regex.MustCompileMultiline(`^(\w+:\w*:\w*:\w*|BEGIN|END|provider\s+|(tick|profile)-\w+\s+{[^}]*}|#pragma\s+D\s+(option|attributes|depends_on)\s|#pragma\s+ident\s)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Makefile"),
-			regexp.MustCompile(`(?m)([\/\\].*:\s+.*\s\\$|: \\$|^[ %]:|^[\w\s\/\\.]+\w+\.\w+\s*:\s+[\w\s\/\\.]+\w+\.\w+)`),
+			regex.MustCompileMultiline(`([\/\\].*:\s+.*\s\\$|: \\$|^[ %]:|^[\w\s\/\\.]+\w+\.\w+\s*:\s+[\w\s\/\\.]+\w+\.\w+)`),
 		),
 	},
 	".dsp": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Microsoft Developer Studio Project"),
-			regexp.MustCompile(`(?m)# Microsoft Developer Studio Generated Build File`),
+			regex.MustCompileMultiline(`# Microsoft Developer Studio Generated Build File`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Faust"),
-			regexp.MustCompile(`(?m)\bprocess\s*[(=]|\b(library|import)\s*\(\s*"|\bdeclare\s+(name|version|author|copyright|license)\s+"`),
+			regex.MustCompileMultiline(`\bprocess\s*[(=]|\b(library|import)\s*\(\s*"|\bdeclare\s+(name|version|author|copyright|license)\s+"`),
 		),
 	},
 	".e": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("E"),
-			regexp.MustCompile(`(?m)^\s*(def|var)\s+(.+):=|^\s*(def|to)\s+(\w+)(\(.+\))?\s+{|^\s*(when)\s+(\(.+\))\s+->\s+{`),
+			regex.MustCompileMultiline(`^\s*(def|var)\s+(.+):=|^\s*(def|to)\s+(\w+)(\(.+\))?\s+{|^\s*(when)\s+(\(.+\))\s+->\s+{`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Eiffel"),
-			regexp.MustCompile(`(?m)^\s*\w+\s*(?:,\s*\w+)*[:]\s*\w+\s|^\s*\w+\s*(?:\(\s*\w+[:][^)]+\))?(?:[:]\s*\w+)?(?:--.+\s+)*\s+(?:do|local)\s|^\s*(?:across|deferred|elseif|ensure|feature|from|inherit|inspect|invariant|note|once|require|undefine|variant|when)\s*$`),
+			regex.MustCompileMultiline(`^\s*\w+\s*(?:,\s*\w+)*[:]\s*\w+\s|^\s*\w+\s*(?:\(\s*\w+[:][^)]+\))?(?:[:]\s*\w+)?(?:--.+\s+)*\s+(?:do|local)\s|^\s*(?:across|deferred|elseif|ensure|feature|from|inherit|inspect|invariant|note|once|require|undefine|variant|when)\s*$`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Euphoria"),
-			regexp.MustCompile(`(?m)^\s*namespace\s|^\s*(?:public\s+)?include\s|^\s*(?:(?:public|export|global)\s+)?(?:atom|constant|enum|function|integer|object|procedure|sequence|type)\s`),
+			regex.MustCompileMultiline(`^\s*namespace\s|^\s*(?:public\s+)?include\s|^\s*(?:(?:public|export|global)\s+)?(?:atom|constant|enum|function|integer|object|procedure|sequence|type)\s`),
 		),
 	},
 	".ecl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("ECLiPSe"),
-			regexp.MustCompile(`(?m)^[^#]+:-`),
+			regex.MustCompileMultiline(`^[^#]+:-`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("ECL"),
-			regexp.MustCompile(`(?m):=`),
+			regex.MustCompileMultiline(`:=`),
 		),
 	},
 	".es": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Erlang"),
-			regexp.MustCompile(`(?m)^\s*(?:%%|main\s*\(.*?\)\s*->)`),
+			regex.MustCompileMultiline(`^\s*(?:%%|main\s*\(.*?\)\s*->)`),
+		),
+		rule.Or(
+			rule.MatchingLanguages("JavaScript"),
+			regex.MustCompileRuby(`(?m:\/\/|("|')use strict\1|export\s+default\s|\/\*.*?\*\/)`),
 		),
 	},
 	".ex": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Elixir"),
-			regexp.MustCompile(`(?m)^\s*@moduledoc\s|^\s*(?:cond|import|quote|unless)\s|^\s*def(?:exception|impl|macro|module|protocol)[(\s]`),
+			regex.MustCompileMultiline(`^\s*@moduledoc\s|^\s*(?:cond|import|quote|unless)\s|^\s*def(?:exception|impl|macro|module|protocol)[(\s]`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Euphoria"),
-			regexp.MustCompile(`(?m)^\s*namespace\s|^\s*(?:public\s+)?include\s|^\s*(?:(?:public|export|global)\s+)?(?:atom|constant|enum|function|integer|object|procedure|sequence|type)\s`),
+			regex.MustCompileMultiline(`^\s*namespace\s|^\s*(?:public\s+)?include\s|^\s*(?:(?:public|export|global)\s+)?(?:atom|constant|enum|function|integer|object|procedure|sequence|type)\s`),
 		),
 	},
 	".f": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Forth"),
-			regexp.MustCompile(`(?m)^: `),
+			regex.MustCompileMultiline(`^: `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Filebench WML"),
-			regexp.MustCompile(`(?m)flowop`),
+			regex.MustCompileMultiline(`flowop`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Fortran"),
-			regexp.MustCompile(`(?m)^(?i:[c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`),
+			regex.MustCompileMultiline(`^(?i:[c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`),
 		),
 	},
 	".for": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Forth"),
-			regexp.MustCompile(`(?m)^: `),
+			regex.MustCompileMultiline(`^: `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Fortran"),
-			regexp.MustCompile(`(?m)^(?i:[c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`),
+			regex.MustCompileMultiline(`^(?i:[c*][^abd-z]|      (subroutine|program|end|data)\s|\s*!)`),
 		),
 	},
 	".fr": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Forth"),
-			regexp.MustCompile(`(?m)^(: |also |new-device|previous )`),
+			regex.MustCompileMultiline(`^(: |also |new-device|previous )`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Frege"),
-			regexp.MustCompile(`(?m)^\s*(import|module|package|data|type) `),
+			regex.MustCompileMultiline(`^\s*(import|module|package|data|type) `),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Text"),
@@ -817,49 +839,53 @@ var ContentHeuristics = map[string]*Heuristics{
 	".fs": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Forth"),
-			regexp.MustCompile(`(?m)^(: |new-device)`),
+			regex.MustCompileMultiline(`^(: |new-device)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("F#"),
-			regexp.MustCompile(`(?m)^\s*(#light|import|let|module|namespace|open|type)`),
+			regex.MustCompileMultiline(`^\s*(#light|import|let|module|namespace|open|type)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("GLSL"),
-			regexp.MustCompile(`(?m)^\s*(#version|precision|uniform|varying|vec[234])`),
+			regex.MustCompileMultiline(`^\s*(#version|precision|uniform|varying|vec[234])`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Filterscript"),
-			regexp.MustCompile(`(?m)#include|#pragma\s+(rs|version)|__attribute__`),
+			regex.MustCompileMultiline(`#include|#pragma\s+(rs|version)|__attribute__`),
 		),
 	},
 	".ftl": &Heuristics{
 		rule.Or(
+			rule.MatchingLanguages("FreeMarker"),
+			regex.MustCompileRuby(`^(?:<|[a-zA-Z-][a-zA-Z0-9_-]+[ \t]+\w)|\${\w+[^\n]*?}|^[ \t]*(?:<#--.*?-->|<#([a-z]+)(?=\s|>)[^>]*>.*?</#\1>|\[#--.*?--\]|\[#([a-z]+)(?=\s|\])[^\]]*\].*?\[#\2\])`),
+		),
+		rule.Or(
 			rule.MatchingLanguages("Fluent"),
-			regexp.MustCompile(`(?m)^-?[a-zA-Z][a-zA-Z0-9_-]* *=|\{\$-?[a-zA-Z][-\w]*(?:\.[a-zA-Z][-\w]*)?\}`),
+			regex.MustCompileMultiline(`^-?[a-zA-Z][a-zA-Z0-9_-]* *=|\{\$-?[a-zA-Z][-\w]*(?:\.[a-zA-Z][-\w]*)?\}`),
 		),
 	},
 	".gd": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("GAP"),
-			regexp.MustCompile(`(?m)\s*(Declare|BindGlobal|KeyDependentOperation)`),
+			regex.MustCompileMultiline(`\s*(Declare|BindGlobal|KeyDependentOperation)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("GDScript"),
-			regexp.MustCompile(`(?m)\s*(extends|var|const|enum|func|class|signal|tool|yield|assert|onready)`),
+			regex.MustCompileMultiline(`\s*(extends|var|const|enum|func|class|signal|tool|yield|assert|onready)`),
 		),
 	},
 	".gml": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)(?i:^\s*(\<\?xml|xmlns))`),
+			regex.MustCompileMultiline(`(?i:^\s*(\<\?xml|xmlns))`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Graph Modeling Language"),
-			regexp.MustCompile(`(?m)(?i:^\s*(graph|node)\s+\[$)`),
+			regex.MustCompileMultiline(`(?i:^\s*(graph|node)\s+\[$)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Gerber Image"),
-			regexp.MustCompile(`(?m)^[DGMT][0-9]{2}\*$`),
+			regex.MustCompileMultiline(`^[DGMT][0-9]{2}\*$`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Game Maker Language"),
@@ -868,27 +894,37 @@ var ContentHeuristics = map[string]*Heuristics{
 	".gs": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("GLSL"),
-			regexp.MustCompile(`(?m)^#version\s+[0-9]+\b`),
+			regex.MustCompileMultiline(`^#version\s+[0-9]+\b`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Gosu"),
-			regexp.MustCompile(`(?m)^uses (java|gw)\.`),
+			regex.MustCompileMultiline(`^uses (java|gw)\.`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Genie"),
-			regexp.MustCompile(`(?m)^\[indent=[0-9]+\]`),
+			regex.MustCompileMultiline(`^\[indent=[0-9]+\]`),
 		),
 	},
-	".gsc": &Heuristics{},
-	".gsh": &Heuristics{},
+	".gsc": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("GSC"),
+			regex.MustCompileRuby(`^\s*#\s*(?:using|insert|include|define|namespace)[ \t]+\w|^\s*(?>(?:autoexec|private)\s+){0,2}function\s+(?>(?:autoexec|private)\s+){0,2}\w+\s*\(|\b(?:level|self)[ \t]+thread[ \t]+(?:\[\[[ \t]*(?>\w+\.)*\w+[ \t]*\]\]|\w+)[ \t]*\([^\r\n\)]*\)[ \t]*;|^[ \t]*#[ \t]*(?:precache|using_animtree)[ \t]*\(`),
+		),
+	},
+	".gsh": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("GSC"),
+			regex.MustCompileRuby(`^\s*#\s*(?:using|insert|include|define|namespace)[ \t]+\w|^\s*(?>(?:autoexec|private)\s+){0,2}function\s+(?>(?:autoexec|private)\s+){0,2}\w+\s*\(|\b(?:level|self)[ \t]+thread[ \t]+(?:\[\[[ \t]*(?>\w+\.)*\w+[ \t]*\]\]|\w+)[ \t]*\([^\r\n\)]*\)[ \t]*;|^[ \t]*#[ \t]*(?:precache|using_animtree)[ \t]*\(`),
+		),
+	},
 	".h": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Objective-C"),
-			regexp.MustCompile(`(?m)^\s*(@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">])`),
+			regex.MustCompileMultiline(`^\s*(@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">])`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("C++"),
-			regexp.MustCompile(`(?m)^\s*#\s*include <(cstdint|string|vector|map|list|array|bitset|queue|stack|forward_list|unordered_map|unordered_set|(i|o|io)stream)>|^\s*template\s*<|^[ \t]*(try|constexpr)|^[ \t]*catch\s*\(|^[ \t]*(class|(using[ \t]+)?namespace)\s+\w+|^[ \t]*(private|public|protected):$|std::\w+`),
+			regex.MustCompileMultiline(`^\s*#\s*include <(cstdint|string|vector|map|list|array|bitset|queue|stack|forward_list|unordered_map|unordered_set|(i|o|io)stream)>|^\s*template\s*<|^[ \t]*(try|constexpr)|^[ \t]*catch\s*\(|^[ \t]*(class|(using[ \t]+)?namespace)\s+\w+|^[ \t]*(private|public|protected):$|std::\w+`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("C"),
@@ -897,23 +933,23 @@ var ContentHeuristics = map[string]*Heuristics{
 	".hh": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Hack"),
-			regexp.MustCompile(`(?m)<\?hh`),
+			regex.MustCompileMultiline(`<\?hh`),
 		),
 	},
 	".i": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Motorola 68K Assembly"),
-			regexp.MustCompile(`(?m)(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
+			regex.MustCompileMultiline(`(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("SWIG"),
-			regexp.MustCompile(`(?m)^[ \t]*%[a-z_]+\b|^%[{}]$`),
+			regex.MustCompileMultiline(`^[ \t]*%[a-z_]+\b|^%[{}]$`),
 		),
 	},
 	".ice": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("JSON"),
-			regexp.MustCompile(`(?m)\A\s*[{\[]`),
+			regex.MustCompileMultiline(`\A\s*[{\[]`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Slice"),
@@ -922,57 +958,61 @@ var ContentHeuristics = map[string]*Heuristics{
 	".inc": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Motorola 68K Assembly"),
-			regexp.MustCompile(`(?m)(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
+			regex.MustCompileMultiline(`(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("PHP"),
-			regexp.MustCompile(`(?m)^<\?(?:php)?`),
+			regex.MustCompileMultiline(`^<\?(?:php)?`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("SourcePawn"),
-			regexp.MustCompile(`(?m)^public\s+(?:SharedPlugin(?:\s+|:)__pl_\w+\s*=(?:\s*{)?|(?:void\s+)?__pl_\w+_SetNTVOptional\(\)(?:\s*{)?)|^methodmap\s+\w+\s+<\s+\w+|^\s*MarkNativeAsOptional\s*\(`),
+			regex.MustCompileMultiline(`^public\s+(?:SharedPlugin(?:\s+|:)__pl_\w+\s*=(?:\s*{)?|(?:void\s+)?__pl_\w+_SetNTVOptional\(\)(?:\s*{)?)|^methodmap\s+\w+\s+<\s+\w+|^\s*MarkNativeAsOptional\s*\(`),
+		),
+		rule.Or(
+			rule.MatchingLanguages("NASL"),
+			regex.MustCompileRuby(`^\s*include\s*\(\s*(?:"|')[\\/\w\-\.:\s]+\.(?:nasl|inc)\s*(?:"|')\s*\)\s*;|^\s*(?:global|local)_var\s+(?:\w+(?:\s*=\s*[\w\-"']+)?\s*)(?:,\s*\w+(?:\s*=\s*[\w\-"']+)?\s*)*+\s*;|^\s*namespace\s+\w+\s*{|^\s*object\s+\w+\s*(?:extends\s+\w+(?:::\w+)?)?\s*{|^\s*(?:public\s+|private\s+|\s*)function\s+\w+\s*\([\w\s,]*\)\s*{`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("POV-Ray SDL"),
-			regexp.MustCompile(`(?m)^\s*#(declare|local|macro|while)\s`),
+			regex.MustCompileMultiline(`^\s*#(declare|local|macro|while)\s`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Pascal"),
-			regexp.MustCompile(`(?m)(?i:^\s*{\$(?:mode|ifdef|undef|define)[ ]+[a-z0-9_]+})|^\s*end[.;]\s*$`),
+			regex.MustCompileMultiline(`(?i:^\s*{\$(?:mode|ifdef|undef|define)[ ]+[a-z0-9_]+})|^\s*end[.;]\s*$`),
 		),
 	},
 	".l": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Common Lisp"),
-			regexp.MustCompile(`(?m)\(def(un|macro)\s`),
+			regex.MustCompileMultiline(`\(def(un|macro)\s`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Lex"),
-			regexp.MustCompile(`(?m)^(%[%{}]xs|<.*>)`),
+			regex.MustCompileMultiline(`^(%[%{}]xs|<.*>)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.[A-Za-z]{2}(\s|$)`),
+			regex.MustCompileMultiline(`^\.[A-Za-z]{2}(\s|$)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("PicoLisp"),
-			regexp.MustCompile(`(?m)^\((de|class|rel|code|data|must)\s`),
+			regex.MustCompileMultiline(`^\((de|class|rel|code|data|must)\s`),
 		),
 	},
 	".lisp": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Common Lisp"),
-			regexp.MustCompile(`(?m)^\s*\((?i:defun|in-package|defpackage) `),
+			regex.MustCompileMultiline(`^\s*\((?i:defun|in-package|defpackage) `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("NewLisp"),
-			regexp.MustCompile(`(?m)^\s*\(define `),
+			regex.MustCompileMultiline(`^\s*\(define `),
 		),
 	},
 	".ls": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("LoomScript"),
-			regexp.MustCompile(`(?m)^\s*package\s*[\w\.\/\*\s]*\s*{`),
+			regex.MustCompileMultiline(`^\s*package\s*[\w\.\/\*\s]*\s*{`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("LiveScript"),
@@ -981,54 +1021,54 @@ var ContentHeuristics = map[string]*Heuristics{
 	".lsp": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Common Lisp"),
-			regexp.MustCompile(`(?m)^\s*\((?i:defun|in-package|defpackage) `),
+			regex.MustCompileMultiline(`^\s*\((?i:defun|in-package|defpackage) `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("NewLisp"),
-			regexp.MustCompile(`(?m)^\s*\(define `),
+			regex.MustCompileMultiline(`^\s*\(define `),
 		),
 	},
 	".m": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Objective-C"),
-			regexp.MustCompile(`(?m)^\s*(@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">])`),
+			regex.MustCompileMultiline(`^\s*(@(interface|class|protocol|property|end|synchronised|selector|implementation)\b|#import\s+.+\.h[">])`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Mercury"),
-			regexp.MustCompile(`(?m):- module`),
+			regex.MustCompileMultiline(`:- module`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("MUF"),
-			regexp.MustCompile(`(?m)^: `),
+			regex.MustCompileMultiline(`^: `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("M"),
-			regexp.MustCompile(`(?m)^\s*;`),
+			regex.MustCompileMultiline(`^\s*;`),
 		),
 		rule.And(
 			rule.MatchingLanguages("Mathematica"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)\(\*`),
+				regex.MustCompileMultiline(`\(\*`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)\*\)$`),
+				regex.MustCompileMultiline(`\*\)$`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("MATLAB"),
-			regexp.MustCompile(`(?m)^\s*%`),
+			regex.MustCompileMultiline(`^\s*%`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Limbo"),
-			regexp.MustCompile(`(?m)^\w+\s*:\s*module\s*{`),
+			regex.MustCompileMultiline(`^\w+\s*:\s*module\s*{`),
 		),
 	},
 	".m4": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("M4Sugar"),
-			regexp.MustCompile(`(?m)AC_DEFUN|AC_PREREQ|AC_INIT|^_?m4_`),
+			regex.MustCompileMultiline(`AC_DEFUN|AC_PREREQ|AC_INIT|^_?m4_`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("M4"),
@@ -1039,26 +1079,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -1068,27 +1108,31 @@ var ContentHeuristics = map[string]*Heuristics{
 	".mask": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Unity3D Asset"),
-			regexp.MustCompile(`(?m)tag:unity3d.com`),
+			regex.MustCompileMultiline(`tag:unity3d.com`),
 		),
 	},
 	".mc": &Heuristics{
 		rule.Or(
+			rule.MatchingLanguages("Win32 Message File"),
+			regex.MustCompileRuby(`(?i)^[ \t]*(?>\/\*\s*)?MessageId=|^\.$`),
+		),
+		rule.Or(
 			rule.MatchingLanguages("M4"),
-			regexp.MustCompile(`(?m)^dnl|^divert\((?:-?\d+)?\)|^\w+\(`+"`"+`[^\n]*?'[),]`),
+			regex.MustCompileMultiline(`^dnl|^divert\((?:-?\d+)?\)|^\w+\(`+"`"+`[^\n]*?'[),]`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Monkey C"),
-			regexp.MustCompile(`(?m)\b(?:using|module|function|class|var)\s+\w`),
+			regex.MustCompileMultiline(`\b(?:using|module|function|class|var)\s+\w`),
 		),
 	},
 	".md": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Markdown"),
-			regexp.MustCompile(`(?m)(^[-A-Za-z0-9=#!\*\[|>])|<\/|\A\z`),
+			regex.MustCompileMultiline(`(^[-A-Za-z0-9=#!\*\[|>])|<\/|\A\z`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("GCC Machine Description"),
-			regexp.MustCompile(`(?m)^(;;|\(define_)`),
+			regex.MustCompileMultiline(`^(;;|\(define_)`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Markdown"),
@@ -1099,26 +1143,26 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dd +(?:[^"\s]+|"[^"]+")`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Dt +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
+				regex.MustCompileMultiline(`^[.'][ \t]*Sh +(?:[^"\s]|"[^"]+")`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Roff Manpage"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*TH +(?:[^"\s]+|"[^"]+") +"?(?:[1-9]|@[^\s@]+@)`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
+				regex.MustCompileMultiline(`^[.'][ \t]*SH +(?:[^"\s]+|"[^"\s]+)`),
 			),
 		),
 		rule.Always(
@@ -1128,21 +1172,21 @@ var ContentHeuristics = map[string]*Heuristics{
 	".ml": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("OCaml"),
-			regexp.MustCompile(`(?m)(^\s*module)|let rec |match\s+(\S+\s)+with`),
+			regex.MustCompileMultiline(`(^\s*module)|let rec |match\s+(\S+\s)+with`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Standard ML"),
-			regexp.MustCompile(`(?m)=> |case\s+(\S+\s)+of`),
+			regex.MustCompileMultiline(`=> |case\s+(\S+\s)+of`),
 		),
 	},
 	".mod": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)<!ENTITY `),
+			regex.MustCompileMultiline(`<!ENTITY `),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Modula-2"),
-			regexp.MustCompile(`(?m)^\s*(?i:MODULE|END) [\w\.]+;`),
+			regex.MustCompileMultiline(`^\s*(?i:MODULE|END) [\w\.]+;`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Linux Kernel Module", "AMPL"),
@@ -1151,17 +1195,17 @@ var ContentHeuristics = map[string]*Heuristics{
 	".ms": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^[.'][A-Za-z]{2}(\s|$)`),
+			regex.MustCompileMultiline(`^[.'][A-Za-z]{2}(\s|$)`),
 		),
 		rule.And(
 			rule.MatchingLanguages("Unix Assembly"),
 			rule.Not(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)/\*`),
+				regex.MustCompileMultiline(`/\*`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^\s*\.(?:include\s|globa?l\s|[A-Za-z][_A-Za-z0-9]*:)`),
+				regex.MustCompileMultiline(`^\s*\.(?:include\s|globa?l\s|[A-Za-z][_A-Za-z0-9]*:)`),
 			),
 		),
 		rule.Always(
@@ -1171,31 +1215,31 @@ var ContentHeuristics = map[string]*Heuristics{
 	".n": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^[.']`),
+			regex.MustCompileMultiline(`^[.']`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Nemerle"),
-			regexp.MustCompile(`(?m)^(module|namespace|using)\s`),
+			regex.MustCompileMultiline(`^(module|namespace|using)\s`),
 		),
 	},
 	".ncl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)^\s*<\?xml\s+version`),
+			regex.MustCompileMultiline(`^\s*<\?xml\s+version`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Gerber Image"),
-			regexp.MustCompile(`(?m)^[DGMT][0-9]{2}\*\r?\n`),
+			regex.MustCompileMultiline(`^[DGMT][0-9]{2}\*\r?\n`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Text"),
-			regexp.MustCompile(`(?m)THE_TITLE`),
+			regex.MustCompileMultiline(`THE_TITLE`),
 		),
 	},
 	".nl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("NL"),
-			regexp.MustCompile(`(?m)^(b|g)[0-9]+ `),
+			regex.MustCompileMultiline(`^(b|g)[0-9]+ `),
 		),
 		rule.Always(
 			rule.MatchingLanguages("NewLisp"),
@@ -1204,17 +1248,17 @@ var ContentHeuristics = map[string]*Heuristics{
 	".odin": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Object Data Instance Notation"),
-			regexp.MustCompile(`(?m)(?:^|<)\s*[A-Za-z0-9_]+\s*=\s*<`),
+			regex.MustCompileMultiline(`(?:^|<)\s*[A-Za-z0-9_]+\s*=\s*<`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Odin"),
-			regexp.MustCompile(`(?m)package\s+\w+|\b(?:im|ex)port\s*"[\w:./]+"|\w+\s*::\s*(?:proc|struct)\s*\(|^\s*//\s`),
+			regex.MustCompileMultiline(`package\s+\w+|\b(?:im|ex)port\s*"[\w:./]+"|\w+\s*::\s*(?:proc|struct)\s*\(|^\s*//\s`),
 		),
 	},
 	".p": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Gnuplot"),
-			regexp.MustCompile(`(?m)^s?plot\b|^set\s+(term|terminal|out|output|[xy]tics|[xy]label|[xy]range|style)\b`),
+			regex.MustCompileMultiline(`^s?plot\b|^set\s+(term|terminal|out|output|[xy]tics|[xy]label|[xy]range|style)\b`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("OpenEdge ABL"),
@@ -1223,31 +1267,31 @@ var ContentHeuristics = map[string]*Heuristics{
 	".php": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Hack"),
-			regexp.MustCompile(`(?m)<\?hh`),
+			regex.MustCompileMultiline(`<\?hh`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("PHP"),
-			regexp.MustCompile(`(?m)<\?[^h]`),
+			regex.MustCompileMultiline(`<\?[^h]`),
 		),
 	},
 	".pl": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Prolog"),
-			regexp.MustCompile(`(?m)^[^#]*:-`),
+			regex.MustCompileMultiline(`^[^#]*:-`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Perl"),
-			regexp.MustCompile(`(?m)\buse\s+(?:strict\b|v?5\.)`),
+			regex.MustCompileMultiline(`\buse\s+(?:strict\b|v?5\.)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Raku"),
-			regexp.MustCompile(`(?m)^\s*(?:use\s+v6\b|\bmodule\b|\b(?:my\s+)?class\b)`),
+			regex.MustCompileMultiline(`^\s*(?:use\s+v6\b|\bmodule\b|\b(?:my\s+)?class\b)`),
 		),
 	},
 	".plist": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML Property List"),
-			regexp.MustCompile(`(?m)<!DOCTYPE\s+plist`),
+			regex.MustCompileMultiline(`<!DOCTYPE\s+plist`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("OpenStep Property List"),
@@ -1256,21 +1300,21 @@ var ContentHeuristics = map[string]*Heuristics{
 	".pm": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Perl"),
-			regexp.MustCompile(`(?m)\buse\s+(?:strict\b|v?5\.)`),
+			regex.MustCompileMultiline(`\buse\s+(?:strict\b|v?5\.)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Raku"),
-			regexp.MustCompile(`(?m)^\s*(?:use\s+v6\b|\bmodule\b|\b(?:my\s+)?class\b)`),
+			regex.MustCompileMultiline(`^\s*(?:use\s+v6\b|\bmodule\b|\b(?:my\s+)?class\b)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("X PixMap"),
-			regexp.MustCompile(`(?m)^\s*\/\* XPM \*\/`),
+			regex.MustCompileMultiline(`^\s*\/\* XPM \*\/`),
 		),
 	},
 	".pod": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Pod 6"),
-			regexp.MustCompile(`(?m)^[\s&&[^\n]]*=(comment|begin pod|begin para|item\d+)`),
+			regex.MustCompileMultiline(`^[\s&&[^\n]]*=(comment|begin pod|begin para|item\d+)`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Pod"),
@@ -1279,40 +1323,40 @@ var ContentHeuristics = map[string]*Heuristics{
 	".pp": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Pascal"),
-			regexp.MustCompile(`(?m)^\s*end[.;]`),
+			regex.MustCompileMultiline(`^\s*end[.;]`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Puppet"),
-			regexp.MustCompile(`(?m)^\s+\w+\s+=>\s`),
+			regex.MustCompileMultiline(`^\s+\w+\s+=>\s`),
 		),
 	},
 	".pro": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Proguard"),
-			regexp.MustCompile(`(?m)^-(include\b.*\.pro$|keep\b|keepclassmembers\b|keepattributes\b)`),
+			regex.MustCompileMultiline(`^-(include\b.*\.pro$|keep\b|keepclassmembers\b|keepattributes\b)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Prolog"),
-			regexp.MustCompile(`(?m)^[^\[#]+:-`),
+			regex.MustCompileMultiline(`^[^\[#]+:-`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("INI"),
-			regexp.MustCompile(`(?m)last_client=`),
+			regex.MustCompileMultiline(`last_client=`),
 		),
 		rule.And(
 			rule.MatchingLanguages("QMake"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)HEADERS`),
+				regex.MustCompileMultiline(`HEADERS`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)SOURCES`),
+				regex.MustCompileMultiline(`SOURCES`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("IDL"),
-			regexp.MustCompile(`(?m)^\s*function[ \w,]+$`),
+			regex.MustCompileMultiline(`^\s*function[ \w,]+$`),
 		),
 	},
 	".properties": &Heuristics{
@@ -1320,89 +1364,93 @@ var ContentHeuristics = map[string]*Heuristics{
 			rule.MatchingLanguages("INI"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[^#!;][^=]*=`),
+				regex.MustCompileMultiline(`^[^#!;][^=]*=`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[;\[]`),
+				regex.MustCompileMultiline(`^[;\[]`),
 			),
 		),
 		rule.And(
 			rule.MatchingLanguages("Java Properties"),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[^#!;][^=]*=`),
+				regex.MustCompileMultiline(`^[^#!;][^=]*=`),
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regexp.MustCompile(`(?m)^[#!]`),
+				regex.MustCompileMultiline(`^[#!]`),
 			),
 		),
 		rule.Or(
 			rule.MatchingLanguages("INI"),
-			regexp.MustCompile(`(?m)^[^#!;][^=]*=`),
+			regex.MustCompileMultiline(`^[^#!;][^=]*=`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Java Properties"),
-			regexp.MustCompile(`(?m)^[^#!][^:]*:`),
+			regex.MustCompileMultiline(`^[^#!][^:]*:`),
 		),
 	},
 	".q": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("q"),
-			regexp.MustCompile(`(?m)((?i:[A-Z.][\w.]*:{)|(^|\n)\\(cd?|d|l|p|ts?) )`),
+			regex.MustCompileMultiline(`((?i:[A-Z.][\w.]*:{)|(^|\n)\\(cd?|d|l|p|ts?) )`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("HiveQL"),
-			regexp.MustCompile(`(?m)(?i:SELECT\s+[\w*,]+\s+FROM|(CREATE|ALTER|DROP)\s(DATABASE|SCHEMA|TABLE))`),
+			regex.MustCompileMultiline(`(?i:SELECT\s+[\w*,]+\s+FROM|(CREATE|ALTER|DROP)\s(DATABASE|SCHEMA|TABLE))`),
 		),
 	},
 	".qs": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Q#"),
-			regexp.MustCompile(`(?m)^((\/{2,3})?\s*(namespace|operation)\b)`),
+			regex.MustCompileMultiline(`^((\/{2,3})?\s*(namespace|operation)\b)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Qt Script"),
-			regexp.MustCompile(`(?m)(\w+\.prototype\.\w+|===|\bvar\b)`),
+			regex.MustCompileMultiline(`(\w+\.prototype\.\w+|===|\bvar\b)`),
 		),
 	},
 	".r": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Rebol"),
-			regexp.MustCompile(`(?m)(?i:\bRebol\b)`),
+			regex.MustCompileMultiline(`(?i:\bRebol\b)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("R"),
-			regexp.MustCompile(`(?m)<-|^\s*#`),
+			regex.MustCompileMultiline(`<-|^\s*#`),
 		),
 	},
 	".re": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Reason"),
-			regexp.MustCompile(`(?m)^\s*module\s+type\s|^\s*(?:include|open)\s+\w+\s*;\s*$|^\s*let\s+(?:module\s\w+\s*=\s*{|\w+:\s+.*=.*;\s*$)`),
+			regex.MustCompileMultiline(`^\s*module\s+type\s|^\s*(?:include|open)\s+\w+\s*;\s*$|^\s*let\s+(?:module\s\w+\s*=\s*{|\w+:\s+.*=.*;\s*$)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("C++"),
-			regexp.MustCompile(`(?m)^\s*#(?:(?:if|ifdef|define|pragma)\s+\w|\s*include\s+<[^>]+>)|^\s*template\s*<`),
+			regex.MustCompileMultiline(`^\s*#(?:(?:if|ifdef|define|pragma)\s+\w|\s*include\s+<[^>]+>)|^\s*template\s*<`),
 		),
 	},
 	".res": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("ReScript"),
-			regexp.MustCompile(`(?m)^\s*(let|module|type)\s+\w*\s+=\s+|^\s*(?:include|open)\s+\w+\s*$`),
+			regex.MustCompileMultiline(`^\s*(let|module|type)\s+\w*\s+=\s+|^\s*(?:include|open)\s+\w+\s*$`),
 		),
 	},
 	".rno": &Heuristics{
 		rule.Or(
+			rule.MatchingLanguages("RUNOFF"),
+			regex.MustCompileRuby(`(?i:^\.!|^\f|\f$|^\.end lit(?:eral)?\b|^\.[a-zA-Z].*?;\.[a-zA-Z](?:[; \t])|\^\*[^\s*][^*]*\\\*(?=$|\s)|^\.c;[ \t]*\w+)`),
+		),
+		rule.Or(
 			rule.MatchingLanguages("Roff"),
-			regexp.MustCompile(`(?m)^\.\\" `),
+			regex.MustCompileMultiline(`^\.\\" `),
 		),
 	},
 	".rpy": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Python"),
-			regexp.MustCompile(`(?m)(?m:^(import|from|class|def)\s)`),
+			regex.MustCompileMultiline(`(?m:^(import|from|class|def)\s)`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Ren'Py"),
@@ -1411,55 +1459,59 @@ var ContentHeuristics = map[string]*Heuristics{
 	".rs": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Rust"),
-			regexp.MustCompile(`(?m)^(use |fn |mod |pub |macro_rules|impl|#!?\[)`),
+			regex.MustCompileMultiline(`^(use |fn |mod |pub |macro_rules|impl|#!?\[)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("RenderScript"),
-			regexp.MustCompile(`(?m)#include|#pragma\s+(rs|version)|__attribute__`),
+			regex.MustCompileMultiline(`#include|#pragma\s+(rs|version)|__attribute__`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)^\s*<\?xml`),
+			regex.MustCompileMultiline(`^\s*<\?xml`),
 		),
 	},
 	".s": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Motorola 68K Assembly"),
-			regexp.MustCompile(`(?m)(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
+			regex.MustCompileMultiline(`(?im)\bmoveq(?:\.l)?\s+#(?:\$-?[0-9a-f]{1,3}|%[0-1]{1,8}|-?[0-9]{1,3}),\s*d[0-7]\b|(?im)^\s*move(?:\.[bwl])?\s+(?:sr|usp),\s*[^\s]+|(?im)^\s*move\.[bwl]\s+.*\b[ad]\d|(?im)^\s*movem\.[bwl]\b|(?im)^\s*move[mp](?:\.[wl])?\b|(?im)^\s*btst\b|(?im)^\s*dbra\b`),
 		),
 	},
 	".sc": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("SuperCollider"),
-			regexp.MustCompile(`(?m)(?i:\^(this|super)\.|^\s*~\w+\s*=\.)`),
+			regex.MustCompileMultiline(`(?i:\^(this|super)\.|^\s*~\w+\s*=\.)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Scala"),
-			regexp.MustCompile(`(?m)(^\s*import (scala|java)\.|^\s*class\b)`),
+			regex.MustCompileMultiline(`(^\s*import (scala|java)\.|^\s*class\b)`),
 		),
 	},
 	".sol": &Heuristics{
 		rule.Or(
+			rule.MatchingLanguages("Solidity"),
+			regex.MustCompileRuby(`\bpragma\s+solidity\b|\b(?:abstract\s+)?contract\s+(?!\d)[a-zA-Z0-9$_]+(?:\s+is\s+(?:[a-zA-Z0-9$_][^\{]*?)?)?\s*\{`),
+		),
+		rule.Or(
 			rule.MatchingLanguages("Gerber Image"),
-			regexp.MustCompile(`(?m)^[DGMT][0-9]{2}\*\r?\n`),
+			regex.MustCompileMultiline(`^[DGMT][0-9]{2}\*\r?\n`),
 		),
 	},
 	".sql": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("PLpgSQL"),
-			regexp.MustCompile(`(?m)(?i:^\\i\b|AS\s+\$\$|LANGUAGE\s+'?plpgsql'?|BEGIN(\s+WORK)?\s*;)`),
+			regex.MustCompileMultiline(`(?i:^\\i\b|AS\s+\$\$|LANGUAGE\s+'?plpgsql'?|BEGIN(\s+WORK)?\s*;)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("SQLPL"),
-			regexp.MustCompile(`(?m)(?i:ALTER\s+MODULE|MODE\s+DB2SQL|\bSYS(CAT|PROC)\.|ASSOCIATE\s+RESULT\s+SET|\bEND!\s*$)`),
+			regex.MustCompileMultiline(`(?i:ALTER\s+MODULE|MODE\s+DB2SQL|\bSYS(CAT|PROC)\.|ASSOCIATE\s+RESULT\s+SET|\bEND!\s*$)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("PLSQL"),
-			regexp.MustCompile(`(?m)(?i:\$\$PLSQL_|XMLTYPE|systimestamp|\.nextval|CONNECT\s+BY|AUTHID\s+(DEFINER|CURRENT_USER)|constructor\W+function)`),
+			regex.MustCompileMultiline(`(?i:\$\$PLSQL_|XMLTYPE|systimestamp|\.nextval|CONNECT\s+BY|AUTHID\s+(DEFINER|CURRENT_USER)|constructor\W+function)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("TSQL"),
-			regexp.MustCompile(`(?m)(?i:^\s*GO\b|BEGIN(\s+TRY|\s+CATCH)|OUTPUT\s+INSERTED|DECLARE\s+@|\[dbo\])`),
+			regex.MustCompileMultiline(`(?i:^\s*GO\b|BEGIN(\s+TRY|\s+CATCH)|OUTPUT\s+INSERTED|DECLARE\s+@|\[dbo\])`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("SQL"),
@@ -1468,53 +1520,62 @@ var ContentHeuristics = map[string]*Heuristics{
 	".srt": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("SubRip Text"),
-			regexp.MustCompile(`(?m)^(\d{2}:\d{2}:\d{2},\d{3})\s*(-->)\s*(\d{2}:\d{2}:\d{2},\d{3})$`),
+			regex.MustCompileMultiline(`^(\d{2}:\d{2}:\d{2},\d{3})\s*(-->)\s*(\d{2}:\d{2}:\d{2},\d{3})$`),
 		),
 	},
 	".st": &Heuristics{
 		rule.Or(
+			rule.MatchingLanguages("StringTemplate"),
+			regex.MustCompileRuby(`\$\w+[($]|(.)!\s*.+?\s*!\1|<!\s*.+?\s*!>|\[!\s*.+?\s*!\]|\{!\s*.+?\s*!\}`),
+		),
+		rule.Or(
 			rule.MatchingLanguages("Smalltalk"),
-			regexp.MustCompile(`(?m)\A\s*[\[{(^"'\w#]|[a-zA-Z_]\w*\s*:=\s*[a-zA-Z_]\w*|class\s*>>\s*[a-zA-Z_]\w*|^[a-zA-Z_]\w*\s+[a-zA-Z_]\w*:|^Class\s*{|if(?:True|False):\s*\[`),
+			regex.MustCompileMultiline(`\A\s*[\[{(^"'\w#]|[a-zA-Z_]\w*\s*:=\s*[a-zA-Z_]\w*|class\s*>>\s*[a-zA-Z_]\w*|^[a-zA-Z_]\w*\s+[a-zA-Z_]\w*:|^Class\s*{|if(?:True|False):\s*\[`),
 		),
 	},
 	".star": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("STAR"),
-			regexp.MustCompile(`(?m)^loop_\s*$`),
+			regex.MustCompileMultiline(`^loop_\s*$`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Starlark"),
 		),
 	},
-	".stl": &Heuristics{},
+	".stl": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("STL"),
+			regex.MustCompileRuby(`\A\s*solid(?=$|\s)(?m:.*?)\Rendsolid(?:$|\s)`),
+		),
+	},
 	".t": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Perl"),
-			regexp.MustCompile(`(?m)\buse\s+(?:strict\b|v?5\.)`),
+			regex.MustCompileMultiline(`\buse\s+(?:strict\b|v?5\.)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Raku"),
-			regexp.MustCompile(`(?m)^\s*(?:use\s+v6\b|\bmodule\b|\bmy\s+class\b)`),
+			regex.MustCompileMultiline(`^\s*(?:use\s+v6\b|\bmodule\b|\bmy\s+class\b)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Turing"),
-			regexp.MustCompile(`(?m)^\s*%[ \t]+|^\s*var\s+\w+(\s*:\s*\w+)?\s*:=\s*\w+`),
+			regex.MustCompileMultiline(`^\s*%[ \t]+|^\s*var\s+\w+(\s*:\s*\w+)?\s*:=\s*\w+`),
 		),
 	},
 	".toc": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("World of Warcraft Addon Data"),
-			regexp.MustCompile(`(?m)^## |@no-lib-strip@`),
+			regex.MustCompileMultiline(`^## |@no-lib-strip@`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("TeX"),
-			regexp.MustCompile(`(?m)^\\(contentsline|defcounter|beamer|boolfalse)`),
+			regex.MustCompileMultiline(`^\\(contentsline|defcounter|beamer|boolfalse)`),
 		),
 	},
 	".ts": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)<TS\b`),
+			regex.MustCompileMultiline(`<TS\b`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("TypeScript"),
@@ -1523,7 +1584,7 @@ var ContentHeuristics = map[string]*Heuristics{
 	".tst": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("GAP"),
-			regexp.MustCompile(`(?m)gap> `),
+			regex.MustCompileMultiline(`gap> `),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Scilab"),
@@ -1532,37 +1593,46 @@ var ContentHeuristics = map[string]*Heuristics{
 	".tsx": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("TSX"),
-			regexp.MustCompile(`(?m)^\s*(import.+(from\s+|require\()['"]react|\/\/\/\s*<reference\s)`),
+			regex.MustCompileMultiline(`^\s*(import.+(from\s+|require\()['"]react|\/\/\/\s*<reference\s)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("XML"),
-			regexp.MustCompile(`(?m)(?i:^\s*<\?xml\s+version)`),
+			regex.MustCompileMultiline(`(?i:^\s*<\?xml\s+version)`),
 		),
 	},
 	".txt": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("Vim Help File"),
+			regex.MustCompileRuby(`(?:(?:^|[ \t])(?:vi|Vi(?=m))(?:m[<=>]?[0-9]+|m)?|[ \t]ex)(?=:(?=[ \t]*set?[ \t][^\r\n:]+:)|:(?![ \t]*set?[ \t]))(?:(?:[ \t]*:[ \t]*|[ \t])\w*(?:[ \t]*=(?:[^\\\s]|\\.)*)?)*[ \t:](?:filetype|ft|syntax)[ \t]*=(help)(?=$|\s|:)`),
+		),
 		rule.Always(
 			rule.MatchingLanguages("Text"),
 		),
 	},
-	".url": &Heuristics{},
+	".url": &Heuristics{
+		rule.Or(
+			rule.MatchingLanguages("INI"),
+			regex.MustCompileRuby(`^\[InternetShortcut\]\R(?>[^\s\[][^\n]*\R)*URL=`),
+		),
+	},
 	".v": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Coq"),
-			regexp.MustCompile(`(?m)(?:^|\s)(?:Proof|Qed)\.(?:$|\s)|(?:^|\s)Require[ \t]+(Import|Export)\s`),
+			regex.MustCompileMultiline(`(?:^|\s)(?:Proof|Qed)\.(?:$|\s)|(?:^|\s)Require[ \t]+(Import|Export)\s`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Verilog"),
-			regexp.MustCompile(`(?m)^[ \t]*module\s+[^\s()]+\s+\#?\(|^[ \t]*`+"`"+`(?:define|ifdef|ifndef|include|timescale)|^[ \t]*always[ \t]+@|^[ \t]*initial[ \t]+(begin|@)`),
+			regex.MustCompileMultiline(`^[ \t]*module\s+[^\s()]+\s+\#?\(|^[ \t]*`+"`"+`(?:define|ifdef|ifndef|include|timescale)|^[ \t]*always[ \t]+@|^[ \t]*initial[ \t]+(begin|@)`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("V"),
-			regexp.MustCompile(`(?m)\$(?:if|else)[ \t]|^[ \t]*fn\s+[^\s()]+\(.*?\).*?\{|^[ \t]*for\s*\{`),
+			regex.MustCompileMultiline(`\$(?:if|else)[ \t]|^[ \t]*fn\s+[^\s()]+\(.*?\).*?\{|^[ \t]*for\s*\{`),
 		),
 	},
 	".vba": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("Vim Script"),
-			regexp.MustCompile(`(?m)^UseVimball`),
+			regex.MustCompileMultiline(`^UseVimball`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("VBA"),
@@ -1571,35 +1641,35 @@ var ContentHeuristics = map[string]*Heuristics{
 	".w": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("OpenEdge ABL"),
-			regexp.MustCompile(`(?m)&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS`),
+			regex.MustCompileMultiline(`&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("CWeb"),
-			regexp.MustCompile(`(?m)^@(<|\w+\.)`),
+			regex.MustCompileMultiline(`^@(<|\w+\.)`),
 		),
 	},
 	".x": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("DirectX 3D File"),
-			regexp.MustCompile(`(?m)^xof 030(2|3)(?:txt|bin|tzip|bzip)\b`),
+			regex.MustCompileMultiline(`^xof 030(2|3)(?:txt|bin|tzip|bzip)\b`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("RPC"),
-			regexp.MustCompile(`(?m)\b(program|version)\s+\w+\s*{|\bunion\s+\w+\s+switch\s*\(`),
+			regex.MustCompileMultiline(`\b(program|version)\s+\w+\s*{|\bunion\s+\w+\s+switch\s*\(`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Logos"),
-			regexp.MustCompile(`(?m)^%(end|ctor|hook|group)\b`),
+			regex.MustCompileMultiline(`^%(end|ctor|hook|group)\b`),
 		),
 		rule.Or(
 			rule.MatchingLanguages("Linker Script"),
-			regexp.MustCompile(`(?m)OUTPUT_ARCH\(|OUTPUT_FORMAT\(|SECTIONS`),
+			regex.MustCompileMultiline(`OUTPUT_ARCH\(|OUTPUT_FORMAT\(|SECTIONS`),
 		),
 	},
 	".yaml": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("MiniYAML"),
-			regexp.MustCompile(`(?m)^\t+.*?[^\s:].*?:`),
+			regex.MustCompileMultiline(`^\t+.*?[^\s:].*?:`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("YAML"),
@@ -1608,7 +1678,7 @@ var ContentHeuristics = map[string]*Heuristics{
 	".yy": &Heuristics{
 		rule.Or(
 			rule.MatchingLanguages("JSON"),
-			regexp.MustCompile(`(?m)\"modelName\"\:\s*\"GM`),
+			regex.MustCompileMultiline(`\"modelName\"\:\s*\"GM`),
 		),
 		rule.Always(
 			rule.MatchingLanguages("Yacc"),

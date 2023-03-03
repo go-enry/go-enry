@@ -1,9 +1,8 @@
 package data
 
 import (
-	"regexp"
-
 	"github.com/go-enry/go-enry/v2/data/rule"
+	"github.com/go-enry/go-enry/v2/regex"
 )
 
 var ContentHeuristics = map[string]*Heuristics{
@@ -27,12 +26,12 @@ var ContentHeuristics = map[string]*Heuristics{
 	{{- else if eq .Op "Or" -}}
 		rule.Or(
 			{{ template "Languages" .Langs -}}
-			regexp.MustCompile({{ .Pattern | stringVal }}),
+			{{ template "mustCompile" . }}
 		),
 	{{- else if eq .Op "Not" -}}
 		rule.Not(
 			{{ template "Languages" .Langs -}}
-			regexp.MustCompile({{ .Pattern | stringVal }}),
+			{{ template "mustCompile" . }}
 		),
 	{{- else if eq .Op "Always" -}}
 		rule.Always(
@@ -48,4 +47,12 @@ var ContentHeuristics = map[string]*Heuristics{
 	{{ else -}}
 		rule.MatchingLanguages(""),
 	{{end -}}
+{{end}}
+
+{{define "mustCompile" -}}
+	{{ if .IsRE2  -}}
+		regex.MustCompileMultiline({{ .Pattern | stringVal }}),
+	{{- else -}}
+		regex.MustCompileRuby({{ .Pattern | stringVal }}),
+	{{ end -}}
 {{end}}

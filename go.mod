@@ -4,6 +4,6 @@ go 1.14
 
 require (
 	github.com/go-enry/go-oniguruma v1.2.1
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.8.1
 	gopkg.in/yaml.v2 v2.2.8
 )

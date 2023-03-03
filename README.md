@@ -184,6 +184,8 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 
 In all the cases above that have an issue number - we plan to update enry to match Linguist behavior.
 
+> All the issues related to heuristics' regexp  syntax incompatibilities with the RE2 engine can be avoided by using `oniguruma` instead (see [instuctions](#misc))
+
 ## Benchmarks
 
 Enry's language detection has been compared with Linguist's on [_linguist/samples_](https://github.com/github/linguist/tree/master/samples).
