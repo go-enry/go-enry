@@ -51,8 +51,9 @@ var vendorTests = []struct {
 	{false, "some/python/venv/", false},
 	{false, "foo/.imageset/bar", true},
 	{false, "Vagrantfile", true},
+	{false, "custom.bootstrap.css", true},
 	{true, "src/bootstrap-custom.js", true},
-	// {true, "/css/bootstrap.rtl.css", true}, // from linguist v7.23
+	{true, "/css/bootstrap.rtl.css", true}, // from linguist v7.23
 }
 
 func TestIsVendor(t *testing.T) {
