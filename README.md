@@ -1,4 +1,4 @@
-# go-enry [![GoDoc](https://godoc.org/github.com/go-enry/go-enry?status.svg)](https://pkg.go.dev/github.com/go-enry/go-enry/v2) [![Test](https://github.com/go-enry/go-enry/workflows/Test/badge.svg)](https://github.com/go-enry/go-enry/actions?query=workflow%3ATest+branch%3Amaster) [![codecov](https://codecov.io/gh/go-enry/go-enry/branch/master/graph/badge.svg)](https://codecov.io/gh/go-enry/go-enry)
+# go-enry [![GoDoc](https://godoc.org/github.com/go-enry/go-enry?status.svg)](https://pkg.go.dev/github.com/go-enry/go-enry/v2) [![Test](https://github.com/go-enry/go-enry/actions/workflows/goTest.yml/badge.svg)](https://github.com/go-enry/go-enry/actions/workflows/goTest.yml?query=branch%3Amaster) [![codecov](https://codecov.io/gh/go-enry/go-enry/branch/master/graph/badge.svg)](https://codecov.io/gh/go-enry/go-enry)
 
 Programming language detector and toolbox to ignore binary or vendored files. _enry_, started as a port to _Go_ of the original [Linguist](https://github.com/github/linguist) _Ruby_ library, that has an improved _2x performance_.
 
