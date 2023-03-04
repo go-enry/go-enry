@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/go-enry/go-enry/v2/data"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,9 +24,15 @@ func Test_EnryOnLinguistCorpus(t *testing.T) {
 func (s *linguistCorpusSuite) TestLinguistSamples() {
 	const filenamesDir = "filenames"
 	var cornerCases = map[string]bool{
-		"drop_stuff.sql":        true, // https://github.com/src-d/enry/issues/194
-		"textobj-rubyblock.vba": true, // Because of unsupported negative lookahead RE syntax (https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521)
+		"drop_stuff.sql":        false, // not the case in v7.23, https://github.com/src-d/enry/issues/194
+		"textobj-rubyblock.vba": true,  // unsupported negative lookahead RE syntax (https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521)
 		// .es and .ice fail heuristics parsing, but do not fail any tests
+		// 'Adblock Filter List' hack https://github.com/github/linguist/blob/bf853f1c663903e3ee35935189760191f1c45e1c/lib/linguist/heuristics.yml#L680-L702
+		"Imperial Units Remover.txt": true,
+		"abp-filters-anti-cv.txt":    true,
+		"anti-facebook.txt":          true,
+		"fake-news.txt":              true,
+		"test_rules.txt":             true,
 	}
 
 	var total, failed, ok, other int
@@ -45,25 +50,23 @@ func (s *linguistCorpusSuite) TestLinguistSamples() {
 		content, _ := ioutil.ReadFile(path)
 
 		total++
-		obtained := GetLanguage(filename, content)
-		if obtained == OtherLanguage {
-			obtained = "Other"
+		got := GetLanguage(filename, content)
+		if got == OtherLanguage {
+			got = "Other"
 			other++
 		}
 
-		var status string
-		if expected == obtained {
-			status = "ok"
+		if expected == got {
 			ok++
 		} else {
-			status = "failed"
 			failed++
 		}
 
+		errMsg := fmt.Sprintf("file: %q\texpected: %q\tgot: %q\n", path, expected, got)
 		if _, ok := cornerCases[filename]; ok {
-			s.T().Logf("\t\t[considered corner case] %s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status)
+			s.T().Logf(fmt.Sprintf("\t\t[corner case] %s", errMsg))
 		} else {
-			assert.Equal(s.T(), expected, obtained, fmt.Sprintf("%s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status))
+			s.Equal(expected, got, errMsg)
 		}
 		return nil
 	})
