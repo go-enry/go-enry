@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/go-enry/go-enry/v2/data"
+	"github.com/go-enry/go-enry/v2/regex"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -71,4 +72,52 @@ func (s *linguistCorpusSuite) TestLinguistSamples() {
 		return nil
 	})
 	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
+}
+
+// Second part of the test_blob.rb#test_language
+// https://github.com/github/linguist/blob/59b2d88b2242e6062384e5fb876668cc30ead951/test/test_blob.rb#L275
+func (s *linguistCorpusSuite) TestLinguistGenericFixtures() {
+	if regex.Name != regex.Oniguruma {
+		s.T().Skip("requires Ruby regexp support")
+	}
+	const filenamesDir = "filenames"
+
+	var total, failed, ok, multiple int
+	var expected string
+	filepath.Walk(filepath.Join(s.testFixturesDir, "Generic"), func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() {
+			if f.Name() != filenamesDir {
+				expected, _ = data.LanguageByAlias(f.Name())
+			}
+			return nil
+		}
+
+		filename := filepath.Base(path)
+		content, _ := ioutil.ReadFile(path)
+
+		total++
+		result := GetLanguagesByContent(filename, content, nil)
+
+		var obtained, status string
+		switch len(result) {
+		case 0:
+			obtained = ""
+		case 1:
+			obtained = result[0]
+		default:
+			obtained = ""
+			multiple++
+		}
+
+		if expected == obtained {
+			status = "ok"
+			ok++
+		} else {
+			status = "failed"
+			failed++
+		}
+		s.Equal(expected, obtained, fmt.Sprintf("%s\texpected: %s\tobtained: %s\tstatus: %s\n", filename, expected, obtained, status))
+		return nil
+	})
+	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, multiple: %d\n", total, ok, failed, multiple)
 }
