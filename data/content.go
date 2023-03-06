@@ -712,7 +712,7 @@ var ContentHeuristics = map[string]*Heuristics{
 			),
 			rule.Or(
 				rule.MatchingLanguages(""),
-				regex.MustCompileMultiline(`^\s*BEGIN\R\s*MultiUse\s*=.*\R\s*Persistable\s*=`),
+				regex.MustCompileRuby(`^\s*BEGIN\R\s*MultiUse\s*=.*\R\s*Persistable\s*=`),
 			),
 		),
 		rule.Or(
