@@ -168,12 +168,14 @@ func parseYaml(file string) (*Heuristics, error) {
 // - named & numbered capturing group/after text matching
 // - backreference
 // - possessive quantifier
+// - "general newline"
 // For reference on supported syntax see https://github.com/google/re2/wiki/Syntax
 func isUnsupportedRegexpSyntax(reg string) bool {
 	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) ||
 		strings.Contains(reg, `(?>`) || strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
 		// See https://github.com/github/linguist/pull/4243#discussion_r246105067
-		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
+		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`)) ||
+		strings.Contains(reg, `\R`)
 }
 
 func isRE2(s string) bool {
