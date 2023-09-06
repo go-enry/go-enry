@@ -126,5 +126,5 @@ jobs:
       if: ${{ steps.commit.outputs.needs_pr == 'true' }}
       run: echo ${{ steps.open-pr.outputs.pr_url }}
     - name: No PR Created
-      if: ${{ steps.commit.needs_pr != true }}
+      if: ${{ steps.commit.needs_pr != 'true' }}
       run: echo "No changes for ${{ steps.linguist-release.outputs.linguist_version }}"
