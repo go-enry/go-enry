@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/go-enry/go-enry/v2/data"
+	"github.com/go-enry/go-enry/v2/internal/tests"
 	"github.com/go-enry/go-enry/v2/internal/tokenizer"
 
 	"github.com/stretchr/testify/assert"
@@ -18,8 +19,8 @@ import (
 )
 
 var (
-	linguistURL          = "https://github.com/github/linguist.git"
 	linguistClonedEnvVar = "ENRY_TEST_REPO"
+	linguistURL          = "https://github.com/github/linguist.git"
 	commit               = "bf853f1c663903e3ee35935189760191f1c45e1c"
 	samplesDir           = "samples"
 	languagesFile        = filepath.Join("lib", "linguist", "languages.yml")
@@ -120,38 +121,11 @@ func Test_GeneratorTestSuite(t *testing.T) {
 	suite.Run(t, new(GeneratorTestSuite))
 }
 
-func (s *GeneratorTestSuite) maybeCloneLinguist() {
-	var err error
-	s.tmpLinguistDir = os.Getenv(linguistClonedEnvVar)
-	isLinguistCloned := s.tmpLinguistDir != ""
-	if !isLinguistCloned {
-		s.tmpLinguistDir, err = ioutil.TempDir("", "linguist-")
-		require.NoError(s.T(), err)
-
-		s.T().Logf("Cloning Linguist repo to '%s' as %s was not set\n",
-			s.tmpLinguistDir, linguistClonedEnvVar)
-		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, s.tmpLinguistDir)
-		err = cmd.Run()
-		require.NoError(s.T(), err)
-		s.isCleanupNeeded = true
-	}
-
-	cwd, err := os.Getwd()
-	require.NoError(s.T(), err)
-
-	err = os.Chdir(s.tmpLinguistDir)
-	require.NoError(s.T(), err)
-
-	cmd := exec.Command("git", "checkout", commit)
-	err = cmd.Run()
-	require.NoError(s.T(), err)
-
-	err = os.Chdir(cwd)
-	require.NoError(s.T(), err)
-}
-
 func (s *GeneratorTestSuite) SetupSuite() {
-	s.maybeCloneLinguist()
+	var err error
+	s.tmpLinguistDir, s.isCleanupNeeded, err = tests.MaybeCloneLinguist(linguistClonedEnvVar, linguistURL, data.LinguistCommit)
+	require.NoError(s.T(), err)
+
 	s.testCases = []testCase{
 		{
 			name:        "Extensions()",
