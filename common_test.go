@@ -275,7 +275,7 @@ func (s *enryTestSuite) TestGetLanguagesByFilename() {
 		{name: "TestGetLanguagesByFilename_7", filename: "_vimrc", expected: []string{"Vim Script"}},
 		{name: "TestGetLanguagesByFilename_8", filename: "pom.xml", expected: []string{"Maven POM"}},
 		{name: "TestGetLanguagesByFilename_9", filename: "", expected: nil},
-		{name: "TestGetLanguagesByFilename_10", filename: "hi.py", expected: []string{"Python"}},
+		{name: "TestGetLanguagesByFilename_10", filename: "hi.py", expected: nil}, // LanguagesByFilename is only for the well-known file names (.gitignore, etc)
 	}
 
 	for _, test := range tests {
