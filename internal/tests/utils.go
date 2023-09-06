@@ -21,7 +21,7 @@ func MaybeCloneLinguist(envVar, url, commit string) (string, bool, error) {
 		}
 
 		isCleanupNeeded = true
-		cmd := exec.Command("git", "clone", "--depth", "100", url, linguistTmpDir)
+		cmd := exec.Command("git", "clone", "--depth", "150", url, linguistTmpDir)
 		if err := cmd.Run(); err != nil {
 			panic(fmt.Errorf("%s: %w", cmd.String(), err))
 		}
