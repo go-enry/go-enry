@@ -21,7 +21,7 @@ jobs:
         if [ -f python/requirements.dev.txt ]; then pip install -r python/requirements.dev.txt; fi
     - name: Build and install package
       run: |
-        pip install -e python
+        pip -v install -e python
     - name: Test
       run: |
         pytest python/
