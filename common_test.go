@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/go-enry/go-enry/v2/data"
+	"github.com/go-enry/go-enry/v2/internal/tests"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,43 +19,8 @@ import (
 const linguistURL = "https://github.com/github/linguist.git"
 const linguistClonedEnvVar = "ENRY_TEST_REPO"
 
-// not a part of the test Suite as benchmark does not use testify
 func maybeCloneLinguist() (string, bool, error) {
-	var err error
-	linguistTmpDir := os.Getenv(linguistClonedEnvVar)
-	isCleanupNeeded := false
-	isLinguistCloned := linguistTmpDir != ""
-	if !isLinguistCloned {
-		linguistTmpDir, err = ioutil.TempDir("", "linguist-")
-		if err != nil {
-			return "", false, err
-		}
-
-		isCleanupNeeded = true
-		cmd := exec.Command("git", "clone", "--depth", "100", linguistURL, linguistTmpDir)
-		if err := cmd.Run(); err != nil {
-			return linguistTmpDir, isCleanupNeeded, err
-		}
-	}
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		return linguistTmpDir, isCleanupNeeded, err
-	}
-
-	if err = os.Chdir(linguistTmpDir); err != nil {
-		return linguistTmpDir, isCleanupNeeded, err
-	}
-
-	cmd := exec.Command("git", "checkout", data.LinguistCommit)
-	if err := cmd.Run(); err != nil {
-		return linguistTmpDir, isCleanupNeeded, err
-	}
-
-	if err = os.Chdir(cwd); err != nil {
-		return linguistTmpDir, isCleanupNeeded, err
-	}
-	return linguistTmpDir, isCleanupNeeded, nil
+	return tests.MaybeCloneLinguist(linguistClonedEnvVar, linguistURL, data.LinguistCommit)
 }
 
 type enryBaseTestSuite struct {
@@ -275,7 +240,7 @@ func (s *enryTestSuite) TestGetLanguagesByFilename() {
 		{name: "TestGetLanguagesByFilename_7", filename: "_vimrc", expected: []string{"Vim Script"}},
 		{name: "TestGetLanguagesByFilename_8", filename: "pom.xml", expected: []string{"Maven POM"}},
 		{name: "TestGetLanguagesByFilename_9", filename: "", expected: nil},
-		{name: "TestGetLanguagesByFilename_10", filename: "hi.py", expected: []string{"Python"}},
+		{name: "TestGetLanguagesByFilename_10", filename: "hi.py", expected: nil}, // LanguagesByFilename is only for the well-known file names (.gitignore, etc)
 	}
 
 	for _, test := range tests {
