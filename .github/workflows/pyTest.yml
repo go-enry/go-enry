@@ -21,7 +21,8 @@ jobs:
         if [ -f python/requirements.dev.txt ]; then pip install -r python/requirements.dev.txt; fi
     - name: Build and install package
       run: |
-        pip -v install -e python
+        pip install setuptools wheel
+        pip -v install --no-use-pep517 -e python
     - name: Test
       run: |
         pytest python/
