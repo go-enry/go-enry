@@ -33,6 +33,12 @@ func (s *linguistCorpusSuite) TestLinguistSamples() {
 		"anti-facebook.txt":          true,
 		"fake-news.txt":              true,
 		"test_rules.txt":             true,
+		// backreference in .plist heuristics for "XML Property List" language https://github.com/go-enry/go-enry/pull/169#discussion_r1319889500
+		// upsteam fix comming in https://github.com/go-enry/go-enry/pull/169#issuecomment-1708840755
+		"ff-man.plist":   true,
+		"info.min.plist": true,
+		"info.plist":     true,
+		"man.plist":      true,
 	}
 
 	var total, failed, ok, other int
