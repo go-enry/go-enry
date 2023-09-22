@@ -17,13 +17,13 @@ func MaybeCloneLinguist(envVar, url, commit string) (string, bool, error) {
 	if !isLinguistCloned {
 		linguistTmpDir, err = ioutil.TempDir("", "linguist-")
 		if err != nil {
-			return "", false, err
+			panic(err)
 		}
 
 		isCleanupNeeded = true
 		cmd := exec.Command("git", "clone", "--depth", "150", url, linguistTmpDir)
 		if err := cmd.Run(); err != nil {
-			panic(fmt.Errorf("%s: %w", cmd.String(), err))
+			panicOn(cmd.String(), err)
 		}
 	}
 
@@ -38,11 +38,15 @@ func MaybeCloneLinguist(envVar, url, commit string) (string, bool, error) {
 
 	cmd := exec.Command("git", "checkout", commit)
 	if err := cmd.Run(); err != nil {
-		panic(fmt.Errorf("%s: %w", cmd.String(), err))
+		panicOn(cmd.String(), err)
 	}
 
 	if err = os.Chdir(cwd); err != nil {
-		panic(fmt.Errorf("%s: %w", cmd.String(), err))
+		panicOn(cmd.String(), err)
 	}
 	return linguistTmpDir, isCleanupNeeded, nil
+}
+
+func panicOn(cmd string, err error) {
+	panic(fmt.Errorf("%q returned %w", cmd, err))
 }

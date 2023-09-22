@@ -12,15 +12,16 @@ import (
 const binSniffLen = 8000
 
 var configurationLanguages = map[string]struct{}{
-	"XML":  {},
-	"JSON": {},
-	"TOML": {},
-	"YAML": {},
-	"INI":  {},
-	"SQL":  {},
+	"XML":      {},
+	"JSON":     {},
+	"TOML":     {},
+	"YAML":     {},
+	"MiniYAML": {},
+	"INI":      {},
+	"SQL":      {},
 }
 
-// IsConfiguration tells if filename is in one of the configuration languages.
+// IsConfiguration tells if a give file is in one of the configuration languages.
 func IsConfiguration(path string) bool {
 	language, _ := GetLanguageByExtension(path)
 	_, is := configurationLanguages[language]
