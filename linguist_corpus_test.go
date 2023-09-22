@@ -65,13 +65,13 @@ func (s *linguistCorpusSuite) TestLinguistSamples() {
 
 		errMsg := fmt.Sprintf("file: %q\texpected: %q\tgot: %q\n", path, expected, got)
 		if _, ok := cornerCases[filename]; ok {
-			s.T().Logf(fmt.Sprintf("\t\t[corner case] %s", errMsg))
+			s.T().Logf(fmt.Sprintf("\t[corner case] %s", errMsg))
 		} else {
 			s.Equal(expected, got, errMsg)
 		}
 		return nil
 	})
-	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
+	s.T().Logf("\ttotal files: %d, ok: %d, failed: %d, other: %d\n", total, ok, failed, other)
 }
 
 // Second part of the test_blob.rb#test_language
