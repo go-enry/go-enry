@@ -98,5 +98,5 @@ def test_get_languages():
 
 def test_get_language_extensions():
     assert get_language_extensions("Python") == [".py", ".cgi", ".fcgi", ".gyp", ".gypi", ".lmi", ".py3", ".pyde",
-                                                 ".pyi", ".pyp", ".pyt", ".pyw", ".rpy", ".smk", ".spec", ".tac",
+                                                 ".pyi", ".pyp", ".pyt", ".pyw", ".rpy", ".spec", ".tac",
                                                  ".wsgi", ".xpy"]
