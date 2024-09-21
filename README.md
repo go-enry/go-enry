@@ -160,13 +160,9 @@ The `enry` library is based on the data from `github/linguist` version **v8.0.0*
 
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
-- [Heuristic for ".plist" extension](https://github.com/github-linguist/linguist/blob/b5432ebc7e78f25415b98d48c2fbacddbf8df317/lib/linguist/heuristics.yml#L524) in 'XML Property List', due to unsupported backreference in RE2 regexp engine.
-
 - [Heuristics for ".txt" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521) in Vim Help File could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
 
 - [Heuristics for ".sol" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L464) in Solidity could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
-
-- [Heuristics for ".es" extension](https://github.com/github/linguist/blob/e761f9b013e5b61161481fcb898b59721ee40e3d/lib/linguist/heuristics.yml#L103) in JavaScript could not be parsed, due to unsupported backreference in RE2 regexp engine.
 
 - [Heuristics for ".rno" extension](https://github.com/github/linguist/blob/3a1bd3c3d3e741a8aaec4704f782e06f5cd2a00d/lib/linguist/heuristics.yml#L365) in RUNOFF could not be parsed, due to unsupported lookahead in RE2 regexp engine.
 
