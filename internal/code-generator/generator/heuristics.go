@@ -171,34 +171,34 @@ func parseYaml(file string) (*Heuristics, error) {
 // - possessive quantifier
 // For reference on supported syntax see https://github.com/google/re2/wiki/Syntax
 func unsupportedRegexpSyntax(reg string) string {
-    var reasons []string
+	var reasons []string
 
-    if strings.Contains(reg, `(?<`) {
-        reasons = append(reasons, "lookbehind")
-    }
-    if strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) {
-        reasons = append(reasons, "lookahead")
-    }
-    if strings.Contains(reg, `(?>`) {
-        reasons = append(reasons, "non-backtracking subexpressions")
-    }
-    if strings.Contains(reg, `\1`) {
-        reasons = append(reasons, "backreference")
-    }
-    if strings.Contains(reg, `*+`) {
-        reasons = append(reasons, "possessive quantifier")
-    }
+	if strings.Contains(reg, `(?<`) {
+		reasons = append(reasons, "lookbehind")
+	}
+	if strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) {
+		reasons = append(reasons, "lookahead")
+	}
+	if strings.Contains(reg, `(?>`) {
+		reasons = append(reasons, "non-backtracking subexpressions")
+	}
+	if strings.Contains(reg, `\1`) {
+		reasons = append(reasons, "backreference")
+	}
+	if strings.Contains(reg, `*+`) {
+		reasons = append(reasons, "possessive quantifier")
+	}
 	// https://github.com/github/linguist/pull/4243#discussion_r246105067
-    if strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`) {
-        reasons = append(reasons, "starts and ends with a slash")
-    }
+	if strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`) {
+		reasons = append(reasons, "starts and ends with a slash")
+	}
 	if strings.Contains(reg, `(?P<`) {
-        reasons = append(reasons, "named capturing group")
-    }
+		reasons = append(reasons, "named capturing group")
+	}
 
-    return strings.Join(reasons, ", ")
+	return strings.Join(reasons, ", ")
 }
 
 func isRE2(s string) bool {
-    return unsupportedRegexpSyntax(s) == ""
+	return unsupportedRegexpSyntax(s) == ""
 }
