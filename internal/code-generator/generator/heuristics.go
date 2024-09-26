@@ -188,9 +188,12 @@ func unsupportedRegexpSyntax(reg string) string {
     if strings.Contains(reg, `*+`) {
         reasons = append(reasons, "possessive quantifier")
     }
-	https://github.com/github/linguist/pull/4243#discussion_r246105067
+	// https://github.com/github/linguist/pull/4243#discussion_r246105067
     if strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`) {
-        reasons = append(reasons, "named & numbered capturing group/after text matching")
+        reasons = append(reasons, "starts and ends with a slash")
+    }
+	if strings.Contains(reg, `(?P<`) {
+        reasons = append(reasons, "named capturing group")
     }
 
     return strings.Join(reasons, ", ")
