@@ -90,7 +90,8 @@ func loadRule(namedPatterns map[string]StringArray, rule *Rule) *LanguagePattern
 	}
 
 	if !isRE2(result.Pattern) {
-		log.Printf("RE2 incompatible syntax for heuristic language:'%s', rule:'%s'\n", rule.Languages, result.Pattern)
+		reasons := unsupportedRegexpSyntax(result.Pattern)
+		log.Printf("RE2 incompatible syntax (%s) for heuristic language:'%s', rule:'%s'\n", reasons, rule.Languages, result.Pattern)
 	}
 	return result
 }
@@ -161,7 +162,7 @@ func parseYaml(file string) (*Heuristics, error) {
 	return h, nil
 }
 
-// isUnsupportedRegexpSyntax filters regexp syntax that is not supported by RE2.
+// unsupportedRegexpSyntax returns list of regexp syntaxes that are not supported by RE2
 // In particular, we stumbled up on usage of next cases:
 // - lookbehind & lookahead
 // - non-backtracking subexpressions
@@ -169,13 +170,35 @@ func parseYaml(file string) (*Heuristics, error) {
 // - backreference
 // - possessive quantifier
 // For reference on supported syntax see https://github.com/google/re2/wiki/Syntax
-func isUnsupportedRegexpSyntax(reg string) bool {
-	return strings.Contains(reg, `(?<`) || strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) ||
-		strings.Contains(reg, `(?>`) || strings.Contains(reg, `\1`) || strings.Contains(reg, `*+`) ||
-		// See https://github.com/github/linguist/pull/4243#discussion_r246105067
-		(strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`))
+func unsupportedRegexpSyntax(reg string) string {
+	var reasons []string
+
+	if strings.Contains(reg, `(?<`) {
+		reasons = append(reasons, "lookbehind")
+	}
+	if strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) {
+		reasons = append(reasons, "lookahead")
+	}
+	if strings.Contains(reg, `(?>`) {
+		reasons = append(reasons, "non-backtracking subexpressions")
+	}
+	if strings.Contains(reg, `\1`) {
+		reasons = append(reasons, "backreference")
+	}
+	if strings.Contains(reg, `*+`) {
+		reasons = append(reasons, "possessive quantifier")
+	}
+	// https://github.com/github/linguist/pull/4243#discussion_r246105067
+	if strings.HasPrefix(reg, multilinePrefix+`/`) && strings.HasSuffix(reg, `/`) {
+		reasons = append(reasons, "starts and ends with a slash")
+	}
+	if strings.Contains(reg, `(?P<`) {
+		reasons = append(reasons, "named capturing group")
+	}
+
+	return strings.Join(reasons, ", ")
 }
 
 func isRE2(s string) bool {
-	return !isUnsupportedRegexpSyntax(s)
+	return unsupportedRegexpSyntax(s) == ""
 }
