@@ -289,12 +289,15 @@ func TestIsGenerated(t *testing.T) {
 		//npm shrinkwrap file
 		{"Dummy/npm-shrinkwrap.json", false, true},
 		{"Dummy/package-lock.json", false, true},
-		{"JavaScript/jquery-1.6.1.min.js", true, true},
+
+		//pnpm lockfile
+		{"Dummy/pnpm-lock.yaml", false, true},
 
 		//Yarn Plug'n'Play file
 		{".pnp.js", false, true},
 		{".pnp.cjs", false, true},
 		{".pnp.mjs", false, true},
+		{".pnp.loader.mjs", false, true},
 
 		//Godep saved dependencies
 		{"Godeps/Godeps.json", false, true},
@@ -385,8 +388,54 @@ func TestIsGenerated(t *testing.T) {
 		{"Generated/Haxe/Main.cs", true, true},
 		{"Generated/Haxe/Main.php", true, true},
 
-		//Poetry lock file
-		{"Dummy/poetry.lock", false, true},
+		//Cargo
+		{"TOML/filenames/Cargo.toml.orig", false, true},
+
+		//poetry
+		{"TOML/filenames/poetry.lock", false, true},
+
+		//pdm
+		{"TOML/filenames/pdm.lock", false, true},
+
+		//uv
+		{"TOML/filenames/uv.lock", false, true},
+
+		//coverage.py `coverage html` output
+		{"htmlcov/index.html", false, true},
+		{"htmlcov/coverage_html.js", false, true},
+		{"htmlcov/style.css", false, true},
+		{"htmlcov/status.json", false, true},
+		{"Dummy/htmlcov/index.html", false, true},
+		{"Dummy/htmlcov/coverage_html.js", false, true},
+		{"Dummy/htmlcov/style.css", false, true},
+		{"Dummy/htmlcov/status.json", false, true},
+
+		//Jest snapshots (https://github.com/github-linguist/linguist/pull/3579)
+		{"Jest Snapshot/css.test.tsx.snap", false, false},
+
+		//Yarn lockfiles (https://github.com/github-linguist/linguist/pull/4459)
+		{"YAML/filenames/yarn.lock", false, false},
+
+		//Nix generated flake.lock file
+		{"JSON/filenames/flake.lock", false, true},
+
+		//Bazel generated bzlmod lockfile
+		{"JSON/filenames/MODULE.bazel.lock", false, true},
+
+		//Deno generated deno.lock file
+		{"JSON/filenames/deno.lock", false, true},
+
+		//Generated Pascal _TLB file
+		{"Pascal/lazcomlib_1_0_tlb.pas", false, true},
+
+		//SQLx query files
+		{"Rust/.sqlx/query-2b8b1aae3740a05cb7179be9c7d5af30e8362c3cba0b07bc18fa32ff1a2232cc.json", false, true},
+
+		//IntelliJ IDEA project
+		{"Dummy/.idea/vcs.xml", false, true},
+
+		//Terraform lock
+		{"Dummy/.terraform.lock.hcl", false, true},
 	}
 
 	for _, tt := range testCases {

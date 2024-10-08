@@ -42,6 +42,9 @@ func nameEndsWith(pattern string) GeneratedCodeNameMatcher {
 // GeneratedCodeNameMatchers are all the matchers that check whether the code
 // is generated based only on the file name.
 var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
+	// IntelliJ IDEA project
+	nameMatches(`(?:^|\/)\.idea\/`),
+
 	// Cocoa pods
 	nameMatches(`(^Pods|\/Pods)\/`),
 
@@ -52,7 +55,7 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 	nameMatches(`(?i)\.designer\.(cs|vb)$`),
 
 	// Generated NET specflow feature file
-	nameEndsWith(".feature.cs"),
+	nameMatches(`(?i)\.feature\.cs$`),
 
 	// Node modules
 	nameContains("node_modules/"),
@@ -64,14 +67,29 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 	nameEndsWith("Gopkg.lock"),
 	nameEndsWith("glide.lock"),
 
+	// Poetry lock
+	nameEndsWith("poetry.lock"),
+
+	// PDM lock
+	nameEndsWith("pdm.lock"),
+
+	// uv lock
+	nameEndsWith("uv.lock"),
+
 	// Esy lock
 	nameMatches(`(^|\/)(\w+\.)?esy.lock$`),
+
+	// Deno lock
+	nameEndsWith("deno.lock"),
 
 	// NPM shrinkwrap
 	nameEndsWith("npm-shrinkwrap.json"),
 
 	// NPM package lock
 	nameEndsWith("package-lock.json"),
+
+	// pnpm lock
+	nameEndsWith("pnpm-lock.yaml"),
 
 	// Yarn plugnplay
 	nameMatches(`(^|\/)\.pnp\..*$`),
@@ -88,14 +106,32 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 	// Cargo lock
 	nameEndsWith("Cargo.lock"),
 
+	// Cargo original file
+	nameEndsWith("Cargo.toml.orig"),
+
+	// Nix flakes lock
+	nameMatches(`(^|\/)flake\.lock$`),
+
+	// Bazel Bzlmod lock
+	nameMatches(`(^|\/)MODULE\.bazel\.lock$`),
+
 	// Pipenv lock
 	nameEndsWith("Pipfile.lock"),
+
+	// Terraform lock
+	nameMatches(`(?:^|\/)\.terraform\.lock\.hcl$`),
 
 	// GraphQL relay
 	nameContains("__generated__/"),
 
-	// Poetry lock
-	nameEndsWith("poetry.lock"),
+	// Delphi interface file
+	nameMatches(`(?i)_tlb\.pas$`),
+
+	// HTML coverage report
+	nameMatches(`(?:^|\/)htmlcov\/`),
+
+	// SQLx query file
+	nameMatches(`(?:^|.*\/)\.sqlx\/query-.+\.json$`),
 }
 
 // GeneratedCodeMatcher checks whether the file with the given data is
