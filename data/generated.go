@@ -172,6 +172,7 @@ var GeneratedCodeMatchers = []GeneratedCodeMatcher{
 	isGeneratedHaxe,
 	isGeneratedHTML,
 	isGeneratedJooq,
+	isAnsibleVault,
 }
 
 func canBeMinified(ext string) bool {
@@ -878,4 +879,9 @@ func countAppearancesInLine(line []byte, targets ...string) int {
 		count += bytes.Count(line, []byte(t))
 	}
 	return count
+}
+
+func isAnsibleVault(_, ext string, content []byte) bool {
+	firstLine := getFirstLine(content)
+	return bytes.HasPrefix(firstLine, []byte("$ANSIBLE_VAULT;"))
 }
