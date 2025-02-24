@@ -173,7 +173,7 @@ func parseYaml(file string) (*Heuristics, error) {
 func unsupportedRegexpSyntax(reg string) string {
 	var reasons []string
 
-	if strings.Contains(reg, `(?<`) {
+	if strings.Contains(reg, `(?<=`) || strings.Contains(reg, `(?<!`){
 		reasons = append(reasons, "lookbehind")
 	}
 	if strings.Contains(reg, `(?=`) || strings.Contains(reg, `(?!`) {
