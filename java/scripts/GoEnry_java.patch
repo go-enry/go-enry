@@ -1,0 +1,13 @@
+--- a/generated-sources/jextract/tech/sourced/enry/internal/GoEnry.java
++++ b/generated-sources/jextract/tech/sourced/enry/internal/GoEnry.java
+@@ -55,9 +55,7 @@ public class GoEnry {
+         };
+     }
+
+-    static final SymbolLookup SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName("enry"), LIBRARY_ARENA)
+-            .or(SymbolLookup.loaderLookup())
+-            .or(Linker.nativeLinker().defaultLookup());
++    static final SymbolLookup SYMBOL_LOOKUP = ChainedLibraryLookup.INSTANCE.get(LIBRARY_ARENA);
+
+     public static final ValueLayout.OfBoolean C_BOOL = ValueLayout.JAVA_BOOLEAN;
+     public static final ValueLayout.OfByte C_CHAR = ValueLayout.JAVA_BYTE;
