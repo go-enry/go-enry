@@ -18,6 +18,7 @@ typedef _GoString_ GoString;
 
 typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 
+extern void FreeCString(char *str);
 
 extern GoString GetLanguage(GoString p0, GoSlice p1);
 

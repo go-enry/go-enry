@@ -3,9 +3,19 @@
 
 package main
 
+// #include <stdlib.h>
 import "C"
-import "github.com/go-enry/go-enry/v2"
-import "github.com/go-enry/go-enry/v2/data"
+import (
+	"unsafe"
+
+	"github.com/go-enry/go-enry/v2"
+	"github.com/go-enry/go-enry/v2/data"
+)
+
+//export FreeCString
+func FreeCString(str *C.char) {
+	C.free(unsafe.Pointer(str))
+}
 
 //export GetLanguage
 func GetLanguage(filename string, content []byte) string {
