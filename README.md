@@ -144,7 +144,7 @@ A library is published on Maven as [tech.sourced:enry-java](https://mvnrepositor
 
 ### Python bindings
 
-Python bindings using a C shared library and cffi are available for Python 3.8+.
+Python bindings using a C shared library and cffi are available for Python 3.9+.
 
 **Installation:**
 ```bash

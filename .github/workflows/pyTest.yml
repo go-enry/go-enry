@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
         platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -22,11 +22,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Build Go static library
-        run: make static
-
-      - name: Verify static library exists
-        run: ls -la .shared/libenry.a
+      - name: Build Go shared library
+        # We use 'shared' now because ABI mode needs .so or .dylib
+        run: |
+          # Ensure Go architecture matches the Python runner
+          export GOARCH=$(python -c "import platform; m = platform.machine().lower(); print('arm64' if 'arm' in m or 'aarch64' in m else 'amd64')")
+          make shared
 
       - name: Install Python dependencies
         run: |
@@ -36,9 +37,12 @@ jobs:
 
       - name: Build and install package
         run: |
+          cp LICENSE python/
           cd python
           python build_enry.py
           pip install -e .
 
       - name: Run tests
-        run: pytest python/ -v
+        env:
+          PYTHONMALLOC: malloc
+        run: pytest python/tests/ -v

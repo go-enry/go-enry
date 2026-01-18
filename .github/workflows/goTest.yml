@@ -4,7 +4,8 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.18.x, 1.19.x]
+        # Modernizing Go versions for better 3.12+ compatibility and ARM stability
+        go-version: ['1.21.x', '1.22.x', '1.23.x']
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -17,16 +18,16 @@ jobs:
         git config --global core.autocrlf false
         git config --global core.eol lf
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Test
-      run: go test ./...
+      run: go test -v ./...
       env:
         ENRY_DEBUG: 1
 
   test-oniguruma:
     strategy:
       matrix:
-        go-version: [1.18.x, 1.19.x]
+        go-version: ['1.21.x']
     runs-on: ubuntu-latest
     env:
       ONIGURUMA_VERSION: 6.9.4
@@ -44,9 +45,9 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Test
-      run: go test -tags ${GO_TAGS} ./...
+      run: go test -v -tags ${GO_TAGS} ./...
       env:
         GO_TAGS: oniguruma

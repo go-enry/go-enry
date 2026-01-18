@@ -1,11 +1,11 @@
 # Python bindings for enry
 
-Python bindings through cFFI (API, out-of-line) for calling enry Go functions exposed by CGo wrapper.
+Python bindings through cFFI (ABI, out-of-line) for calling enry Go functions exposed by CGo wrapper.
 
 ## Build
 
 ```
-$ pushd .. && make static && popd
+$ pushd .. && make shared && popd
 $ pip install -r requirements.txt
 $ python build_enry.py
 ```
@@ -16,7 +16,7 @@ Will build a static library for Cgo wrapper `libenry`, then generate and build `
 
 ### From PyPI (Recommended)
 
-For Python 3.8+, install pre-built wheels:
+For Python 3.9+, install pre-built wheels:
 ```bash
 pip install enry
 ```
@@ -31,7 +31,7 @@ If you need to build from source or use an unsupported platform, you'll need Go 
 ```bash
 git clone https://github.com/go-enry/go-enry.git
 cd go-enry
-make static
+make shared
 cd python
 pip install -e .
 ```
@@ -39,7 +39,7 @@ pip install -e .
 **Requirements for building:**
 - Go 1.21 or later
 - GCC or compatible C compiler
-- Python 3.8 or later
+- Python 3.9 or later
 
 ## Usage
 ```python
@@ -52,10 +52,10 @@ print(f"Detected language: {language}")
 
 ## Supported Python Versions
 
-- Python 3.8+
+- Python 3.9+
 - CPython only (PyPy not yet supported)
 
-**Note:** Python 3.6 and 3.7 reached end-of-life and are no longer supported. 
+**Note:** Python 3.6, 3.7 and 3.8 reached end-of-life and are no longer supported. 
 Use enry 0.1.1 if you must use these versions (not recommended for security reasons).
 
 ## Platform Support

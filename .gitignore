@@ -10,3 +10,22 @@ vendor/
 java/lib/
 .vscode/
 .venv
+
+# --- Python Enry specific additions ---
+
+# Ignore the Go shared library artifacts copied into binding directories
+python/enry/*.so
+python/enry/*.dylib
+python/enry/*.dll
+python/enry/libenry.h
+
+# Ignore CFFI generated files
+python/_c_enry.py
+python/enry/_c_enry.py
+python/_c_enry.c
+python/*.so
+
+# Ignore Python build/dist artifacts
+python/dist/
+python/*.egg-info/
+python/.pytest_cache/

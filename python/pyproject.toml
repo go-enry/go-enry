@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=64.0", "cffi>=1.16.0", "wheel"]
+# We need cffi 1.15+ for 3.11/3.12 support and setuptools for 3.12+
+requires = ["setuptools>=77.0.0", "cffi>=1.15.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,10 +11,11 @@ readme = "README.md"
 authors = [
     {name = "go-enry contributors"},
 ]
-license = {text = "Apache-2.0"}
-requires-python = ">=3.8"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
 dependencies = [
-    "cffi>=1.16.0",
+    "cffi>=1.15.0",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -39,6 +41,9 @@ Documentation = "https://github.com/go-enry/go-enry/tree/master/python"
 
 [tool.setuptools]
 packages = ["enry"]
+# Disable zip_safe because we need to load a shared library from the disk
+zip-safe = false
 
 [tool.setuptools.package-data]
-enry = ["*.py"]
+# This ensures the binary is included in the wheel for all versions.
+enry = ["*.py", "*.so", "*.dylib", "*.dll", "libenry.h"]

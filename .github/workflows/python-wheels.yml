@@ -15,18 +15,23 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, macos-14]
+        # macos-14 is the standard ARM (M1/M2/M3) runner.
+        # macos-15-intel is the new home for x86_64 builds.
+        os: [ubuntu-22.04, macos-14, macos-15-intel]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      - name: Build static library
-        run: make static
-      - name: Verify static library exists
-        run: ls -la .shared/libenry.a
+      - name: Build Go shared library and Prep
+        # This builds the binary once. cibuildwheel will see it in the mounted directory.
+        # copy the LICENSE file to python root
+        run: |
+          make shared
+          cp LICENSE python/
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -34,15 +39,53 @@ jobs:
       - name: Install cibuildwheel
         run: python -m pip install -r python/requirements.ci.txt
       - name: Build wheels
-        run: python -m cibuildwheel python/
+        uses: pypa/cibuildwheel@v3.3.1
+        with:
+          # This is the correct way to point to a subfolder in v3.x
+          package-dir: python
         env:
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*
+          
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
           CIBW_SKIP: "*-win* *-musllinux*"
+          
+          # ARCH handling
           CIBW_ARCHS_MACOS: "x86_64 arm64"
           CIBW_ARCHS_LINUX: "x86_64"
-          CIBW_BEFORE_BUILD: "python build_enry.py"
-          CIBW_TEST_COMMAND: "python -c 'import enry; result = enry.get_language(\"test.py\", b\"print(123)\"); print(f\"Language detected: {result}\"); assert result == \"Python\", f\"Expected Python, got {result}\"'"
-          CIBW_TEST_REQUIRES: ""
+
+          # Use a modern manylinux image for Go compatibility
+          CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
+
+          # Building Go inside the container
+          CIBW_BEFORE_ALL_LINUX: >
+            yum install -y make &&
+            curl -L https://go.dev/dl/go1.21.0.linux-amd64.tar.gz | tar -xz -C /usr/local
+          CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/local/go/bin"
+
+          # This hook runs for EVERY wheel. 
+          # It ensures the .so/.dylib matches the architecture of the current wheel build.
+          CIBW_BEFORE_BUILD: |
+            pip install cffi
+
+            # 1. Sync architecture for Go
+            if [ "$CIBW_ARCHS" = "arm64" ]; then export GOARCH=arm64;
+            elif [ "$CIBW_ARCHS" = "x86_64" ]; then export GOARCH=amd64;
+            fi
+
+            # 2. Build via Makefile
+            make shared
+
+            # Defensive: find the lib we just built and make sure it's in the package
+            find .shared -name "libenry.*" -exec cp {} python/enry/ \;
+            
+            cp LICENSE python/
+          
+          # Use the requirements file located in python/requirements.dev.txt
+          # {project} here resolves to the "python" directory
+          CIBW_TEST_REQUIRES: "-r {project}/requirements.dev.txt"
+
+          # Run pytest on the tests directory
+          CIBW_TEST_COMMAND: "pytest {project}/tests -v"
+
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -58,10 +101,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      - name: Build static library
-        run: make static
-      - name: Verify static library exists
-        run: ls -la .shared/libenry.a
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -69,7 +108,7 @@ jobs:
       - name: Build sdist
         run: |
           cd python
-          python -m pip install build
+          python -m pip install build cffi  # Ensure cffi is available here
           python -m build --sdist
       - name: Upload sdist
         uses: actions/upload-artifact@v4
@@ -85,7 +124,7 @@ jobs:
         fail-fast: false
         matrix:
             os: [ubuntu-22.04, macos-13]
-            python-version: ['3.8', '3.12']
+            python-version: ['3.9', '3.12', '3.13']
 
     steps:
       - name: Set up Python
@@ -104,7 +143,13 @@ jobs:
         run: ls -lh wheels/
 
       - name: Install wheel
-        run: pip install wheels/*.whl
+        shell: bash
+        run: |
+          # Remove the dot from the version string (e.g., 3.12 -> 312)
+          PY_VER=$(echo "${{ matrix.python-version }}" | tr -d '.')
+          
+          # Try to install the specific CPython wheel, fallback to the generic abi3 wheel
+          pip install wheels/*cp${PY_VER}*.whl || pip install wheels/*abi3*.whl
 
       - name: Test installed package
         run: |
@@ -133,7 +178,7 @@ jobs:
           fi
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist, test_wheels]
     runs-on: ubuntu-22.04
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     permissions:
