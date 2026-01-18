@@ -12,6 +12,64 @@ $ python build_enry.py
 
 Will build a static library for Cgo wrapper `libenry`, then generate and build `enry.c` - a CPython extension that provides actual bindings.
 
+## Installation
+
+### From PyPI (Recommended)
+
+For Python 3.8+, install pre-built wheels:
+```bash
+pip install enry
+```
+
+No Go compiler required! Pre-built wheels are available for:
+- **Linux**: x86_64 (manylinux)
+- **macOS**: x86_64 (Intel) and arm64 (Apple Silicon)
+
+### From Source
+
+If you need to build from source or use an unsupported platform, you'll need Go installed:
+```bash
+git clone https://github.com/go-enry/go-enry.git
+cd go-enry
+make static
+cd python
+pip install -e .
+```
+
+**Requirements for building:**
+- Go 1.21 or later
+- GCC or compatible C compiler
+- Python 3.8 or later
+
+## Usage
+```python
+import enry
+
+# Detect language by filename and content
+language = enry.get_language("example.py", b"print('Hello, world!')")
+print(f"Detected language: {language}")
+```
+
+## Supported Python Versions
+
+- Python 3.8+
+- CPython only (PyPy not yet supported)
+
+**Note:** Python 3.6 and 3.7 reached end-of-life and are no longer supported. 
+Use enry 0.1.1 if you must use these versions (not recommended for security reasons).
+
+## Platform Support
+
+- ✅ Linux (x86_64)
+- ✅ macOS (Intel x86_64 and Apple Silicon arm64)
+- ❌ Windows (planned - see [#150](https://github.com/src-d/enry/issues/150))
+- ❌ Linux ARM/aarch64 (not yet available)
+
+## Known Issues
+
+- Memory leak fixed in version 0.1.2 (see [#36](https://github.com/go-enry/go-enry/issues/36))
+
+
 ## Run
 
 Example for single exposed API function is provided.

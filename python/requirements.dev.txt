@@ -1,1 +1,3 @@
-pytest>=6.0.1
+# Test requirements
+pytest>=7.0.0
+psutil>=5.9.0

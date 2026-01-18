@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=64.0", "cffi>=1.16.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enry"
+version = "0.1.2"
+description = "Python bindings for go-enry language detector"
+readme = "README.md"
+authors = [
+    {name = "go-enry contributors"},
+]
+license = {text = "Apache-2.0"}
+requires-python = ">=3.8"
+dependencies = [
+    "cffi>=1.16.0",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.urls]
+Homepage = "https://github.com/go-enry/go-enry"
+Repository = "https://github.com/go-enry/go-enry"
+Issues = "https://github.com/go-enry/go-enry/issues"
+Documentation = "https://github.com/go-enry/go-enry/tree/master/python"
+
+[tool.setuptools]
+packages = ["enry"]
+
+[tool.setuptools.package-data]
+enry = ["*.py"]

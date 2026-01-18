@@ -144,10 +144,30 @@ A library is published on Maven as [tech.sourced:enry-java](https://mvnrepositor
 
 ### Python bindings
 
-Generated Python bindings using a C shared library and cffi are WIP under [src-d/enry#154](https://github.com/src-d/enry/issues/154).
+Python bindings using a C shared library and cffi are available for Python 3.8+.
+
+**Installation:**
+```bash
+pip install enry
+```
+
+Pre-built wheels are available for Linux (x86_64) and macOS (Intel + Apple Silicon).
+
+**Usage:**
+```python
+import enry
+
+language = enry.get_language("example.go", b"package main")
+print(language)  # Output: Go
+```
 
 A library is going to be published on pypi as [enry](https://pypi.org/project/enry/) for
-macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
+macOS and linux platforms.
+
+Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
+
+For more details, see [python/README.md](https://github.com/go-enry/go-enry/blob/master/python/README.md).
+
 
 ### Rust bindings
 

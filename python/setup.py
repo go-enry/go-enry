@@ -1,46 +1,77 @@
-from logging import getLogger
-import shutil
+"""
+Minimal setup.py that handles building the Go static library and cffi bindings.
+All package metadata is in pyproject.toml.
+"""
 import subprocess
-
-from setuptools import setup, find_packages
+import shutil
+import sys
+from pathlib import Path
+from setuptools import setup
+from setuptools.command.build_py import build_py
 from setuptools.command.develop import develop
-from setuptools.command.install import install
-
-logger = getLogger(__name__)
+from setuptools.command.build_ext import build_ext
 
 
-def build_go_archive():
-    logger.info("Building C archive with static library")
+def build_go_static_lib():
+    """Build the Go static library using make."""
     if shutil.which("go") is None:
-        raise EnvironmentError("You should have Go installed and available on your path in order to build this module")
-    subprocess.check_output(["make", "static"], cwd="../")
-    logger.info("C archive successfully built")
+        print(
+            "\n" + "="*70 + "\n"
+            "ERROR: Go compiler not found!\n\n"
+            "To build from source, you need Go installed.\n"
+            "Install Go: https://golang.org/dl/\n\n"
+            "Or install pre-built wheels instead:\n"
+            "  pip install enry\n"
+            + "="*70 + "\n",
+            file=sys.stderr
+        )
+        sys.exit(1)
+    
+    print("Building Go static library (this may take a minute)...")
+    try:
+        subprocess.check_call(["make", "static"], cwd="..")
+        print("✓ Go static library built successfully")
+    except subprocess.CalledProcessError as e:
+        print(f"\n✗ Failed to build Go static library: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
-class build_static_and_develop(develop):
+def build_cffi_extension():
+    """Build the cffi extension by running build_enry.py."""
+    print("Building cffi extension...")
+    try:
+        # Run build_enry.py which creates the cffi bindings
+        subprocess.check_call([sys.executable, "build_enry.py"])
+        print("✓ cffi extension built successfully")
+    except subprocess.CalledProcessError as e:
+        print(f"\n✗ Failed to build cffi extension: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+class BuildPyWithGo(build_py):
+    """Build Python package after building Go static library and cffi extension."""
     
     def run(self):
-        build_go_archive()
-        super(build_static_and_develop, self).run()
+        build_go_static_lib()
+        build_cffi_extension()
+        super().run()
 
 
-class build_static_and_install(install):
+class DevelopWithGo(develop):
+    """Install in development mode after building Go static library and cffi extension."""
     
     def run(self):
-        build_go_archive()
-        super(build_static_and_install, self).run()
+        build_go_static_lib()
+        build_cffi_extension()
+        super().run()
 
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
-setup(
-    name="enry",
-    version="0.1.1",
-    description="Python bindings for go-enry package",
-    setup_requires=["cffi>=1.0.0"],
-    cffi_modules=["build_enry.py:ffibuilder"],
-    packages=find_packages(),
-    install_requires=["cffi>=1.0.0"],
-    cmdclass={"develop": build_static_and_develop, "install": build_static_and_install}
-)
+if __name__ == "__main__":
+    setup(
+        # Reference to cffi builder
+        cffi_modules=["build_enry.py:ffibuilder"],
+        cmdclass={
+            "build_py": BuildPyWithGo,
+            "develop": DevelopWithGo,
+        }
+    )

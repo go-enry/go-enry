@@ -1,2 +1,4 @@
-cffi==1.16.0
-pycparser==2.20
+cffi>=1.16.0
+pycparser>=2.20
+setuptools>=64.0
+wheel
