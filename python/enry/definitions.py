@@ -144,11 +144,11 @@ def get_language_extensions(language: str) -> List[str]:
     return go_str_slice_to_py(lib, res)
 
 def get_languages_by_filename(filename: str, content: bytes = b"", candidates: List[str] = None) -> List[str]:
-    c_cand = prepare_candidates(candidates)
+    c_cand, _keep_alive = prepare_candidates(candidates)
     res = lib.GetLanguagesByFilename(filename.encode(), content, len(content), c_cand)
     return go_str_slice_to_py(lib, res)
 
 def get_languages_by_shebang(filename: str, content: bytes = b"", candidates: List[str] = None) -> List[str]:
-    c_cand = prepare_candidates(candidates)
+    c_cand, _keep_alive = prepare_candidates(candidates)
     res = lib.GetLanguagesByShebang(filename.encode(), content, len(content), c_cand)
     return go_str_slice_to_py(lib, res)

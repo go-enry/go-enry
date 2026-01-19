@@ -46,7 +46,7 @@ def prepare_candidates(candidates: List[str]):
         c_list[i] = c_str
     
     c_list[len(candidates)] = ffi.NULL
-    return c_list
+    return c_list, c_strings  # Return c_strings to keep them in scope
 
 def go_guess_to_py(lib, c_ptr) -> Guess:
     """Standardizes the return of single-string 'Guess' functions."""

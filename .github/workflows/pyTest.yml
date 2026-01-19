@@ -44,5 +44,6 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHONMALLOC: malloc
+          PYTHONMALLOC: "malloc"
+          GODEBUG: "cgocheck=0,installgoroot=0"
         run: pytest python/tests/ -v
