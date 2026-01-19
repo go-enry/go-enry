@@ -1,8 +1,8 @@
 """
-Python library calling enry Go implementation trough cFFI (API, out-of-line) and Cgo.
+Python library calling enry Go implementation through cFFI (ABI, out-of-line) and Cgo.
 """
-import os
 import platform
+from pathlib import Path
 from typing import List
 from enry._c_enry import ffi
 from enry.types import Guess
@@ -15,31 +15,47 @@ from enry.utils import (
 
 def _load_library():
     """
-    Locates and opens the Go shared library based on the operating system.
-    This is the core of the ABI mode implementation.
+    Locates and opens the Go shared library using Path.
+    Handles cross-platform naming and package vs development layouts.
     """
-    base_path = os.path.dirname(__file__)
-    system = platform.system()
+    # Path to the directory containing this file (python/enry/)
+    pkg_dir = Path(__file__).resolve().parent
     
-    if system == "Darwin":
+    system = platform.system().lower()
+    
+    if system == "darwin":
         lib_name = "libenry.dylib"
-    elif system == "Windows":
+    elif system == "windows":
         lib_name = "libenry.dll"
     else:
         lib_name = "libenry.so"
+
+    # 1. Search in the current package directory (standard for wheels)
+    lib_path = pkg_dir / lib_name
+
+    # 2. Fallback: Local dev environment (.shared/os-arch/)
+    if not lib_path.exists():
+        machine = platform.machine().lower()
+        # Map for Go-style architecture names
+        go_arch = "amd64" if machine in ["x86_64", "amd64"] else "arm64"
         
-    lib_path = os.path.join(base_path, lib_name)
-    
-    # Fallback to current directory for local testing
-    if not os.path.exists(lib_path):
-        lib_path = os.path.join(os.getcwd(), lib_name)
+        # Look up two levels (repo root) then into .shared
+        fallback_path = pkg_dir.parents[1] / ".shared" / f"{system}-{go_arch}" / lib_name
+        if fallback_path.exists():
+            lib_path = fallback_path
+
+    # 3. Final Fallback: Current Working Directory
+    if not lib_path.exists():
+        lib_path = Path.cwd() / lib_name
 
     try:
-        return ffi.dlopen(lib_path)
+        # ffi.dlopen requires a string path
+        return ffi.dlopen(str(lib_path))
     except OSError as e:
         raise ImportError(
-            f"Could not load the enry shared library at {lib_path}. "
-            "Ensure the Go library is built and placed in the enry/ directory."
+            f"Could not load the enry shared library at {lib_path}.\n"
+            f"System: {system}, Architecture: {platform.machine()}\n"
+            "Ensure 'make shared' was run and the library is in the enry/ directory."
         ) from e
 
 # Load the library globally for this module

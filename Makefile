@@ -10,12 +10,26 @@ LINUX_LIB = libenry.so
 DARWIN_LIB = libenry.dylib
 HEADER_FILE=libenry.h
 
-LINUX_DIR=$(RESOURCES_DIR)/linux-x86-64
-LINUX_SHARED_LIB=$(LINUX_DIR)/${LINUX_LIB}
-DARWIN_DIR=$(RESOURCES_DIR)/darwin
-DARWIN_SHARED_LIB=$(DARWIN_DIR)/${DARWIN_LIB}
 STATIC_LIB=$(RESOURCES_DIR)/libenry.a
 NATIVE_LIB=./shared/enry.go
+
+# --- Architecture Detection ---
+# Use GOARCH if set (by CI), otherwise fallback to native go env
+TARGET_ARCH ?= $(shell go env GOARCH)
+# Use GOOS if set (by CI), otherwise fallback to native go env
+TARGET_OS ?= $(shell go env GOOS)
+
+# Map Go OS to library extensions
+ifeq ($(TARGET_OS),darwin)
+    LIB_EXT = dylib
+else
+    LIB_EXT = so
+endif
+
+# Define the specific output path based on OS and ARCH
+# This prevents different builds from overwriting each other in CI
+BUILD_DIR = $(RESOURCES_DIR)/$(TARGET_OS)-$(TARGET_ARCH)
+SHARED_LIB = $(BUILD_DIR)/libenry.$(LIB_EXT)
 
 all: shared static
 
@@ -39,37 +53,22 @@ code-generate: $(LINGUIST_PATH)
 # --- Shared Library Targets ---
 
 # Master shared target - detects host OS
-shared:
-	@if [ "$$(uname)" = "Darwin" ]; then \
-		$(MAKE) darwin-shared; \
-	else \
-		$(MAKE) linux-shared; \
-	fi
+shared: $(SHARED_LIB)
 
-
-# These act as aliases for the file-based targets below
-linux-shared: $(LINUX_SHARED_LIB)
-darwin-shared: $(DARWIN_SHARED_LIB)
-
-$(LINUX_SHARED_LIB):
-	mkdir -p $(LINUX_DIR)
-	# Build shared object natively
-	CGO_ENABLED=1 GOOS=linux go build -buildmode=c-shared -o $(LINUX_SHARED_LIB) $(NATIVE_LIB)
-	mv $(LINUX_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
-	# Copy for Python ABI discovery
-	cp $(LINUX_SHARED_LIB) $(PYTHON_ENRY_DIR)
-	cp $(RESOURCES_DIR)/$(HEADER_FILE) $(PYTHON_ENRY_DIR)
-	@echo "$(LINUX_LIB) built and copied to $(PYTHON_ENRY_DIR)"
-
-$(DARWIN_SHARED_LIB):
-	mkdir -p $(DARWIN_DIR)
-	# Build shared object. We remove o64-clang to support native M1/M2/M3 builds.
-	CGO_ENABLED=1 GOOS=darwin go build -buildmode=c-shared -o $(DARWIN_SHARED_LIB) $(NATIVE_LIB)
-	mv $(DARWIN_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
-	# Copy for Python ABI discovery
-	cp $(DARWIN_SHARED_LIB) $(PYTHON_ENRY_DIR)
-	cp $(RESOURCES_DIR)/$(HEADER_FILE) $(PYTHON_ENRY_DIR)
-	@echo "$(DARWIN_LIB) built and copied to $(PYTHON_ENRY_DIR)"
+$(SHARED_LIB):
+	mkdir -p $(BUILD_DIR)
+	# CGO_ENABLED=1 is required for buildmode=c-shared
+	# We let Go handle GOOS and GOARCH from the environment variables
+	CGO_ENABLED=1 go build -v -buildmode=c-shared -o $(SHARED_LIB) $(NATIVE_LIB)
+	
+	# Move header to a central location
+	mv $(BUILD_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
+	
+	# Copy to Python directory for packaging
+	mkdir -p $(PYTHON_ENRY_DIR)
+	cp $(SHARED_LIB) $(PYTHON_ENRY_DIR)/
+	cp $(RESOURCES_DIR)/$(HEADER_FILE) $(PYTHON_ENRY_DIR)/
+	@echo "Successfully built $(SHARED_LIB) and copied to $(PYTHON_ENRY_DIR)"
 
 ## --- Static Library ---
 
@@ -97,8 +96,8 @@ benchmarks-slow: $(LINGUIST_PATH)
 
 clean-shared:
 	rm -rf $(RESOURCES_DIR)
-	rm -f $(PYTHON_ENRY_DIR)/*.so $(PYTHON_ENRY_DIR)/*.dylib
+	rm -f $(PYTHON_ENRY_DIR)/*.so $(PYTHON_ENRY_DIR)/*.dylib $(PYTHON_ENRY_DIR)/*.h
 
 clean: clean-linguist clean-shared
 
-.PHONY: all shared linux-shared darwin-shared static clean code-generate benchmarks benchmarks-samples benchmarks-slow
+.PHONY: all shared static clean code-generate benchmarks benchmarks-samples benchmarks-slow

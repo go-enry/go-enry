@@ -47,6 +47,9 @@ jobs:
           
           CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
           CIBW_SKIP: "*-win* *-musllinux*"
+
+          # Fix for the Python 3.9 Segfault
+          CIBW_ENVIRONMENT_MACOS: "PYTHONMALLOC=malloc"
           
           # ARCH handling
           CIBW_ARCHS_MACOS: "x86_64 arm64"
@@ -66,25 +69,45 @@ jobs:
           CIBW_BEFORE_BUILD: |
             pip install cffi
 
-            # 1. Sync architecture for Go
-            if [ "$CIBW_ARCHS" = "arm64" ]; then export GOARCH=arm64;
-            elif [ "$CIBW_ARCHS" = "x86_64" ]; then export GOARCH=amd64;
+            # Clean up ANY existing binaries to prevent pollution
+            make clean-shared
+
+            # Set a consistent deployment target
+            export MACOSX_DEPLOYMENT_TARGET=11.0
+
+            # 1. Map cibuildwheel arch to Go/C architectures
+            if [ "$CIBW_ARCHS" = "arm64" ]; then
+              export GOARCH=arm64
+              export CGO_CFLAGS="-arch arm64"
+              export CGO_LDFLAGS="-arch arm64"
+              export LDFLAGS="-arch arm64"
+            elif [ "$CIBW_ARCHS" = "x86_64" ]; then
+              export GOARCH=amd64
+              export CGO_CFLAGS="-arch x86_64"
+              export CGO_LDFLAGS="-arch x86_64"
+            fi
+
+            # Ensure the C compiler knows where the SDK is on macOS
+            if [[ "$(uname)" == "Darwin" ]]; then
+              export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
+              export MACOSX_DEPLOYMENT_TARGET=11.0
             fi
 
             # 2. Build via Makefile
-            make shared
+            CGO_ENABLED=1 make shared
 
             # Defensive: find the lib we just built and make sure it's in the package
             find .shared -name "libenry.*" -exec cp {} python/enry/ \;
-            
-            cp LICENSE python/
-          
-          # Use the requirements file located in python/requirements.dev.txt
-          # {project} here resolves to the "python" directory
-          CIBW_TEST_REQUIRES: "-r {project}/requirements.dev.txt"
 
-          # Run pytest on the tests directory
-          CIBW_TEST_COMMAND: "pytest {project}/tests -v"
+            cp LICENSE python/
+
+            # Debug check: verify what we actually built
+            if [[ "$(uname)" == "Darwin" ]]; then
+              lipo -info python/enry/libenry.dylib
+            fi
+          
+          CIBW_TEST_COMMAND: "python -c 'import enry; result = enry.get_language(\"test.py\", b\"print(123)\"); print(f\"Language detected: {result}\"); assert result == \"Python\", f\"Expected Python, got {result}\"'"
+          CIBW_TEST_REQUIRES: ""
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4

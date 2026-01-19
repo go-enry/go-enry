@@ -41,9 +41,9 @@ Documentation = "https://github.com/go-enry/go-enry/tree/master/python"
 
 [tool.setuptools]
 packages = ["enry"]
-# Disable zip_safe because we need to load a shared library from the disk
-zip-safe = false
+# Ensure the build script is included in the sdist so others can build it
+include-package-data = true
 
 [tool.setuptools.package-data]
 # This ensures the binary is included in the wheel for all versions.
-enry = ["*.py", "*.so", "*.dylib", "*.dll", "libenry.h"]
+enry = ["*.so", "*.dylib", "*.dll", "*.h", "*.py"]
