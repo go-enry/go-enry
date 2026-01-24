@@ -154,7 +154,7 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-            os: [ubuntu-22.04, macos-13]
+            os: [ubuntu-22.04, macos-14, macos-15-intel]
             python-version: ['3.9', '3.12', '3.13']
 
     steps:
@@ -176,11 +176,34 @@ jobs:
       - name: Install wheel
         shell: bash
         run: |
-          # Remove the dot from the version string (e.g., 3.12 -> 312)
+          set -euo pipefail
+          shopt -s nullglob
+
           PY_VER=$(echo "${{ matrix.python-version }}" | tr -d '.')
-          
-          # Try to install the specific CPython wheel, fallback to the generic abi3 wheel
-          pip install wheels/*cp${PY_VER}*.whl || pip install wheels/*abi3*.whl
+
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            # manylinux wheel for this CPython version
+            matches=(wheels/*cp${PY_VER}*-manylinux*_x86_64.whl)
+
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            arch="$(uname -m)"  # arm64 on macos-14, x86_64 on macos-15-intel
+            matches=(wheels/*cp${PY_VER}*-macosx_11_0_${arch}.whl)
+
+          else
+            echo "Unsupported runner OS: ${{ runner.os }}"
+            exit 1
+          fi
+
+          if (( ${#matches[@]} == 0 )); then
+            echo "No compatible wheel found for OS=${{ runner.os }} Python=cp${PY_VER} arch=${arch:-x86_64}"
+            echo "Available wheels:"
+            ls -lh wheels/
+            exit 1
+          fi
+
+          echo "Installing: ${matches[0]}"
+          python -m pip install "${matches[0]}"
+
 
       - name: Test installed package
         run: |
