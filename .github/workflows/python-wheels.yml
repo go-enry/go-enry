@@ -19,7 +19,13 @@ jobs:
       matrix:
         # macos-14 is the standard ARM (M1/M2/M3) runner.
         # macos-15-intel is the new home for x86_64 builds.
-        os: [ubuntu-22.04, macos-14, macos-15-intel]
+        include:
+          - os: ubuntu-22.04
+            macos_arch: ""
+          - os: macos-14
+            macos_arch: arm64
+          - os: macos-15-intel
+            macos_arch: x86_64
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go
@@ -49,10 +55,12 @@ jobs:
           CIBW_SKIP: "*-win* *-musllinux*"
 
           # Fix for the Python 3.9 Segfault
-          CIBW_ENVIRONMENT_MACOS: "PYTHONMALLOC=malloc"
+          CIBW_ENVIRONMENT_MACOS: >
+            PYTHONMALLOC=malloc
+            MACOSX_DEPLOYMENT_TARGET=11.0
           
           # ARCH handling
-          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ARCHS_MACOS: ${{ matrix.macos_arch }}
           CIBW_ARCHS_LINUX: "x86_64"
 
           # Use a modern manylinux image for Go compatibility
