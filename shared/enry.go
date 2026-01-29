@@ -1,6 +1,11 @@
 //go:build (darwin && cgo) || (linux && cgo)
 // +build darwin,cgo linux,cgo
 
+// NOTE: Many enry APIs return (value, safe). The shared-library exports intentionally
+// return only the primary string to keep the C ABI minimal (char* in/out).
+// The `safe` signal is currently not exposed over the ABI; bindings may implement
+// "safe mode" policy at the language layer, or we can add explicit ...WithSafety exports.
+
 package main
 
 /*

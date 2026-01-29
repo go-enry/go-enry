@@ -46,4 +46,13 @@ jobs:
         env:
           PYTHONMALLOC: "malloc"
           GODEBUG: "cgocheck=0,installgoroot=0"
+
+          # Memory tests:
+          ENRY_MEM_RUN_SMOKE: "1"
+          ENRY_MEM_ITERS_SHORT: "2000"
+          ENRY_MEM_ITERS_SMOKE: "200"
+
+          # Run the long leak regression only on one matrix job (fast CI, strong coverage)
+          ENRY_MEM_RUN_LONG: ${{ matrix.platform == 'ubuntu-latest' && matrix.python-version == '3.11' && '1' || '0' }}
+          ENRY_MEM_ITERS_LONG: "50000"
         run: pytest python/tests/ -v

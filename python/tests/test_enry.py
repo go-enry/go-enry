@@ -103,3 +103,38 @@ def test_get_language_extensions():
         ".pyi", ".pyp", ".pyt", ".pyw", ".rpy", ".spec", ".tac",
         ".wsgi", ".xpy"
     ]
+
+
+@pytest.mark.parametrize("filename,content,candidates", [
+    ('test.py', b'print("Hello World")', None),
+    ('test.py', b'print("Hello World")', []),
+])
+def test_get_languages_by_filename_with_empty_or_none_candidates(filename: str, content: bytes, candidates):
+    result = get_languages_by_filename(filename, content, candidates)
+    assert isinstance(result, list)
+    assert result == []
+
+
+def test_get_languages_by_filename_with_valid_candidates():
+    # Use a known filename that GetLanguagesByFilename recognizes
+    result = get_languages_by_filename('pom.xml', b'<xml></xml>', ['Maven POM', 'Ruby'])
+    assert isinstance(result, list)
+    # Should return Maven POM since 'pom.xml' is a known filename
+    assert 'Maven POM' in result
+
+
+@pytest.mark.parametrize("filename,content,candidates,expected", [
+    ('test.py', b'#!/usr/bin/env python', None, ['Python']),
+    ('test.py', b'#!/usr/bin/env python', [], []),
+])
+def test_get_languages_by_shebang_with_empty_or_none_candidates(filename: str, content: bytes, candidates, expected):
+    result = get_languages_by_shebang(filename, content, candidates)
+    assert isinstance(result, list)
+    assert result == expected
+
+
+def test_get_languages_by_shebang_with_valid_candidates():
+    result = get_languages_by_shebang('test.sh', b'#!/usr/bin/env python', ['Python', 'Shell', 'Bash'])
+    assert isinstance(result, list)
+    # Should return Python since the shebang is python
+    assert 'Python' in result

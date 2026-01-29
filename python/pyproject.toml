@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "enry"
-version = "0.1.2"
+version = "0.2.0"
 description = "Python bindings for go-enry language detector"
 readme = "README.md"
 authors = [
@@ -23,7 +23,6 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

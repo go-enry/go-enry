@@ -161,10 +161,8 @@ language = enry.get_language("example.go", b"package main")
 print(language)  # Output: Go
 ```
 
-A library is going to be published on pypi as [enry](https://pypi.org/project/enry/) for
+A library is published on pypi as [enry](https://pypi.org/project/enry/) for
 macOS and linux platforms.
-
-Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
 For more details, see [python/README.md](https://github.com/go-enry/go-enry/blob/master/python/README.md).
 

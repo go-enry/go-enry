@@ -1,7 +1,5 @@
 import subprocess
 import shutil
-import sys
-import os
 from pathlib import Path
 from setuptools import setup, Distribution
 

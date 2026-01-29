@@ -7,7 +7,6 @@ from enry.definitions import (
     get_language_by_extension,
     get_language_by_filename,
     is_vendor,
-    is_generated,
 )
 
 # Alias for backward compatibility with previous naming
@@ -29,7 +28,6 @@ def main():
         TestFile(".gitignore", b"", "Ignore List")
     ]
 
-    # Note: .language is the attribute of the Guess namedtuple
     print("\nstrategy: extension")
     for f in files:
         lang = language_by_extension(f.name)

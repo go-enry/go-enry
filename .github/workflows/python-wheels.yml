@@ -139,6 +139,7 @@ jobs:
       - name: Build sdist
         run: |
           cd python
+          cp ../LICENSE .
           python -m pip install build cffi  # Ensure cffi is available here
           python -m build --sdist
       - name: Upload sdist

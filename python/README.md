@@ -50,6 +50,16 @@ language = enry.get_language("example.py", b"print('Hello, world!')")
 print(f"Detected language: {language}")
 ```
 
+### FFI / API design notes
+
+Some upstream Go `enry` functions return `(value, safe)` where `safe` indicates whether the result is considered unambiguous.
+The shared library (`libenry`) exports used by these Python bindings intentionally return **only the primary string value** and do not currently expose the `safe` flag.
+
+**Rationale:** keeping the C ABI to simple primitives (`char*` in/out + explicit free) avoids returning structs/tuples across the language boundary and reduces ABI + memory-ownership pitfalls. It also keeps the shared library broadly usable by non-Python consumers without committing the core ABI to a particular “safe mode” policy.
+
+**Tradeoff:** the Python bindings cannot directly access the Go `safe` signal via the current exports. If we decide we need it, an ABI-friendly extension would be to add parallel exports that surface safety without structs (e.g. `...WithSafety(..., int* out_safe)`), while keeping the existing string-only exports for backwards compatibility.
+
+
 ## Supported Python Versions
 
 - Python 3.9+
@@ -62,12 +72,13 @@ Use enry 0.1.1 if you must use these versions (not recommended for security reas
 
 - ✅ Linux (x86_64)
 - ✅ macOS (Intel x86_64 and Apple Silicon arm64)
-- ❌ Windows (planned - see [#150](https://github.com/src-d/enry/issues/150))
 - ❌ Linux ARM/aarch64 (not yet available)
 
 ## Known Issues
 
-- Memory leak fixed in version 0.1.2 (see [#36](https://github.com/go-enry/go-enry/issues/36))
+- Memory leak fixed in version 0.2.0 (see [#36](https://github.com/go-enry/go-enry/issues/36))
+- The current shared-library exports return only a string result and do not expose the Go `safe` flag (by design; see “FFI / API design notes” above).
+
 
 
 ## Run
@@ -83,5 +94,5 @@ $ python enry.py
  - [x] read `libenry.h` and generate `ffibuilder.cdef(...)` content
  - [x] cover the rest of enry API
  - [x] add `setup.py`
- - [ ] build/release automation on CI (publish on pypi)
- - [ ] try ABI mode, to avoid dependency on C compiler on install (+perf test?)
+ - [x] build/release automation on CI (publish on pypi)
+ - [x] try ABI mode, to avoid dependency on C compiler on install (+perf test?)

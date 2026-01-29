@@ -31,10 +31,23 @@ def go_str_slice_to_py(lib, c_ptr_array) -> List[str]:
         # We call Free on the lib object passed in from definitions.py
         lib.FreeStringArray(c_ptr_array)
 
-def prepare_candidates(candidates: List[str]):
-    """Converts a Python list to a NULL-terminated char** array."""
-    if not candidates:
-        return ffi.NULL
+def prepare_candidates(candidates: List[str]) -> tuple:
+    """Converts a Python list to a NULL-terminated char** array.
+
+    Semantics:
+    - candidates is None -> pass NULL to C (means "no filter" / use default behavior)
+    - candidates is [] (empty list) -> pass a non-NULL char** where the first
+      element is NULL (represents an explicit empty candidate list -> no results)
+    """
+    # Distinguish between None and an empty list
+    if candidates is None:
+        return ffi.NULL, None
+
+    # Explicit empty list: create a single-element array with a NULL terminator
+    if len(candidates) == 0:
+        c_list = ffi.new("char*[]", 1)
+        c_list[0] = ffi.NULL
+        return c_list, []
     
     # Create the array of pointers (size + 1 for the NULL terminator)
     c_list = ffi.new("char*[]", len(candidates) + 1)
