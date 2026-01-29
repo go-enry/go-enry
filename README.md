@@ -216,7 +216,7 @@ The `enry` CLI automatically reads `.gitattributes` from the root of the analyze
 
 ## Divergences from Linguist
 
-The `enry` library is based on the data from `github/linguist` version **v9.3.0**.
+The `enry` library is based on the data from `github/linguist` version **v9.4.0**.
 
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
