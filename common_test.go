@@ -438,6 +438,9 @@ func (s *enryTestSuite) TestGetLanguagesByClassifier() {
 		{name: "TestGetLanguagesByClassifier_5", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"ruby"}, expected: "Ruby"},
 		{name: "TestGetLanguagesByClassifier_6", filename: filepath.Join(s.samplesDir, "Python/django-models-base.py"), candidates: []string{"python", "ruby", "c", "c++"}, expected: "Python"},
 		{name: "TestGetLanguagesByClassifier_7", filename: "", candidates: []string{"python"}, expected: "Python"},
+		// Check that unsupported "zero score" languages are neither returned nor outrank real languages.
+		{name: "TestGetLanguagesByClassifier_8", filename: filepath.Join(s.samplesDir, "C/blob.c"), candidates: []string{"FakeUnsupportedLanguage1", "FakeUnsupportedLanguage2"}, expected: OtherLanguage},
+		{name: "TestGetLanguagesByClassifier_9", filename: filepath.Join(s.samplesDir, "Checksums/single_hash_dec.crc32"), candidates: []string{"FakeUnsupportedLanguage", "Java", "Kotlin"}, expected: "Java"},
 	}
 
 	for _, test := range test {

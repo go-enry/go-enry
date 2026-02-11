@@ -47,10 +47,14 @@ func (c *naiveBayes) classify(content []byte, candidates map[string]float64) []s
 	var tokens []string
 	if !empty {
 		tokens = tokenizer.Tokenize(content)
+		empty = len(tokens) == 0
 	}
 
 	for language := range languages {
-		score := c.languagesLogProbabilities[language]
+		score, ok := c.languagesLogProbabilities[language]
+		if !ok {
+			continue
+		}
 		if !empty {
 			score += c.tokensLogProbability(tokens, language)
 		}
