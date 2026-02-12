@@ -2,7 +2,7 @@ name: Build Python Wheels
 on:
   push:
     tags:
-      - 'v*'
+      - 'python-v*'
     branches:
       - master
   pull_request:
@@ -235,7 +235,7 @@ jobs:
     name: Publish to PyPI
     needs: [build_wheels, build_sdist, test_wheels]
     runs-on: ubuntu-22.04
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/python-v')
     permissions:
       id-token: write
     steps:

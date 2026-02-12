@@ -5,12 +5,25 @@ Python bindings through cFFI (ABI, out-of-line) for calling enry Go functions ex
 ## Build
 
 ```
+# from python/
 $ pushd .. && make shared && popd
 $ pip install -r requirements.txt
 $ python build_enry.py
 ```
 
-Will build a static library for Cgo wrapper `libenry`, then generate and build `enry.c` - a CPython extension that provides actual bindings.
+Builds the Go **shared** library for the CGo wrapper (`libenry.so` / `libenry.dylib`), then generates and builds the CFFI out-of-line module (`enry.c`) that provides the Python bindings.
+
+### Why a shared library?
+
+Historically, the Python package shipped a **static** library and used CFFI **API mode** (a compiled extension that links against `libenry`).
+That approach relied on Go-generated headers/types (e.g. `GoString`, `GoSlice`, and struct return wrappers) and a locally-built archive at build time, which made builds and cross-platform packaging more fragile.
+
+We now build a Go-built **shared** library (`-buildmode=c-shared`) that is bundled inside the wheel and loaded via CFFI **out-of-line (ABI)** mode.
+This makes installation simpler and allows `pip install enry` without requiring a Go toolchain.
+
+**Implementation note:** the shared library is located and loaded at import time in `enry/definitions.py` (see `_load_library()`), which prefers the packaged `enry/libenry.*` shipped in wheels and falls back to local dev build locations.
+
+**Future-proof note:** if we later change the binding strategy (or revisit linking/packaging), we should reevaluate whether a shared library is still the best tradeoff and update this documentation accordingly.
 
 ## Installation
 
@@ -40,6 +53,67 @@ pip install -e .
 - Go 1.21 or later
 - GCC or compatible C compiler
 - Python 3.9 or later
+
+## Developer: publishing to PyPI
+
+Releases are intended to be published from CI on tag pushes (`python-v*`) using **[PyPI Trusted Publishing (OIDC)](https://docs.pypi.org/trusted-publishers/using-a-publisher/)**.
+
+**Note:** CI publishing via OIDC is **gated on PyPI Trusted Publisher configuration** for the `enry` project (must be set up by a PyPI project owner/maintainer for this repo/workflow).
+
+Until that is configured, you can publish manually using a [PyPI API token](https://pypi.org/help/#apitoken).
+
+### Versioning
+
+Before tagging a release, bump the Python package version in `python/pyproject.toml` (`[project].version`) and commit it.
+The git tag should match the package version (e.g. `version = "0.2.1"` and tag `python-v0.2.1`).
+
+### Manual publish (recommended): upload CI-built artifacts
+
+This mirrors what the CI does (cibuildwheel builds platform wheels + an sdist). You simply upload the produced artifacts yourself.
+
+1) Tag a release (this triggers the workflow):
+
+```bash
+git tag python-vX.Y.Z
+git push origin python-vX.Y.Z
+```
+
+2) Download the workflow artifacts from GitHub Actions:
+- the built wheels (wheels-*)
+- the source distribution (sdist)
+
+3) Upload with [Twine](https://packaging.python.org/tutorials/packaging-projects/) using a PyPI token:
+
+```bash
+python -m pip install --upgrade twine
+
+# from the directory where you downloaded artifacts:
+TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-***' python -m twine upload **/*.whl **/*.tar.gz
+```
+
+Notes:
+- The token must be created on PyPI by an account with upload permission for the enry project.
+- This approach is preferred because wheels must be built per-platform/per-arch (Linux manylinux + macOS x86_64/arm64).
+- PyPI token notes: set username to __token__ and password to the token value (including the pypi- prefix).
+
+### Manual publish (local, single-platform only)
+
+If you only need to build and upload artifacts for your current machine, you should build the Go shared library first (mirrors the CI’s make shared step):
+
+```bash
+# from repo root: builds and copies libenry.* into python/enry/
+make shared
+
+cd python
+cp ../LICENSE .
+python -m pip install --upgrade build
+python -m build --sdist --wheel
+
+python -m pip install --upgrade twine
+TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-***' python -m twine upload dist/*
+```
+
+This requires Go locally and only produces a wheel for the current OS/arch.
 
 ## Usage
 ```python
