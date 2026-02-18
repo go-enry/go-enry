@@ -50,6 +50,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Parse .gitattributes if present
+	var gitAttrs enry.GitAttributes
+	gaContent, err := ioutil.ReadFile(filepath.Join(root, ".gitattributes"))
+	if err == nil {
+		gitAttrs = enry.ParseGitAttributes(gaContent)
+	}
+
 	if fileInfo.Mode().IsRegular() {
 		err = printFileAnalysis(root, limit, *jsonFlag)
 		if err != nil {
@@ -83,8 +90,8 @@ func main() {
 			relativePath = relativePath + "/"
 		}
 
-		if enry.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
-			enry.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
+		if gitAttrs.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
+			gitAttrs.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
 			// TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
 			if f.IsDir() {
 				return filepath.SkipDir
@@ -108,7 +115,11 @@ func main() {
 		}
 		// TODO(bzz): skip enry.IsGeneratedContent() as well, after https://github.com/src-d/enry/issues/213
 
-		language := enry.GetLanguage(filepath.Base(path), content)
+		// Check .gitattributes language override first
+		language, overridden := gitAttrs.GetLanguage(relativePath)
+		if !overridden {
+			language = enry.GetLanguage(filepath.Base(path), content)
+		}
 		if language == enry.OtherLanguage {
 			return nil
 		}
