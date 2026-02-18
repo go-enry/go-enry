@@ -154,6 +154,40 @@ macOS and linux platforms. Windows support is planned under [src-d/enry#150](htt
 Generated Rust bindings using a C static library are available at https://github.com/go-enry/rs-enry.
 
 
+## `.gitattributes` Support
+
+go-enry supports overriding language detection via `.gitattributes`, compatible with [Linguist's override system](https://github.com/github/linguist/blob/master/docs/overrides.md).
+
+### Supported attributes
+
+| Attribute | Example | Description |
+|-----------|---------|-------------|
+| `linguist-language` | `*.rb linguist-language=Ruby` | Override detected language |
+| `linguist-vendored` | `vendor/** linguist-vendored` | Mark/unmark as vendored |
+| `linguist-documentation` | `docs/** linguist-documentation` | Mark/unmark as documentation |
+| `linguist-generated` | `*.pb.go linguist-generated` | Mark/unmark as generated |
+| `linguist-detectable` | `*.sql linguist-detectable` | Force inclusion of data/prose languages |
+
+Use `-` prefix to unset: `-linguist-vendored`
+
+### API usage
+
+```go
+content, _ := os.ReadFile(".gitattributes")
+gitAttrs := enry.ParseGitAttributes(content)
+
+// Override checks (fall back to defaults when no rule matches)
+gitAttrs.IsVendor("vendor/lib.go")          // true
+gitAttrs.IsDocumentation("docs/guide.md")   // true
+gitAttrs.IsGenerated("api.pb.go", content)  // true
+
+// Language override
+lang, ok := gitAttrs.GetLanguage("Vagrantfile")
+// lang: "Ruby", ok: true
+```
+
+The `enry` CLI automatically reads `.gitattributes` from the root of the analyzed directory.
+
 ## Divergences from Linguist
 
 The `enry` library is based on the data from `github/linguist` version **v9.3.0**.
@@ -179,8 +213,6 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 - As of [Linguist v5.3.2](https://github.com/github/linguist/releases/tag/v5.3.2) it is using [flex-based scanner in C for tokenization](https://github.com/github/linguist/pull/3846). Enry still uses [extract_token](https://github.com/github/linguist/pull/3846/files#diff-d5179df0b71620e3fac4535cd1368d15L60) regex-based algorithm. See [#193](https://github.com/src-d/enry/issues/193).
 
 - Bayesian classifier can't distinguish "SQL" from "PLpgSQL. See [#194](https://github.com/src-d/enry/issues/194).
-
-- Overriding languages and types though `.gitattributes` is not yet supported. See [#18](https://github.com/src-d/enry/issues/18).
 
 - `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as Linguist does
 
