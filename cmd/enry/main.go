@@ -50,15 +50,26 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Determine the directory to use for .gitattributes lookup.
+	rootDir := root
+	if fileInfo.Mode().IsRegular() {
+		rootDir = filepath.Dir(root)
+	}
+
 	// Parse .gitattributes if present
 	var gitAttrs enry.GitAttributes
-	gaContent, err := ioutil.ReadFile(filepath.Join(root, ".gitattributes"))
+	gaContent, err := ioutil.ReadFile(filepath.Join(rootDir, ".gitattributes"))
 	if err == nil {
-		gitAttrs = enry.ParseGitAttributes(gaContent)
+		gitAttrs, err = enry.ParseGitAttributes(gaContent)
+		if err != nil {
+			log.Printf("warning: could not parse .gitattributes: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		log.Printf("warning: could not read .gitattributes: %v", err)
 	}
 
 	if fileInfo.Mode().IsRegular() {
-		err = printFileAnalysis(root, limit, *jsonFlag)
+		err = printFileAnalysis(root, limit, *jsonFlag, gitAttrs)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -272,7 +283,7 @@ func byteCountValues(root string, files []string) (float64, filelistError) {
 	return t, filesErr
 }
 
-func printFileAnalysis(file string, limit int64, isJSON bool) error {
+func printFileAnalysis(file string, limit int64, isJSON bool, gitAttrs enry.GitAttributes) error {
 	data, err := readFile(file, limit)
 	if err != nil {
 		return err
@@ -290,9 +301,12 @@ func printFileAnalysis(file string, limit int64, isJSON bool) error {
 
 	// functions below can work on a sample
 	fileType := getFileType(file, data)
-	language := enry.GetLanguage(file, data)
+	language, overridden := gitAttrs.GetLanguage(filepath.Base(file))
+	if !overridden {
+		language = enry.GetLanguage(file, data)
+	}
 	mimeType := enry.GetMIMEType(file, language)
-	vendored := enry.IsVendor(file)
+	vendored := gitAttrs.IsVendor(filepath.Base(file))
 
 	if isJSON {
 		return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
