@@ -27,7 +27,8 @@ func TestParseGitAttributes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ga := ParseGitAttributes([]byte(tt.content))
+			ga, err := ParseGitAttributes([]byte(tt.content))
+			require.NoError(t, err)
 			assert.Equal(t, tt.wantRules, len(ga.rules))
 		})
 	}
@@ -35,7 +36,8 @@ func TestParseGitAttributes(t *testing.T) {
 
 func TestParseGitAttributesValues(t *testing.T) {
 	content := "*.go linguist-vendored linguist-language=Go -linguist-documentation\n"
-	ga := ParseGitAttributes([]byte(content))
+	ga, err := ParseGitAttributes([]byte(content))
+	require.NoError(t, err)
 	require.Len(t, ga.rules, 1)
 
 	rule := ga.rules[0]
@@ -82,7 +84,8 @@ func TestMatchGitPattern(t *testing.T) {
 		{"vendor/*.go", "vendor/foo.go", true},
 		{"vendor/*.go", "src/vendor/foo.go", false},
 
-		// Trailing slash (directory only) - should not match files
+		// Trailing slash (directory only) - matches directory paths ending with "/"
+		{"vendor/", "vendor/", true},
 		{"vendor/", "vendor", false},
 		{"vendor/", "vendor/foo.go", false},
 
@@ -106,7 +109,8 @@ func TestMatchGitPattern(t *testing.T) {
 }
 
 func TestGitAttributesIsVendor(t *testing.T) {
-	ga := ParseGitAttributes([]byte("special/lib/* linguist-vendored\nmy/lib/* -linguist-vendored\n"))
+	ga, err := ParseGitAttributes([]byte("special/lib/* linguist-vendored\nmy/lib/* -linguist-vendored\n"))
+	require.NoError(t, err)
 
 	// Explicit vendored
 	assert.True(t, ga.IsVendor("special/lib/foo.go"))
@@ -119,14 +123,16 @@ func TestGitAttributesIsVendor(t *testing.T) {
 }
 
 func TestGitAttributesIsDocumentation(t *testing.T) {
-	ga := ParseGitAttributes([]byte("docs/* linguist-documentation\napi-docs/* -linguist-documentation\n"))
+	ga, err := ParseGitAttributes([]byte("docs/* linguist-documentation\napi-docs/* -linguist-documentation\n"))
+	require.NoError(t, err)
 
 	assert.True(t, ga.IsDocumentation("docs/guide.md"))
 	assert.False(t, ga.IsDocumentation("api-docs/spec.md"))
 }
 
 func TestGitAttributesIsGenerated(t *testing.T) {
-	ga := ParseGitAttributes([]byte("*.pb.go linguist-generated\nhand-written.pb.go -linguist-generated\n"))
+	ga, err := ParseGitAttributes([]byte("*.pb.go linguist-generated\nhand-written.pb.go -linguist-generated\n"))
+	require.NoError(t, err)
 
 	assert.True(t, ga.IsGenerated("foo.pb.go", nil))
 
@@ -135,14 +141,16 @@ func TestGitAttributesIsGenerated(t *testing.T) {
 }
 
 func TestGitAttributesIsDetectable(t *testing.T) {
-	ga := ParseGitAttributes([]byte("*.sql linguist-detectable\n"))
+	ga, err := ParseGitAttributes([]byte("*.sql linguist-detectable\n"))
+	require.NoError(t, err)
 
 	assert.True(t, ga.IsDetectable("schema.sql"))
 	assert.False(t, ga.IsDetectable("main.go"))
 }
 
 func TestGitAttributesGetLanguage(t *testing.T) {
-	ga := ParseGitAttributes([]byte("*.extension linguist-language=Go\n"))
+	ga, err := ParseGitAttributes([]byte("*.extension linguist-language=Go\n"))
+	require.NoError(t, err)
 
 	lang, ok := ga.GetLanguage("foo.extension")
 	assert.True(t, ok)
@@ -155,7 +163,8 @@ func TestGitAttributesGetLanguage(t *testing.T) {
 
 func TestGitAttributesGetLanguageAlias(t *testing.T) {
 	// "py" and "python" should both resolve to "Python"
-	ga := ParseGitAttributes([]byte("*.myext linguist-language=python\n"))
+	ga, err := ParseGitAttributes([]byte("*.myext linguist-language=python\n"))
+	require.NoError(t, err)
 
 	lang, ok := ga.GetLanguage("test.myext")
 	assert.True(t, ok)
@@ -167,7 +176,8 @@ func TestGitAttributesMultipleRules(t *testing.T) {
 	content := `*.go linguist-language=Go
 special.go linguist-language=Ruby
 `
-	ga := ParseGitAttributes([]byte(content))
+	ga, err := ParseGitAttributes([]byte(content))
+	require.NoError(t, err)
 
 	// "special.go" matches both rules; last one wins
 	lang, ok := ga.GetLanguage("special.go")
@@ -182,7 +192,8 @@ special.go linguist-language=Ruby
 
 func TestGitAttributesMultipleAttrsPerLine(t *testing.T) {
 	content := "vendor/** linguist-vendored linguist-generated\n"
-	ga := ParseGitAttributes([]byte(content))
+	ga, err := ParseGitAttributes([]byte(content))
+	require.NoError(t, err)
 
 	assert.True(t, ga.IsVendor("vendor/lib.go"))
 	assert.True(t, ga.IsGenerated("vendor/lib.go", nil))
@@ -207,7 +218,8 @@ Dockerfile.* linguist-language=Dockerfile
 # Documentation
 docs/** linguist-documentation
 `
-	ga := ParseGitAttributes([]byte(content))
+	ga, err := ParseGitAttributes([]byte(content))
+	require.NoError(t, err)
 
 	assert.True(t, ga.IsVendor("vendor/github.com/pkg/errors/errors.go"))
 	assert.True(t, ga.IsVendor("third_party/protobuf/something.cc"))

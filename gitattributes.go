@@ -23,7 +23,7 @@ type gitAttributeRule struct {
 //   - "linguist-vendored" (set/true), "-linguist-vendored" (unset/false)
 //   - "linguist-language=Go"
 //   - etc.
-func ParseGitAttributes(content []byte) GitAttributes {
+func ParseGitAttributes(content []byte) (GitAttributes, error) {
 	var rules []gitAttributeRule
 	scanner := bufio.NewScanner(bytes.NewReader(content))
 	for scanner.Scan() {
@@ -55,23 +55,26 @@ func ParseGitAttributes(content []byte) GitAttributes {
 		rules = append(rules, gitAttributeRule{pattern: pattern, attrs: attrs})
 	}
 
-	return GitAttributes{rules: rules}
+	if err := scanner.Err(); err != nil {
+		return GitAttributes{}, err
+	}
+
+	return GitAttributes{rules: rules}, nil
 }
 
 // getAttr returns the value of a named attribute for the given path.
 // It returns the value from the last matching rule (git precedence: later rules win).
+// Iterates in reverse so we can return immediately on the first (i.e. last-defined) match.
 func (ga GitAttributes) getAttr(path string, attr string) (string, bool) {
-	var result string
-	var found bool
-	for _, rule := range ga.rules {
+	for i := len(ga.rules) - 1; i >= 0; i-- {
+		rule := ga.rules[i]
 		if matchGitPattern(rule.pattern, path) {
 			if val, ok := rule.attrs[attr]; ok {
-				result = val
-				found = true
+				return val, true
 			}
 		}
 	}
-	return result, found
+	return "", false
 }
 
 // IsVendor checks the linguist-vendored attribute for path.
@@ -132,12 +135,15 @@ func (ga GitAttributes) GetLanguage(path string) (string, bool) {
 //   - "?" matches single char except "/"
 //   - Leading "/" anchors to the repo root; otherwise matches basename
 //     or anywhere if the pattern contains "/"
-//   - Trailing "/" only matches directories (ignored for file matching)
+//   - Trailing "/" only matches directory paths (i.e., paths ending with "/")
 func matchGitPattern(pattern, path string) bool {
-	// Trailing slash means directory-only; for file matching we strip it
-	// and always fail since we're matching files
+	// Trailing slash means directory-only; match only when the path
+	// itself denotes a directory (represented as ending with "/").
 	if strings.HasSuffix(pattern, "/") {
-		return false
+		if !strings.HasSuffix(path, "/") {
+			return false
+		}
+		pattern = strings.TrimSuffix(pattern, "/")
 	}
 
 	anchored := strings.HasPrefix(pattern, "/")
@@ -195,7 +201,7 @@ func globMatch(pattern, str string) bool {
 			str = str[1:]
 		case '[':
 			// Character class matching
-			if len(str) == 0 {
+			if len(str) == 0 || str[0] == '/' {
 				return false
 			}
 			// Find closing bracket

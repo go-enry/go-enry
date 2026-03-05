@@ -191,8 +191,8 @@ Use `-` prefix to unset: `-linguist-vendored`
 ### API usage
 
 ```go
-content, _ := os.ReadFile(".gitattributes")
-gitAttrs := enry.ParseGitAttributes(content)
+content, _ := ioutil.ReadFile(".gitattributes")
+gitAttrs, _ := enry.ParseGitAttributes(content)
 
 // Override checks (fall back to defaults when no rule matches)
 gitAttrs.IsVendor("vendor/lib.go")          // true
