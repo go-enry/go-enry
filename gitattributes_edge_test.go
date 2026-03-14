@@ -64,6 +64,12 @@ func TestEdgeTrailingSlashDirectory(t *testing.T) {
 		{"vendor/", "vendor/lib/bar.go", true, "nested files in vendor/ should be matched"},
 		{"vendor/", "vendor/", true, "the directory itself should match"},
 
+		// Subdirectories inside vendor/ as seen by filepath.Walk (trailing slash = directory)
+		// CLI Walk adds "/" to directory relativePaths; the rule must match these too or the
+		// directory is skipped before its contents are checked.
+		{"vendor/", "vendor/github.com/", true, "subdirectory of vendor/ must also match"},
+		{"vendor/", "vendor/github.com/pkg/", true, "deep subdirectory of vendor/ must also match"},
+
 		// Files outside should not match
 		{"vendor/", "src/vendor/foo.go", false, "files in src/vendor/ should not match anchored vendor/"},
 		{"vendor/", "notvendor/foo.go", false, "files in notvendor/ should not match vendor/"},
