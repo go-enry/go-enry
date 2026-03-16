@@ -84,10 +84,12 @@ func TestMatchGitPattern(t *testing.T) {
 		{"vendor/*.go", "vendor/foo.go", true},
 		{"vendor/*.go", "src/vendor/foo.go", false},
 
-		// Trailing slash (directory only) - matches directory paths ending with "/"
+		// Trailing slash (directory pattern) - matches directory and files inside
 		{"vendor/", "vendor/", true},
+		{"vendor/", "vendor/foo.go", true},
+		{"vendor/", "vendor/lib/bar.go", true},
 		{"vendor/", "vendor", false},
-		{"vendor/", "vendor/foo.go", false},
+		{"vendor/", "notvendor/foo.go", false},
 
 		// Character classes
 		{"*.[ch]", "foo.c", true},

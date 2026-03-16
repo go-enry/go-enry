@@ -69,7 +69,7 @@ func main() {
 	}
 
 	if fileInfo.Mode().IsRegular() {
-		err = printFileAnalysis(root, limit, *jsonFlag, gitAttrs)
+		err = printFileAnalysis(root, rootDir, limit, *jsonFlag, gitAttrs)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -283,7 +283,7 @@ func byteCountValues(root string, files []string) (float64, filelistError) {
 	return t, filesErr
 }
 
-func printFileAnalysis(file string, limit int64, isJSON bool, gitAttrs enry.GitAttributes) error {
+func printFileAnalysis(file string, rootDir string, limit int64, isJSON bool, gitAttrs enry.GitAttributes) error {
 	data, err := readFile(file, limit)
 	if err != nil {
 		return err
@@ -299,14 +299,20 @@ func printFileAnalysis(file string, limit int64, isJSON bool, gitAttrs enry.GitA
 
 	totalLines, nonBlank := getLines(file, full)
 
+	// Compute relative path for .gitattributes matching
+	relativePath, relErr := filepath.Rel(rootDir, file)
+	if relErr != nil {
+		relativePath = filepath.Base(file)
+	}
+
 	// functions below can work on a sample
 	fileType := getFileType(file, data)
-	language, overridden := gitAttrs.GetLanguage(filepath.Base(file))
+	language, overridden := gitAttrs.GetLanguage(relativePath)
 	if !overridden {
 		language = enry.GetLanguage(file, data)
 	}
 	mimeType := enry.GetMIMEType(file, language)
-	vendored := gitAttrs.IsVendor(filepath.Base(file))
+	vendored := gitAttrs.IsVendor(relativePath)
 
 	if isJSON {
 		return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
