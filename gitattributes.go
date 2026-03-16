@@ -40,7 +40,10 @@ func ParseGitAttributes(content []byte) (GitAttributes, error) {
 		pattern := fields[0]
 		attrs := make(map[string]string)
 		for _, field := range fields[1:] {
-			if strings.HasPrefix(field, "-") {
+			if strings.HasPrefix(field, "!") {
+				// !attr means unspecified (reset to default)
+				attrs[field[1:]] = "unspecified"
+			} else if strings.HasPrefix(field, "-") {
 				// -attr means unset (false)
 				attrs[field[1:]] = "false"
 			} else if idx := strings.Index(field, "="); idx != -1 {
@@ -65,11 +68,16 @@ func ParseGitAttributes(content []byte) (GitAttributes, error) {
 // getAttr returns the value of a named attribute for the given path.
 // It returns the value from the last matching rule (git precedence: later rules win).
 // Iterates in reverse so we can return immediately on the first (i.e. last-defined) match.
+// If the attribute is "unspecified" (set via !attr), it is treated as not set,
+// causing the caller to fall back to default detection.
 func (ga GitAttributes) getAttr(path string, attr string) (string, bool) {
 	for i := len(ga.rules) - 1; i >= 0; i-- {
 		rule := ga.rules[i]
 		if matchGitPattern(rule.pattern, path) {
 			if val, ok := rule.attrs[attr]; ok {
+				if val == "unspecified" {
+					return "", false
+				}
 				return val, true
 			}
 		}
@@ -135,15 +143,22 @@ func (ga GitAttributes) GetLanguage(path string) (string, bool) {
 //   - "?" matches single char except "/"
 //   - Leading "/" anchors to the repo root; otherwise matches basename
 //     or anywhere if the pattern contains "/"
-//   - Trailing "/" only matches directory paths (i.e., paths ending with "/")
+//   - Trailing "/" matches the directory itself and all files inside it
 func matchGitPattern(pattern, path string) bool {
-	// Trailing slash means directory-only; match only when the path
-	// itself denotes a directory (represented as ending with "/").
+	// Trailing slash means directory pattern: matches the directory path
+	// (ending with "/") or any file inside the directory.
 	if strings.HasSuffix(pattern, "/") {
-		if !strings.HasSuffix(path, "/") {
+		dir := strings.TrimSuffix(pattern, "/")
+		if strings.HasSuffix(path, "/") {
+			// Directory path itself — match against dir name
+			path = strings.TrimSuffix(path, "/")
+			pattern = dir
+		} else if strings.HasPrefix(path, dir+"/") {
+			// File inside the directory — matches
+			return true
+		} else {
 			return false
 		}
-		pattern = strings.TrimSuffix(pattern, "/")
 	}
 
 	anchored := strings.HasPrefix(pattern, "/")
@@ -174,10 +189,12 @@ func globMatch(pattern, str string) bool {
 				if len(rest) == 0 {
 					return true
 				}
-				// Try matching rest against every suffix of str
+				// Try matching rest at path-component boundaries only
 				for i := 0; i <= len(str); i++ {
-					if globMatch(rest, str[i:]) {
-						return true
+					if i == 0 || str[i-1] == '/' {
+						if globMatch(rest, str[i:]) {
+							return true
+						}
 					}
 				}
 				return false

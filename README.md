@@ -206,6 +206,10 @@ lang, ok := gitAttrs.GetLanguage("Vagrantfile")
 
 The `enry` CLI automatically reads `.gitattributes` from the root of the analyzed directory.
 
+**Known limitations:**
+- Only the root `.gitattributes` file is read. Git and Linguist support nested `.gitattributes` files in subdirectories; go-enry does not.
+- Backslash-escaped whitespace in patterns is not supported (patterns are split on whitespace).
+
 ## Divergences from Linguist
 
 The `enry` library is based on the data from `github/linguist` version **v9.5.0**.
