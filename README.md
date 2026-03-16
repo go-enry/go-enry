@@ -199,6 +199,10 @@ gitAttrs.IsVendor("vendor/lib.go")          // true
 gitAttrs.IsDocumentation("docs/guide.md")   // true
 gitAttrs.IsGenerated("api.pb.go", content)  // true
 
+// Detectable override (tri-state: value, hasOverride)
+detectable, ok := gitAttrs.IsDetectable("schema.sql")
+// detectable: true, ok: true (explicitly marked detectable)
+
 // Language override
 lang, ok := gitAttrs.GetLanguage("Vagrantfile")
 // lang: "Ruby", ok: true

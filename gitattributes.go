@@ -113,13 +113,20 @@ func (ga GitAttributes) IsGenerated(path string, content []byte) bool {
 }
 
 // IsDetectable checks the linguist-detectable attribute for path.
-// Returns true only if explicitly set. By default files of type data or prose
-// are not detectable.
-func (ga GitAttributes) IsDetectable(path string) bool {
+// Returns (value, hasOverride). When hasOverride is true, value indicates
+// whether the file should be included in language statistics regardless of
+// its language type. When hasOverride is false, the caller should fall back
+// to default behavior (include programming/markup, exclude data/prose).
+//
+// Per Linguist semantics:
+//   - "linguist-detectable" forces inclusion (e.g., data/prose languages in stats)
+//   - "-linguist-detectable" forces exclusion (e.g., hide a programming language)
+//   - No rule means use default language-type-based detection
+func (ga GitAttributes) IsDetectable(path string) (bool, bool) {
 	if val, ok := ga.getAttr(path, "linguist-detectable"); ok {
-		return val != "false"
+		return val != "false", true
 	}
-	return false
+	return false, false
 }
 
 // GetLanguage checks the linguist-language attribute for path.
