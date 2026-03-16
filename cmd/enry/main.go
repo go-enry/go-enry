@@ -137,10 +137,17 @@ func main() {
 
 		// If we are not asked to display all, do as
 		// https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/blob_helper.rb#L382
-		if !*allLangs &&
-			enry.GetLanguageType(language) != enry.Programming &&
-			enry.GetLanguageType(language) != enry.Markup {
-			return nil
+		if !*allLangs {
+			detectable, hasOverride := gitAttrs.IsDetectable(relativePath)
+			if hasOverride {
+				if !detectable {
+					return nil
+				}
+				// detectable=true: include regardless of language type
+			} else if enry.GetLanguageType(language) != enry.Programming &&
+				enry.GetLanguageType(language) != enry.Markup {
+				return nil
+			}
 		}
 
 		out[language] = append(out[language], relativePath)

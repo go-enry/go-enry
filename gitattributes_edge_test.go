@@ -477,12 +477,14 @@ func TestEdgeAttributeSemantics(t *testing.T) {
 		_ = lang // could be "" or resolved
 	})
 
-	t.Run("is_detectable_no_fallback", func(t *testing.T) {
-		// No rules → IsDetectable returns false (no default fallback for programming langs)
+	t.Run("is_detectable_no_override", func(t *testing.T) {
+		// No rules → IsDetectable returns (false, false) — no override
 		ga, err := ParseGitAttributes([]byte(""))
 		require.NoError(t, err)
-		assert.False(t, ga.IsDetectable("main.go"), "IsDetectable with no rules returns false (no fallback)")
-		assert.False(t, ga.IsDetectable("schema.sql"), "IsDetectable with no rules returns false for SQL")
+		_, ok := ga.IsDetectable("main.go")
+		assert.False(t, ok, "IsDetectable with no rules returns no override")
+		_, ok = ga.IsDetectable("schema.sql")
+		assert.False(t, ok, "IsDetectable with no rules returns no override for SQL")
 	})
 
 	t.Run("vendored_arbitrary_value", func(t *testing.T) {
@@ -498,8 +500,9 @@ func TestEdgeAttributeSemantics(t *testing.T) {
 		assert.Equal(t, IsVendor("vendor/foo.go"), ga.IsVendor("vendor/foo.go"), "empty attrs falls back to IsVendor")
 		assert.Equal(t, IsDocumentation("docs/guide.md"), ga.IsDocumentation("docs/guide.md"), "empty attrs falls back to IsDocumentation")
 		assert.Equal(t, IsGenerated("foo_generated.go", nil), ga.IsGenerated("foo_generated.go", nil), "empty attrs falls back to IsGenerated")
-		assert.False(t, ga.IsDetectable("main.go"), "IsDetectable with no rules is always false")
-		_, ok := ga.GetLanguage("main.go")
+		_, ok := ga.IsDetectable("main.go")
+		assert.False(t, ok, "IsDetectable with no rules returns no override")
+		_, ok = ga.GetLanguage("main.go")
 		assert.False(t, ok, "GetLanguage with no rules returns false")
 	})
 
@@ -624,23 +627,46 @@ func TestEdgeDetectable(t *testing.T) {
 	t.Run("sql_made_detectable", func(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.sql linguist-detectable\n"))
 		require.NoError(t, err)
-		assert.True(t, ga.IsDetectable("schema.sql"))
-		assert.True(t, ga.IsDetectable("migrations/001_init.sql"))
-		assert.False(t, ga.IsDetectable("main.go"), "go files not in rule are not detectable")
+		val, ok := ga.IsDetectable("schema.sql")
+		assert.True(t, ok, "should have override")
+		assert.True(t, val, "should be detectable")
+		val, ok = ga.IsDetectable("migrations/001_init.sql")
+		assert.True(t, ok)
+		assert.True(t, val)
+		_, ok = ga.IsDetectable("main.go")
+		assert.False(t, ok, "go files not in rule have no override")
 	})
 
 	t.Run("detectable_then_not", func(t *testing.T) {
 		content := "*.sql linguist-detectable\nexception.sql -linguist-detectable\n"
 		ga, err := ParseGitAttributes([]byte(content))
 		require.NoError(t, err)
-		assert.False(t, ga.IsDetectable("exception.sql"), "explicitly not detectable")
-		assert.True(t, ga.IsDetectable("other.sql"), "other sql files still detectable")
+		val, ok := ga.IsDetectable("exception.sql")
+		assert.True(t, ok, "should have override")
+		assert.False(t, val, "explicitly not detectable")
+		val, ok = ga.IsDetectable("other.sql")
+		assert.True(t, ok)
+		assert.True(t, val, "other sql files still detectable")
 	})
 
 	t.Run("html_made_detectable", func(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.html linguist-detectable\n"))
 		require.NoError(t, err)
-		assert.True(t, ga.IsDetectable("index.html"))
+		val, ok := ga.IsDetectable("index.html")
+		assert.True(t, ok)
+		assert.True(t, val)
+	})
+
+	t.Run("programming_language_made_undetectable", func(t *testing.T) {
+		// -linguist-detectable can exclude a programming language from stats
+		ga, err := ParseGitAttributes([]byte("tools/*.py -linguist-detectable\n"))
+		require.NoError(t, err)
+		val, ok := ga.IsDetectable("tools/export.py")
+		assert.True(t, ok, "should have override")
+		assert.False(t, val, "-linguist-detectable should exclude from stats")
+		// Other py files have no override
+		_, ok = ga.IsDetectable("src/main.py")
+		assert.False(t, ok, "no override for src/main.py")
 	})
 }
 

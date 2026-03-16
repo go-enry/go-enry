@@ -146,8 +146,12 @@ func TestGitAttributesIsDetectable(t *testing.T) {
 	ga, err := ParseGitAttributes([]byte("*.sql linguist-detectable\n"))
 	require.NoError(t, err)
 
-	assert.True(t, ga.IsDetectable("schema.sql"))
-	assert.False(t, ga.IsDetectable("main.go"))
+	val, ok := ga.IsDetectable("schema.sql")
+	assert.True(t, ok, "should have override")
+	assert.True(t, val, "should be detectable")
+
+	_, ok = ga.IsDetectable("main.go")
+	assert.False(t, ok, "no override for main.go")
 }
 
 func TestGitAttributesGetLanguage(t *testing.T) {
