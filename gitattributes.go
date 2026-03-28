@@ -143,6 +143,19 @@ func (ga GitAttributes) GetLanguage(path string) (string, bool) {
 	return "", false
 }
 
+// HasPotentialOverride reports whether attr is ever explicitly unset or reset
+// in .gitattributes. Directory-level pruning in callers must be conservative
+// when such rules exist, because a later descendant rule may need to override
+// the parent directory classification.
+func (ga GitAttributes) HasPotentialOverride(attr string) bool {
+	for _, rule := range ga.rules {
+		if val, ok := rule.attrs[attr]; ok && (val == "false" || val == "unspecified") {
+			return true
+		}
+	}
+	return false
+}
+
 // matchGitPattern implements git-style glob matching compatible with
 // linguist's fnmatch(FNM_PATHNAME):
 //   - "*" matches anything except "/"

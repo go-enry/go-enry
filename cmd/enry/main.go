@@ -76,8 +76,35 @@ func main() {
 		return
 	}
 
+	out, err := analyzeDir(root, limit, *allLangs, gitAttrs)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var buf bytes.Buffer
+	switch {
+	case *jsonFlag && !*breakdownFlag:
+		printJson(out, &buf)
+	case *jsonFlag && *breakdownFlag:
+		printBreakDown(out, &buf)
+	case *breakdownFlag:
+		printPercents(root, out, &buf, *countMode)
+		buf.WriteByte('\n')
+		printBreakDown(out, &buf)
+	default:
+		printPercents(root, out, &buf, *countMode)
+	}
+
+	fmt.Print(buf.String())
+}
+
+func analyzeDir(root string, limit int64, allLangs bool, gitAttrs enry.GitAttributes) (map[string][]string, error) {
 	out := make(map[string][]string, 0)
-	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
+	canPruneVendoredDirs := !gitAttrs.HasPotentialOverride("linguist-vendored")
+	canPruneDocumentationDirs := !gitAttrs.HasPotentialOverride("linguist-documentation")
+
+	err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			log.Println(err)
 			return filepath.SkipDir
@@ -93,25 +120,34 @@ func main() {
 			return nil
 		}
 
+		relativePath = filepath.ToSlash(relativePath)
 		if relativePath == "." {
 			return nil
 		}
 
-		if f.IsDir() {
-			relativePath = relativePath + "/"
+		isDir := f.IsDir()
+		if isDir {
+			relativePath += "/"
 		}
 
-		if gitAttrs.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
-			gitAttrs.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
-			// TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
-			if f.IsDir() {
+		vendored := gitAttrs.IsVendor(relativePath)
+		documentation := gitAttrs.IsDocumentation(relativePath)
+		dotFile := enry.IsDotFile(relativePath)
+		configuration := enry.IsConfiguration(relativePath)
+
+		if isDir {
+			// Descendant -linguist-vendored / !linguist-vendored rules mean the
+			// parent cannot be pruned safely even if it is vendored itself.
+			if (vendored && canPruneVendoredDirs) ||
+				(documentation && canPruneDocumentationDirs) ||
+				dotFile || configuration {
 				return filepath.SkipDir
 			}
-
 			return nil
 		}
 
-		if f.IsDir() {
+		if vendored || documentation || dotFile || configuration {
+			// TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
 			return nil
 		}
 
@@ -137,7 +173,7 @@ func main() {
 
 		// If we are not asked to display all, do as
 		// https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/blob_helper.rb#L382
-		if !*allLangs {
+		if !allLangs {
 			detectable, hasOverride := gitAttrs.IsDetectable(relativePath)
 			if hasOverride {
 				if !detectable {
@@ -154,25 +190,7 @@ func main() {
 		return nil
 	})
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var buf bytes.Buffer
-	switch {
-	case *jsonFlag && !*breakdownFlag:
-		printJson(out, &buf)
-	case *jsonFlag && *breakdownFlag:
-		printBreakDown(out, &buf)
-	case *breakdownFlag:
-		printPercents(root, out, &buf, *countMode)
-		buf.WriteByte('\n')
-		printBreakDown(out, &buf)
-	default:
-		printPercents(root, out, &buf, *countMode)
-	}
-
-	fmt.Print(buf.String())
+	return out, err
 }
 
 func usage() {
@@ -311,6 +329,7 @@ func printFileAnalysis(file string, rootDir string, limit int64, isJSON bool, gi
 	if relErr != nil {
 		relativePath = filepath.Base(file)
 	}
+	relativePath = filepath.ToSlash(relativePath)
 
 	// functions below can work on a sample
 	fileType := getFileType(file, data)
