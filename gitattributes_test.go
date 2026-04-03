@@ -7,6 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func requireGitAttributeValue(t *testing.T, attrs map[string]gitAttributeValue, name string, want gitAttributeValue) {
+	t.Helper()
+	got, ok := attrs[name]
+	require.True(t, ok, "expected attribute %q to be present", name)
+	assert.Equal(t, want, got)
+}
+
 func TestParseGitAttributes(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -42,9 +49,71 @@ func TestParseGitAttributesValues(t *testing.T) {
 
 	rule := ga.rules[0]
 	assert.Equal(t, "*.go", rule.pattern)
-	assert.Equal(t, "true", rule.attrs["linguist-vendored"])
-	assert.Equal(t, "Go", rule.attrs["linguist-language"])
-	assert.Equal(t, "false", rule.attrs["linguist-documentation"])
+	requireGitAttributeValue(t, rule.attrs, "linguist-vendored", gitAttributeValue{kind: gitAttributeValueSet})
+	requireGitAttributeValue(t, rule.attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "Go"})
+	requireGitAttributeValue(t, rule.attrs, "linguist-documentation", gitAttributeValue{kind: gitAttributeValueUnset})
+}
+
+func TestParseGitAttributesMacros(t *testing.T) {
+	t.Run("macro_expands_linguist_attrs", func(t *testing.T) {
+		ga, err := ParseGitAttributes([]byte("[attr]vendored linguist-vendored\n*.go vendored\n"))
+		require.NoError(t, err)
+		require.Len(t, ga.rules, 1)
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-vendored", gitAttributeValue{kind: gitAttributeValueSet})
+		assert.True(t, ga.IsVendor("main.go"))
+	})
+
+	t.Run("macro_can_be_defined_after_use", func(t *testing.T) {
+		ga, err := ParseGitAttributes([]byte("*.go vendored\n[attr]vendored linguist-vendored\n"))
+		require.NoError(t, err)
+		assert.True(t, ga.IsVendor("main.go"))
+	})
+
+	t.Run("nested_macros_expand_recursively", func(t *testing.T) {
+		content := "[attr]base linguist-vendored\n[attr]combo base linguist-language=Go\n*.go combo\n"
+		ga, err := ParseGitAttributes([]byte(content))
+		require.NoError(t, err)
+		assert.True(t, ga.IsVendor("main.go"))
+		lang, ok := ga.GetLanguage("main.go")
+		assert.True(t, ok)
+		assert.Equal(t, "Go", lang)
+	})
+
+	t.Run("special_macro_forms_do_not_expand", func(t *testing.T) {
+		content := "[attr]lang linguist-language=Go\n*.rb !lang\n*.py -lang\n*.ts lang=value\n"
+		ga, err := ParseGitAttributes([]byte(content))
+		require.NoError(t, err)
+		require.Len(t, ga.rules, 3)
+
+		_, hasLang := ga.rules[0].attrs["linguist-language"]
+		assert.False(t, hasLang)
+		_, hasLang = ga.rules[1].attrs["linguist-language"]
+		assert.False(t, hasLang)
+		_, hasLang = ga.rules[2].attrs["linguist-language"]
+		assert.False(t, hasLang)
+
+		_, ok := ga.GetLanguage("main.rb")
+		assert.False(t, ok)
+		_, ok = ga.GetLanguage("main.py")
+		assert.False(t, ok)
+		_, ok = ga.GetLanguage("main.ts")
+		assert.False(t, ok)
+	})
+
+	t.Run("macro_override_affects_has_potential_override", func(t *testing.T) {
+		ga, err := ParseGitAttributes([]byte("[attr]clear !linguist-vendored\nvendor/** clear\n"))
+		require.NoError(t, err)
+		assert.True(t, ga.HasPotentialOverride("linguist-vendored"))
+	})
+}
+
+func TestGitAttributesUnspecifiedVsStringValue(t *testing.T) {
+	content := "[attr]clear !linguist-vendored\nclear.go clear\nstring.go linguist-vendored=unspecified\n"
+	ga, err := ParseGitAttributes([]byte(content))
+	require.NoError(t, err)
+
+	assert.False(t, ga.IsVendor("clear.go"), "unspecified should fall back to default detection")
+	assert.True(t, ga.IsVendor("string.go"), "string value 'unspecified' should not be treated as reset")
 }
 
 func TestMatchGitPattern(t *testing.T) {

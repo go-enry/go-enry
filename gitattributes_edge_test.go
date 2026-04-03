@@ -88,20 +88,20 @@ func TestEdgeDoubleStarMiddle(t *testing.T) {
 		path    string
 		want    bool
 	}{
-		{"src/**/test.go", "src/test.go", true},          // zero dirs
-		{"src/**/test.go", "src/a/test.go", true},         // one dir
-		{"src/**/test.go", "src/a/b/test.go", true},       // two dirs
-		{"src/**/test.go", "src/a/b/c/test.go", true},     // three dirs
-		{"src/**/test.go", "test.go", false},              // missing src prefix
-		{"src/**/test.go", "other/a/test.go", false},      // wrong top dir
-		{"src/**/*.go", "src/foo.go", true},               // zero dirs
-		{"src/**/*.go", "src/pkg/foo.go", true},           // one dir
-		{"src/**/*.go", "src/pkg/sub/foo.go", true},       // nested
-		{"src/**/*.go", "pkg/foo.go", false},              // missing src
-		{"a/**/b/**/c.go", "a/b/c.go", true},              // two double-stars, both match zero
-		{"a/**/b/**/c.go", "a/x/b/y/c.go", true},         // both expanding
-		{"a/**/b/**/c.go", "a/b/x/c.go", true},           // first ** matches zero, second ** matches x/
-		{"a/**/b/**/c.go", "a/x/c.go", false},            // no b/ component anywhere
+		{"src/**/test.go", "src/test.go", true},       // zero dirs
+		{"src/**/test.go", "src/a/test.go", true},     // one dir
+		{"src/**/test.go", "src/a/b/test.go", true},   // two dirs
+		{"src/**/test.go", "src/a/b/c/test.go", true}, // three dirs
+		{"src/**/test.go", "test.go", false},          // missing src prefix
+		{"src/**/test.go", "other/a/test.go", false},  // wrong top dir
+		{"src/**/*.go", "src/foo.go", true},           // zero dirs
+		{"src/**/*.go", "src/pkg/foo.go", true},       // one dir
+		{"src/**/*.go", "src/pkg/sub/foo.go", true},   // nested
+		{"src/**/*.go", "pkg/foo.go", false},          // missing src
+		{"a/**/b/**/c.go", "a/b/c.go", true},          // two double-stars, both match zero
+		{"a/**/b/**/c.go", "a/x/b/y/c.go", true},      // both expanding
+		{"a/**/b/**/c.go", "a/b/x/c.go", true},        // first ** matches zero, second ** matches x/
+		{"a/**/b/**/c.go", "a/x/c.go", false},         // no b/ component anywhere
 	}
 
 	for _, tt := range tests {
@@ -122,11 +122,11 @@ func TestEdgeSingleStarNoCrossSlash(t *testing.T) {
 		path    string
 		want    bool
 	}{
-		{"*/*.go", "src/main.go", true},       // explicit one-level
-		{"*/*.go", "a/b/main.go", false},      // single * can't cross two slashes
-		{"*/*.go", "main.go", false},          // needs a directory segment
-		{"*.go", "a/b/c.go", true},            // basename-only match (no slash in pattern)
-		{"*.go", "a/b/c.rb", false},           // extension mismatch
+		{"*/*.go", "src/main.go", true},  // explicit one-level
+		{"*/*.go", "a/b/main.go", false}, // single * can't cross two slashes
+		{"*/*.go", "main.go", false},     // needs a directory segment
+		{"*.go", "a/b/c.go", true},       // basename-only match (no slash in pattern)
+		{"*.go", "a/b/c.rb", false},      // extension mismatch
 		{"src/*.go", "src/main.go", true},
 		{"src/*.go", "src/sub/main.go", false}, // * can't cross slash
 		{"src/*.go", "src/main.rb", false},
@@ -284,7 +284,7 @@ func TestEdgeParsing(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.go linguist-language=\n"))
 		require.NoError(t, err)
 		require.Len(t, ga.rules, 1)
-		assert.Equal(t, "", ga.rules[0].attrs["linguist-language"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: ""})
 	})
 
 	t.Run("value_with_multiple_equals", func(t *testing.T) {
@@ -292,7 +292,7 @@ func TestEdgeParsing(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.go linguist-language=a=b\n"))
 		require.NoError(t, err)
 		require.Len(t, ga.rules, 1)
-		assert.Equal(t, "a=b", ga.rules[0].attrs["linguist-language"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "a=b"})
 	})
 
 	t.Run("double_dash_prefix", func(t *testing.T) {
@@ -309,8 +309,8 @@ func TestEdgeParsing(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.go linguist-language=Go\r\n*.rb linguist-language=Ruby\r\n"))
 		require.NoError(t, err)
 		assert.Len(t, ga.rules, 2)
-		assert.Equal(t, "Go", ga.rules[0].attrs["linguist-language"])
-		assert.Equal(t, "Ruby", ga.rules[1].attrs["linguist-language"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "Go"})
+		requireGitAttributeValue(t, ga.rules[1].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "Ruby"})
 	})
 
 	t.Run("inline_comment", func(t *testing.T) {
@@ -320,7 +320,7 @@ func TestEdgeParsing(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, ga.rules, 1)
 		// linguist-vendored should still be parsed
-		assert.Equal(t, "true", ga.rules[0].attrs["linguist-vendored"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-vendored", gitAttributeValue{kind: gitAttributeValueSet})
 		// "#" and "comment" are parsed as bare attrs (not ignored)
 		_, hasHash := ga.rules[0].attrs["#"]
 		assert.True(t, hasHash, "inline # is parsed as attribute name (not a comment)")
@@ -330,7 +330,7 @@ func TestEdgeParsing(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.go\tlinguist-language=Go\n"))
 		require.NoError(t, err)
 		require.Len(t, ga.rules, 1)
-		assert.Equal(t, "Go", ga.rules[0].attrs["linguist-language"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "Go"})
 	})
 
 	t.Run("language_with_special_chars", func(t *testing.T) {
@@ -338,14 +338,14 @@ func TestEdgeParsing(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.cpp linguist-language=C++\n"))
 		require.NoError(t, err)
 		require.Len(t, ga.rules, 1)
-		assert.Equal(t, "C++", ga.rules[0].attrs["linguist-language"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "C++"})
 	})
 
 	t.Run("language_csharp", func(t *testing.T) {
 		ga, err := ParseGitAttributes([]byte("*.cs linguist-language=C#\n"))
 		require.NoError(t, err)
 		require.Len(t, ga.rules, 1)
-		assert.Equal(t, "C#", ga.rules[0].attrs["linguist-language"])
+		requireGitAttributeValue(t, ga.rules[0].attrs, "linguist-language", gitAttributeValue{kind: gitAttributeValueString, value: "C#"})
 	})
 
 	t.Run("whitespace_only_line", func(t *testing.T) {
@@ -681,14 +681,14 @@ func TestEdgeQuestionMark(t *testing.T) {
 		want    bool
 	}{
 		{"?.go", "a.go", true},
-		{"?.go", "ab.go", false},      // too long
-		{"?.go", ".go", false},        // too short (0 chars before .)
-		{"?.go", "/.go", false},       // ? doesn't match /
+		{"?.go", "ab.go", false}, // too long
+		{"?.go", ".go", false},   // too short (0 chars before .)
+		{"?.go", "/.go", false},  // ? doesn't match /
 		{"??.go", "ab.go", true},
 		{"??.go", "a.go", false},
 		{"a?.go", "ab.go", true},
-		{"a?.go", "a/.go", false},     // ? doesn't match /
-		{"a?.go", "abc.go", false},    // pattern expects exactly 1 char after a
+		{"a?.go", "a/.go", false},  // ? doesn't match /
+		{"a?.go", "abc.go", false}, // pattern expects exactly 1 char after a
 	}
 
 	for _, tt := range tests {

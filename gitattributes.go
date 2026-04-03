@@ -14,17 +14,46 @@ type GitAttributes struct {
 
 type gitAttributeRule struct {
 	pattern string
-	attrs   map[string]string
+	attrs   map[string]gitAttributeValue
+}
+
+type gitAttributeValueKind uint8
+
+const (
+	gitAttributeValueSet gitAttributeValueKind = iota
+	gitAttributeValueUnset
+	gitAttributeValueUnspecified
+	gitAttributeValueString
+)
+
+type gitAttributeValue struct {
+	kind  gitAttributeValueKind
+	value string
+}
+
+type gitAttributeAssignment struct {
+	name        string
+	value       gitAttributeValue
+	expandMacro bool
+}
+
+type gitAttributeRawRule struct {
+	pattern     string
+	assignments []gitAttributeAssignment
 }
 
 // ParseGitAttributes parses the content of a .gitattributes file.
-// Each non-comment, non-empty line has the form: pattern attr1 attr2=value ...
-// Attributes can be:
-//   - "linguist-vendored" (set/true), "-linguist-vendored" (unset/false)
-//   - "linguist-language=Go"
-//   - etc.
+// Each non-comment, non-empty line has the form:
+//   - pattern attr1 attr2=value ...
+//   - [attr]macroName attr1 attr2=value ...
+//
+// Attributes can be bare (set), prefixed with "-" (unset), prefixed with "!"
+// (reset to unspecified), or assigned via "=" (string value).
+// Bare macro references are expanded recursively after parsing, matching Git's
+// behavior even when the macro is defined later in the file.
 func ParseGitAttributes(content []byte) (GitAttributes, error) {
-	var rules []gitAttributeRule
+	var rawRules []gitAttributeRawRule
+	macros := make(map[string][]gitAttributeAssignment)
 	scanner := bufio.NewScanner(bytes.NewReader(content))
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -33,63 +62,170 @@ func ParseGitAttributes(content []byte) (GitAttributes, error) {
 		}
 
 		fields := strings.Fields(line)
+		if len(fields) == 0 {
+			continue
+		}
+
+		if strings.HasPrefix(fields[0], "[attr]") {
+			name := strings.TrimPrefix(fields[0], "[attr]")
+			if name == "" {
+				continue
+			}
+			macros[name] = parseGitAttributeAssignments(fields[1:])
+			continue
+		}
+
 		if len(fields) < 2 {
 			continue
 		}
 
-		pattern := fields[0]
-		attrs := make(map[string]string)
-		for _, field := range fields[1:] {
-			if strings.HasPrefix(field, "!") {
-				// !attr means unspecified (reset to default)
-				attrs[field[1:]] = "unspecified"
-			} else if strings.HasPrefix(field, "-") {
-				// -attr means unset (false)
-				attrs[field[1:]] = "false"
-			} else if idx := strings.Index(field, "="); idx != -1 {
-				// attr=value
-				attrs[field[:idx]] = field[idx+1:]
-			} else {
-				// attr alone means set (true)
-				attrs[field] = "true"
-			}
-		}
-
-		rules = append(rules, gitAttributeRule{pattern: pattern, attrs: attrs})
+		rawRules = append(rawRules, gitAttributeRawRule{
+			pattern:     fields[0],
+			assignments: parseGitAttributeAssignments(fields[1:]),
+		})
 	}
 
 	if err := scanner.Err(); err != nil {
 		return GitAttributes{}, err
 	}
 
+	rules := make([]gitAttributeRule, 0, len(rawRules))
+	memo := make(map[string]map[string]gitAttributeValue)
+	for _, rule := range rawRules {
+		rules = append(rules, gitAttributeRule{
+			pattern: rule.pattern,
+			attrs:   resolveGitAttributeAssignments(rule.assignments, macros, memo, map[string]bool{}),
+		})
+	}
+
 	return GitAttributes{rules: rules}, nil
+}
+
+func parseGitAttributeAssignments(fields []string) []gitAttributeAssignment {
+	assignments := make([]gitAttributeAssignment, 0, len(fields))
+	for _, field := range fields {
+		switch {
+		case strings.HasPrefix(field, "!"):
+			assignments = append(assignments, gitAttributeAssignment{
+				name:  field[1:],
+				value: gitAttributeValue{kind: gitAttributeValueUnspecified},
+			})
+		case strings.HasPrefix(field, "-"):
+			assignments = append(assignments, gitAttributeAssignment{
+				name:  field[1:],
+				value: gitAttributeValue{kind: gitAttributeValueUnset},
+			})
+		case strings.Contains(field, "="):
+			idx := strings.Index(field, "=")
+			assignments = append(assignments, gitAttributeAssignment{
+				name:  field[:idx],
+				value: gitAttributeValue{kind: gitAttributeValueString, value: field[idx+1:]},
+			})
+		default:
+			assignments = append(assignments, gitAttributeAssignment{
+				name:        field,
+				value:       gitAttributeValue{kind: gitAttributeValueSet},
+				expandMacro: true,
+			})
+		}
+	}
+	return assignments
+}
+
+func resolveGitAttributeAssignments(assignments []gitAttributeAssignment, macros map[string][]gitAttributeAssignment, memo map[string]map[string]gitAttributeValue, visiting map[string]bool) map[string]gitAttributeValue {
+	resolved := make(map[string]gitAttributeValue)
+	for _, assignment := range assignments {
+		if assignment.expandMacro {
+			if expanded, ok := resolveGitAttributeMacro(assignment.name, macros, memo, visiting); ok {
+				for name, value := range expanded {
+					resolved[name] = value
+				}
+				continue
+			}
+		}
+		resolved[assignment.name] = assignment.value
+	}
+	return resolved
+}
+
+func resolveGitAttributeMacro(name string, macros map[string][]gitAttributeAssignment, memo map[string]map[string]gitAttributeValue, visiting map[string]bool) (map[string]gitAttributeValue, bool) {
+	if expanded, ok := memo[name]; ok {
+		return cloneGitAttributeValues(expanded), true
+	}
+
+	assignments, ok := macros[name]
+	if !ok {
+		return nil, false
+	}
+
+	if visiting[name] {
+		return map[string]gitAttributeValue{}, true
+	}
+
+	visiting[name] = true
+	expanded := resolveGitAttributeAssignments(assignments, macros, memo, visiting)
+	delete(visiting, name)
+
+	memo[name] = cloneGitAttributeValues(expanded)
+	return expanded, true
+}
+
+func cloneGitAttributeValues(attrs map[string]gitAttributeValue) map[string]gitAttributeValue {
+	cloned := make(map[string]gitAttributeValue, len(attrs))
+	for name, value := range attrs {
+		cloned[name] = value
+	}
+	return cloned
+}
+
+func (v gitAttributeValue) boolValue() bool {
+	switch v.kind {
+	case gitAttributeValueUnset:
+		return false
+	case gitAttributeValueString:
+		return v.value != "false"
+	default:
+		return true
+	}
+}
+
+func (v gitAttributeValue) textValue() string {
+	switch v.kind {
+	case gitAttributeValueSet:
+		return "true"
+	case gitAttributeValueUnset:
+		return "false"
+	default:
+		return v.value
+	}
 }
 
 // getAttr returns the value of a named attribute for the given path.
 // It returns the value from the last matching rule (git precedence: later rules win).
 // Iterates in reverse so we can return immediately on the first (i.e. last-defined) match.
-// If the attribute is "unspecified" (set via !attr), it is treated as not set,
-// causing the caller to fall back to default detection.
-func (ga GitAttributes) getAttr(path string, attr string) (string, bool) {
+// If the attribute is unspecified (set via !attr or via a macro that resolves to
+// !attr), it is treated as not set, causing the caller to fall back to default
+// detection.
+func (ga GitAttributes) getAttr(path string, attr string) (gitAttributeValue, bool) {
 	for i := len(ga.rules) - 1; i >= 0; i-- {
 		rule := ga.rules[i]
 		if matchGitPattern(rule.pattern, path) {
 			if val, ok := rule.attrs[attr]; ok {
-				if val == "unspecified" {
-					return "", false
+				if val.kind == gitAttributeValueUnspecified {
+					return gitAttributeValue{}, false
 				}
 				return val, true
 			}
 		}
 	}
-	return "", false
+	return gitAttributeValue{}, false
 }
 
 // IsVendor checks the linguist-vendored attribute for path.
 // If no rule matches, it falls back to the default IsVendor detection.
 func (ga GitAttributes) IsVendor(path string) bool {
 	if val, ok := ga.getAttr(path, "linguist-vendored"); ok {
-		return val != "false"
+		return val.boolValue()
 	}
 	return IsVendor(path)
 }
@@ -98,7 +234,7 @@ func (ga GitAttributes) IsVendor(path string) bool {
 // If no rule matches, it falls back to the default IsDocumentation detection.
 func (ga GitAttributes) IsDocumentation(path string) bool {
 	if val, ok := ga.getAttr(path, "linguist-documentation"); ok {
-		return val != "false"
+		return val.boolValue()
 	}
 	return IsDocumentation(path)
 }
@@ -107,7 +243,7 @@ func (ga GitAttributes) IsDocumentation(path string) bool {
 // If no rule matches, it falls back to the default IsGenerated detection.
 func (ga GitAttributes) IsGenerated(path string, content []byte) bool {
 	if val, ok := ga.getAttr(path, "linguist-generated"); ok {
-		return val != "false"
+		return val.boolValue()
 	}
 	return IsGenerated(path, content)
 }
@@ -124,7 +260,7 @@ func (ga GitAttributes) IsGenerated(path string, content []byte) bool {
 //   - No rule means use default language-type-based detection
 func (ga GitAttributes) IsDetectable(path string) (bool, bool) {
 	if val, ok := ga.getAttr(path, "linguist-detectable"); ok {
-		return val != "false", true
+		return val.boolValue(), true
 	}
 	return false, false
 }
@@ -134,11 +270,11 @@ func (ga GitAttributes) IsDetectable(path string) (bool, bool) {
 // Returns the language and true if an override was found.
 func (ga GitAttributes) GetLanguage(path string) (string, bool) {
 	if val, ok := ga.getAttr(path, "linguist-language"); ok {
-		if lang, ok := GetLanguageByAlias(val); ok {
+		if lang, ok := GetLanguageByAlias(val.textValue()); ok {
 			return lang, true
 		}
 		// Return as-is if alias resolution fails (could be a valid language name)
-		return val, true
+		return val.textValue(), true
 	}
 	return "", false
 }
@@ -149,7 +285,7 @@ func (ga GitAttributes) GetLanguage(path string) (string, bool) {
 // the parent directory classification.
 func (ga GitAttributes) HasPotentialOverride(attr string) bool {
 	for _, rule := range ga.rules {
-		if val, ok := rule.attrs[attr]; ok && (val == "false" || val == "unspecified") {
+		if val, ok := rule.attrs[attr]; ok && (val.kind == gitAttributeValueUnset || val.kind == gitAttributeValueUnspecified) {
 			return true
 		}
 	}
