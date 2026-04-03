@@ -68,3 +68,29 @@ func TestAnalyzeDirRespectsNestedTrailingSlashVendorOverride(t *testing.T) {
 
 	assert.ElementsMatch(t, []string{"main.go", "vendor/github.com/pkg/errors/errors.go"}, out["Go"])
 }
+
+func TestAnalyzeDirRespectsMacroVendorOverride(t *testing.T) {
+	root := t.TempDir()
+
+	writeFile := func(relativePath string, content string) {
+		path := filepath.Join(root, relativePath)
+		require.NoError(t, os.MkdirAll(filepath.Dir(path), 0o755))
+		require.NoError(t, os.WriteFile(path, []byte(content), 0o644))
+	}
+
+	writeFile(".gitattributes", "[attr]unvendor -linguist-vendored\nvendor/** linguist-vendored\nvendor/github.com/** unvendor\n")
+	writeFile("main.go", "package main\n")
+	writeFile("vendor/github.com/pkg/errors/errors.go", "package errors\n")
+	writeFile("vendor/acme/lib.go", "package acme\n")
+
+	content, err := os.ReadFile(filepath.Join(root, ".gitattributes"))
+	require.NoError(t, err)
+
+	gitAttrs, err := enry.ParseGitAttributes(content)
+	require.NoError(t, err)
+
+	out, err := analyzeDir(root, -1, true, gitAttrs)
+	require.NoError(t, err)
+
+	assert.ElementsMatch(t, []string{"main.go", "vendor/github.com/pkg/errors/errors.go"}, out["Go"])
+}

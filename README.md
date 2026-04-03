@@ -188,6 +188,15 @@ go-enry supports overriding language detection via `.gitattributes`, compatible 
 
 Use `-` prefix to unset: `-linguist-vendored`
 
+Use `!` prefix to reset an attribute to the default behavior: `!linguist-vendored`
+
+Git-style attribute macros are also supported, for example:
+
+```text
+[attr]linguist-go linguist-language=Go
+*.myext linguist-go
+```
+
 ### API usage
 
 ```go
@@ -212,7 +221,6 @@ The `enry` CLI automatically reads `.gitattributes` from the root of the analyze
 
 **Known limitations:**
 - Only the root `.gitattributes` file is read. Git and Linguist support nested `.gitattributes` files in subdirectories; go-enry does not.
-- Backslash-escaped whitespace in patterns is not supported (patterns are split on whitespace).
 
 ## Divergences from Linguist
 
