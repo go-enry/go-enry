@@ -79,6 +79,18 @@ func TestEdgeTrailingSlashDirectory(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
+// EC-2b: Trailing-slash with glob in dir part
+// ---------------------------------------------------------------------------
+
+// TestEdgeTrailingSlashWithGlob verifies that trailing-slash patterns
+// containing globs (e.g. "**/vendor/") still glob-match, not literal-match.
+func TestEdgeTrailingSlashWithGlob(t *testing.T) {
+	// "**/vendor/" should match files inside any vendor/ directory at any depth
+	assert.True(t, matchGitPattern("**/vendor/", "a/vendor/foo.go"),
+		"**/vendor/ should glob-match nested vendor dirs")
+}
+
+// ---------------------------------------------------------------------------
 // EC-3: Double-star in middle of pattern
 // ---------------------------------------------------------------------------
 
