@@ -1,13 +1,14 @@
 package tech.sourced.enry;
 
-import tech.sourced.enry.nativelib.*;
+import tech.sourced.enry.internal.*;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 
 import static tech.sourced.enry.GoUtils.*;
 
 public class Enry {
     public static final Guess unknownLanguage = new Guess("", false);
-
-    private static final EnryLibrary nativeLib = EnryLibrary.INSTANCE;
 
     /**
      * Returns the language of the given file based on the filename and its
@@ -18,10 +19,13 @@ public class Enry {
      * @return the guessed language
      */
     public static synchronized String getLanguage(String filename, byte[] content) {
-        return toJavaString(nativeLib.GetLanguage(
-                toGoString(filename),
-                toGoByteSlice(content)
-        ));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaString(GoEnry.GetLanguage(
+                arena,
+                toGoString(arena, filename),
+                toGoByteSlice(arena, content)
+            ));
+        }
     }
 
     /**
@@ -34,11 +38,17 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByContent(String filename, byte[] content) {
-        GetLanguageByContent_return.ByValue res = nativeLib.GetLanguageByContent(
-                toGoString(filename),
-                toGoByteSlice(content)
-        );
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByContent(
+                arena,
+                toGoString(arena, filename),
+                toGoByteSlice(arena, content)
+            );
+            return new Guess(
+                toJavaString(GetLanguageByContent_return.r0(res)),
+                toJavaBool(GetLanguageByContent_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -50,8 +60,13 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByEmacsModeline(byte[] content) {
-        GetLanguageByEmacsModeline_return.ByValue res = nativeLib.GetLanguageByEmacsModeline(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByEmacsModeline(arena, toGoByteSlice(arena, content));
+            return new Guess(
+                toJavaString(GetLanguageByEmacsModeline_return.r0(res)),
+                toJavaBool(GetLanguageByEmacsModeline_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -63,8 +78,13 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByExtension(String filename) {
-        GetLanguageByExtension_return.ByValue res = nativeLib.GetLanguageByExtension(toGoString(filename));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByExtension(arena, toGoString(arena, filename));
+            return new Guess(
+                toJavaString(GetLanguageByExtension_return.r0(res)),
+                toJavaBool(GetLanguageByExtension_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -76,8 +96,13 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByShebang(byte[] content) {
-        GetLanguageByShebang_return.ByValue res = nativeLib.GetLanguageByShebang(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByShebang(arena, toGoByteSlice(arena, content));
+            return new Guess(
+                toJavaString(GetLanguageByShebang_return.r0(res)),
+                toJavaBool(GetLanguageByShebang_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -89,8 +114,13 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByFilename(String filename) {
-        GetLanguageByFilename_return.ByValue res = nativeLib.GetLanguageByFilename(toGoString(filename));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByFilename(arena, toGoString(arena, filename));
+            return new Guess(
+                toJavaString(GetLanguageByFilename_return.r0(res)),
+                toJavaBool(GetLanguageByFilename_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -102,8 +132,13 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByModeline(byte[] content) {
-        GetLanguageByModeline_return.ByValue res = nativeLib.GetLanguageByModeline(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByModeline(arena, toGoByteSlice(arena, content));
+            return new Guess(
+                toJavaString(GetLanguageByModeline_return.r0(res)),
+                toJavaBool(GetLanguageByModeline_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -115,8 +150,13 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByVimModeline(byte[] content) {
-        GetLanguageByVimModeline_return.ByValue res = nativeLib.GetLanguageByVimModeline(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment res = GoEnry.GetLanguageByVimModeline(arena, toGoByteSlice(arena, content));
+            return new Guess(
+                toJavaString(GetLanguageByVimModeline_return.r0(res)),
+                toJavaBool(GetLanguageByVimModeline_return.r1(res))
+            );
+        }
     }
 
     /**
@@ -126,9 +166,11 @@ public class Enry {
      * @return extensions
      */
     public static synchronized String[] getLanguageExtensions(String language) {
-        GoSlice result = new GoSlice();
-        nativeLib.GetLanguageExtensions(toGoString(language), result);
-        return toJavaStringArray(result);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment result = GoSlice.allocate(arena);
+            GoEnry.GetLanguageExtensions(toGoString(arena, language), result);
+            return toJavaStringArray(result);
+        }
     }
 
     /**
@@ -139,9 +181,11 @@ public class Enry {
      * @return all possible languages
      */
     public static synchronized String[] getLanguages(String filename, byte[] content) {
-        GoSlice result = new GoSlice();
-        nativeLib.GetLanguages(toGoString(filename), toGoByteSlice(content), result);
-        return toJavaStringArray(result);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment result = GoSlice.allocate(arena);
+            GoEnry.GetLanguages(toGoString(arena, filename), toGoByteSlice(arena, content), result);
+            return toJavaStringArray(result);
+        }
     }
 
     /**
@@ -152,7 +196,9 @@ public class Enry {
      * @return mime type
      */
     public static synchronized String getMimeType(String path, String language) {
-        return toJavaString(nativeLib.GetMimeType(toGoString(path), toGoString(language)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaString(GoEnry.GetMimeType(arena, toGoString(arena, path), toGoString(arena, language)));
+        }
     }
 
     /**
@@ -162,7 +208,9 @@ public class Enry {
      * @return whether it's binary or not
      */
     public static synchronized boolean isBinary(byte[] content) {
-        return toJavaBool(nativeLib.IsBinary(toGoByteSlice(content)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsBinary(toGoByteSlice(arena, content)));
+        }
     }
 
     /**
@@ -172,7 +220,9 @@ public class Enry {
      * @return whether it's config or not
      */
     public static synchronized boolean isConfiguration(String path) {
-        return toJavaBool(nativeLib.IsConfiguration(toGoString(path)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsConfiguration(toGoString(arena, path)));
+        }
     }
 
     /**
@@ -184,7 +234,9 @@ public class Enry {
      * @return whether it's docs or not
      */
     public static synchronized boolean isDocumentation(String path) {
-        return toJavaBool(nativeLib.IsDocumentation(toGoString(path)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsDocumentation(toGoString(arena, path)));
+        }
     }
 
     /**
@@ -194,7 +246,9 @@ public class Enry {
      * @return whether it's a dotfile or not
      */
     public static synchronized boolean isDotFile(String path) {
-        return toJavaBool(nativeLib.IsDotFile(toGoString(path)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsDotFile(toGoString(arena, path)));
+        }
     }
 
     /**
@@ -204,7 +258,9 @@ public class Enry {
      * @return whether it's an image or not
      */
     public static synchronized boolean isImage(String path) {
-        return toJavaBool(nativeLib.IsImage(toGoString(path)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsImage(toGoString(arena, path)));
+        }
     }
 
     /**
@@ -214,7 +270,9 @@ public class Enry {
      * @return whether it's vendor or not
      */
     public static synchronized boolean isVendor(String path) {
-        return toJavaBool(nativeLib.IsVendor(toGoString(path)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsVendor(toGoString(arena, path)));
+        }
     }
 
     /**
@@ -225,7 +283,9 @@ public class Enry {
      * @return whether it's autogenerated or not
      */
     public static synchronized boolean isGenerated(String path, byte[] content) {
-        return toJavaBool(nativeLib.IsGenerated(toGoString(path), toGoByteSlice(content)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsGenerated(toGoString(arena, path), toGoByteSlice(arena, content)));
+        }
     }
 
     /**
@@ -235,7 +295,9 @@ public class Enry {
      * @return color code
      */
     public static synchronized String getColor(String language) {
-        return toJavaString(nativeLib.GetColor(toGoString(language)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaString(GoEnry.GetColor(arena, toGoString(arena, language)));
+        }
     }
 
     /**
@@ -245,7 +307,9 @@ public class Enry {
      * @return whether it's test or not
      */
     public static synchronized boolean isTest(String path) {
-        return toJavaBool(nativeLib.IsTest(toGoString(path)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaBool(GoEnry.IsTest(toGoString(arena, path)));
+        }
     }
 
     /**
@@ -255,6 +319,8 @@ public class Enry {
      * @return type (data, programming, markup, prose)
      */
     public static synchronized String getLanguageType(String language) {
-        return toJavaString(nativeLib.GetLanguageType(toGoString(language)));
+        try (Arena arena = Arena.ofConfined()) {
+            return toJavaString(GoEnry.GetLanguageType(arena, toGoString(arena, language)));
+        }
     }
 }

@@ -1,35 +1,13 @@
-JNAERATOR_VERSION=ac73c9e
-JARS_DIR=./lib
-JAR=$(JARS_DIR)/enry.jar
-JNAERATOR_DIR=./.jnaerator
-JNAERATOR_JAR=$(JNAERATOR_DIR)/jnaerator.jar
-JNAERATOR_JAR_URL="https://jitpack.io/com/github/nativelibs4java/JNAerator/jnaerator/$(JNAERATOR_VERSION)/jnaerator-$(JNAERATOR_VERSION)-shaded.jar"
 RESOURCES_SRC=../.shared
 RESOURCES_DIR=./shared
-HEADER_FILE=$(RESOURCES_DIR)/libenry.h
 
 SHELL := /bin/bash
 
-all: $(JAR)
-
-$(JAR): $(RESOURCES_DIR) $(JNAERATOR_JAR)
-	mkdir -p lib && \
-	java -jar $(JNAERATOR_JAR) \
-		-package tech.sourced.enry.nativelib \
-		-library enry \
-		$(HEADER_FILE) \
-		-I/usr/lib/gcc/x86_64-linux-gnu/4.8/include \
-		-D__GNUC__=4 \
-		-o $(JARS_DIR) \
-		-mode StandaloneJar \
-		-runtime JNA;
+all: $(RESOURCES_DIR)
 
 $(RESOURCES_DIR): os-shared-lib
 	cp -R $(RESOURCES_SRC) $(RESOURCES_DIR)
-
-$(JNAERATOR_JAR): $(RESOURCES_DIR)
-	mkdir -p $(JNAERATOR_DIR) && \
-	wget $(JNAERATOR_JAR_URL) -O $(JNAERATOR_JAR)
+	mvn package
 
 os-shared-lib:
 	@os_name="$(shell uname -s)" && \
@@ -43,22 +21,19 @@ os-shared-lib:
 	fi;
 
 linux-shared:
-	cd .. && \
-	$(MAKE) linux-shared
+	$(MAKE) -C .. linux-shared
 
 darwin-shared:
-	cd .. && \
-	$(MAKE) darwin-shared
+	$(MAKE) -C .. darwin-shared
 
 test:
-	./sbt clean test
+	mvn clean test
 
 package:
-	./sbt clean assembly
+	mvn package
 
 clean:
-	rm -rf $(JAR)
 	rm -rf $(RESOURCES_DIR)
-	rm -rf $(JNAERATOR_JAR)
+	mvn clean
 
 .PHONY: test package clean linux-shared darwin-shared os-shared-lib
