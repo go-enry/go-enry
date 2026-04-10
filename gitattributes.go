@@ -374,8 +374,8 @@ func globMatch(pattern, str string) bool {
 			if len(str) == 0 || str[0] == '/' {
 				return false
 			}
-			// Find closing bracket
-			end := strings.Index(pattern, "]")
+			// Find closing bracket, skipping POSIX class [:..:]
+			end := findClosingBracket(pattern)
 			if end == -1 {
 				// No closing bracket, treat as literal
 				if str[0] != pattern[0] {
@@ -391,7 +391,10 @@ func globMatch(pattern, str string) bool {
 				negate = true
 				class = class[1:]
 			}
-			matched := matchCharClass(class, str[0])
+			matched, valid := matchCharClass(class, str[0])
+			if !valid {
+				return false
+			}
 			if negate {
 				matched = !matched
 			}
@@ -411,18 +414,106 @@ func globMatch(pattern, str string) bool {
 	return len(str) == 0
 }
 
-func matchCharClass(class string, ch byte) bool {
-	for i := 0; i < len(class); i++ {
-		if i+2 < len(class) && class[i+1] == '-' {
-			if ch >= class[i] && ch <= class[i+2] {
-				return true
+// findClosingBracket returns the index of the closing ']' in a bracket
+// expression starting at pattern[0] == '[', skipping POSIX classes [:name:].
+func findClosingBracket(pattern string) int {
+	for i := 1; i < len(pattern); i++ {
+		if pattern[i] == '[' && i+1 < len(pattern) && pattern[i+1] == ':' {
+			if end := strings.Index(pattern[i+2:], ":]"); end != -1 {
+				i += end + 3
+				continue
 			}
-			i += 2
-			continue
 		}
-		if class[i] == ch {
-			return true
+		if pattern[i] == ']' {
+			return i
 		}
 	}
-	return false
+	return -1
+}
+
+// matchCharClass returns (matched, valid). valid is false if the class
+// contains an unknown POSIX class name, in which case the caller should
+// treat the entire pattern as non-matching.
+func matchCharClass(class string, ch byte) (bool, bool) {
+	if !hasValidPOSIXClasses(class) {
+		return false, false
+	}
+	for len(class) > 0 {
+		if strings.HasPrefix(class, "[:") {
+			if end := strings.Index(class[2:], ":]"); end != -1 {
+				m, _ := matchPOSIXClass(class[2:2+end], ch)
+				if m {
+					return true, true
+				}
+				class = class[2+end+2:]
+				continue
+			}
+		}
+		if len(class) >= 3 && class[1] == '-' {
+			if ch >= class[0] && ch <= class[2] {
+				return true, true
+			}
+			class = class[3:]
+			continue
+		}
+		if class[0] == ch {
+			return true, true
+		}
+		class = class[1:]
+	}
+	return false, true
+}
+
+// hasValidPOSIXClasses checks that every [:name:] in the class string
+// refers to a known POSIX class.
+func hasValidPOSIXClasses(class string) bool {
+	for {
+		i := strings.Index(class, "[:")
+		if i == -1 {
+			return true
+		}
+		end := strings.Index(class[i+2:], ":]")
+		if end == -1 {
+			return true
+		}
+		if _, valid := matchPOSIXClass(class[i+2:i+2+end], 0); !valid {
+			return false
+		}
+		class = class[i+2+end+2:]
+	}
+}
+
+// matchPOSIXClass returns (matched, valid). valid is false for unknown class names.
+func matchPOSIXClass(name string, ch byte) (bool, bool) {
+	var m bool
+	switch name {
+	case "alnum":
+		m = (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
+	case "alpha":
+		m = (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
+	case "blank":
+		m = ch == ' ' || ch == '\t'
+	case "cntrl":
+		m = ch < 0x20 || ch == 0x7f
+	case "digit":
+		m = ch >= '0' && ch <= '9'
+	case "graph":
+		m = ch >= 0x21 && ch <= 0x7e
+	case "lower":
+		m = ch >= 'a' && ch <= 'z'
+	case "print":
+		m = ch >= 0x20 && ch <= 0x7e
+	case "punct":
+		m = ch >= 0x21 && ch <= 0x7e &&
+			!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))
+	case "space":
+		m = ch == '\t' || ch == '\n' || ch == '\v' || ch == '\f' || ch == '\r' || ch == ' '
+	case "upper":
+		m = ch >= 'A' && ch <= 'Z'
+	case "xdigit":
+		m = (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f')
+	default:
+		return false, false
+	}
+	return m, true
 }

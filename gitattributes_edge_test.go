@@ -185,11 +185,69 @@ func TestEdgeCharClasses(t *testing.T) {
 		// Char class should not match path separator
 		{"[a-z]oo.go", "foo.go", true, "f matches [a-z]"},
 		{"[a-z]oo.go", "/oo.go", false, "/ must not match char class"},
+		// POSIX named character classes
+		{"[[:alpha:]]oo.go", "foo.go", true, "f in [:alpha:]"},
+		{"[[:alpha:]]oo.go", "3oo.go", false, "3 not in [:alpha:]"},
+		{"[[:digit:]]*.txt", "3file.txt", true, "3 in [:digit:]"},
+		{"[[:digit:]]*.txt", "afile.txt", false, "a not in [:digit:]"},
+		{"*.[[:upper:]]", "foo.C", true, "C in [:upper:]"},
+		{"*.[[:upper:]]", "foo.c", false, "c not in [:upper:]"},
+		{"*.[[:lower:]]", "foo.c", true, "c in [:lower:]"},
+		{"*.[[:lower:]]", "foo.C", false, "C not in [:lower:]"},
+		{"[[:alnum:]]*.go", "a.go", true, "a in [:alnum:]"},
+		{"[[:alnum:]]*.go", "9.go", true, "9 in [:alnum:]"},
+		{"[[:alnum:]]*.go", "-.go", false, "- not in [:alnum:]"},
+		{"[[:xdigit:]]", "a", true, "a in [:xdigit:]"},
+		{"[[:xdigit:]]", "F", true, "F in [:xdigit:]"},
+		{"[[:xdigit:]]", "g", false, "g not in [:xdigit:]"},
+		{"[[:blank:]]", " ", true, "space in [:blank:]"},
+		{"[[:blank:]]", "\t", true, "tab in [:blank:]"},
+		{"[[:blank:]]", "a", false, "a not in [:blank:]"},
+		// Negated POSIX class
+		{"[^[:digit:]]*.go", "a.go", true, "a not in negated [:digit:]"},
+		{"[^[:digit:]]*.go", "3.go", false, "3 in negated [:digit:]"},
+		// POSIX class combined with other chars in bracket
+		{"[[:digit:]ab]", "a", true, "a in [:digit:] + ab"},
+		{"[[:digit:]ab]", "5", true, "5 in [:digit:] + ab"},
+		{"[[:digit:]ab]", "c", false, "c not in [:digit:] + ab"},
+		// Unknown POSIX class makes entire pattern non-matching
+		{"[[:spaci:]]", " ", false, "unknown class rejects match"},
+		{"[[:digit:][:spaci:]]", "5", false, "unknown class in mix rejects match"},
+		{"[^[:spaci:]]", "a", false, "negated unknown class rejects match"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.pattern+"__"+tt.path, func(t *testing.T) {
 			got := matchGitPattern(tt.pattern, tt.path)
+			assert.Equal(t, tt.want, got, "%s", tt.note)
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// EC-5b: POSIX class validation
+// ---------------------------------------------------------------------------
+
+func TestHasValidPOSIXClasses(t *testing.T) {
+	tests := []struct {
+		class string
+		want  bool
+		note  string
+	}{
+		{"", true, "empty class string"},
+		{"a-z", true, "no POSIX classes"},
+		{"[:alpha:]", true, "single valid class"},
+		{"[:digit:]ab", true, "valid class with trailing chars"},
+		{"[:digit:][:alpha:]", true, "two valid classes"},
+		{"[:spaci:]", false, "unknown class"},
+		{"[:digit:][:spaci:]", false, "valid + unknown mix"},
+		{"[:", true, "incomplete opening, not a POSIX class"},
+		{"[:alpha", true, "no closing :], not a POSIX class"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.class, func(t *testing.T) {
+			got := hasValidPOSIXClasses(tt.class)
 			assert.Equal(t, tt.want, got, "%s", tt.note)
 		})
 	}
