@@ -52,7 +52,7 @@ func TestAnalyzeDirRespectsNestedTrailingSlashVendorOverride(t *testing.T) {
 		require.NoError(t, os.WriteFile(path, []byte(content), 0o644))
 	}
 
-	writeFile(".gitattributes", "vendor/** linguist-vendored\nvendor/github.com/ -linguist-vendored\n")
+	writeFile(".gitattributes", "vendor/** linguist-vendored\nvendor/github.com/** -linguist-vendored\n")
 	writeFile("main.go", "package main\n")
 	writeFile("vendor/github.com/pkg/errors/errors.go", "package errors\n")
 	writeFile("vendor/acme/lib.go", "package acme\n")

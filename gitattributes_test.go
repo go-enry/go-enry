@@ -153,10 +153,11 @@ func TestMatchGitPattern(t *testing.T) {
 		{"vendor/*.go", "vendor/foo.go", true},
 		{"vendor/*.go", "src/vendor/foo.go", false},
 
-		// Trailing slash (directory pattern) - matches directory and files inside
+		// Trailing slash (directory-only pattern) - only matches directory paths
+		// Unlike .gitignore, .gitattributes trailing "/" does NOT recurse into files
 		{"vendor/", "vendor/", true},
-		{"vendor/", "vendor/foo.go", true},
-		{"vendor/", "vendor/lib/bar.go", true},
+		{"vendor/", "vendor/foo.go", false},
+		{"vendor/", "vendor/lib/bar.go", false},
 		{"vendor/", "vendor", false},
 		{"vendor/", "notvendor/foo.go", false},
 

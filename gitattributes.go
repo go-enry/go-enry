@@ -301,20 +301,17 @@ func (ga GitAttributes) HasPotentialOverride(attr string) bool {
 //     or anywhere if the pattern contains "/"
 //   - Trailing "/" matches the directory itself and all files inside it
 func matchGitPattern(pattern, path string) bool {
-	// Trailing slash means directory pattern: matches the directory path
-	// (ending with "/") or any file inside the directory.
+	// Trailing slash means directory-only pattern. Unlike .gitignore,
+	// .gitattributes does NOT recurse into directories — the pattern only
+	// matches paths that are themselves directories (ending with "/").
+	// The Git docs call trailing "/" in .gitattributes "pointless";
+	// users should use "vendor/**" instead of "vendor/".
 	if strings.HasSuffix(pattern, "/") {
-		dir := strings.TrimSuffix(pattern, "/")
-		if strings.HasSuffix(path, "/") {
-			// Directory path itself — match against dir name
-			path = strings.TrimSuffix(path, "/")
-			pattern = dir
-		} else if strings.HasPrefix(path, dir+"/") {
-			// File inside the directory — matches
-			return true
-		} else {
+		if !strings.HasSuffix(path, "/") {
 			return false
 		}
+		pattern = strings.TrimSuffix(pattern, "/")
+		path = strings.TrimSuffix(path, "/")
 	}
 
 	anchored := strings.HasPrefix(pattern, "/")
