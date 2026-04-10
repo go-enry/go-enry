@@ -50,8 +50,10 @@ func TestEdgeDoubleStarPathBoundary(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 // TestEdgeTrailingSlashDirectory verifies that a trailing-slash pattern
-// (e.g. "vendor/") matches files INSIDE that directory, not just the literal
-// path ending in "/".
+// (e.g. "vendor/") only matches directory paths (ending with "/"), NOT
+// files inside the directory. This differs from .gitignore behavior.
+// The Git docs call trailing "/" in .gitattributes "pointless" — use
+// "vendor/**" instead.
 func TestEdgeTrailingSlashDirectory(t *testing.T) {
 	tests := []struct {
 		pattern string
@@ -59,14 +61,14 @@ func TestEdgeTrailingSlashDirectory(t *testing.T) {
 		want    bool
 		note    string
 	}{
-		// Files inside vendor/ should match vendor/ pattern
-		{"vendor/", "vendor/foo.go", true, "files in vendor/ should be matched"},
-		{"vendor/", "vendor/lib/bar.go", true, "nested files in vendor/ should be matched"},
-		{"vendor/", "vendor/", true, "the directory itself should match"},
+		// Trailing-slash only matches directory paths, not files inside
+		{"vendor/", "vendor/foo.go", false, "trailing-slash does NOT match files inside directory"},
+		{"vendor/", "vendor/lib/bar.go", false, "trailing-slash does NOT match nested files"},
+		{"vendor/", "vendor/", true, "the directory path itself should match"},
 
-		// Files outside should not match
-		{"vendor/", "src/vendor/foo.go", false, "files in src/vendor/ should not match anchored vendor/"},
-		{"vendor/", "notvendor/foo.go", false, "files in notvendor/ should not match vendor/"},
+		// These should also not match
+		{"vendor/", "src/vendor/foo.go", false, "files in src/vendor/ should not match"},
+		{"vendor/", "notvendor/foo.go", false, "files in notvendor/ should not match"},
 		{"vendor/", "vendor", false, "bare 'vendor' without trailing slash should not match"},
 	}
 
@@ -83,11 +85,15 @@ func TestEdgeTrailingSlashDirectory(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 // TestEdgeTrailingSlashWithGlob verifies that trailing-slash patterns
-// containing globs (e.g. "**/vendor/") still glob-match, not literal-match.
+// do NOT match file paths, even when combined with globs.
+// In .gitattributes, trailing "/" is "pointless" per Git docs.
 func TestEdgeTrailingSlashWithGlob(t *testing.T) {
-	// "**/vendor/" should match files inside any vendor/ directory at any depth
-	assert.True(t, matchGitPattern("**/vendor/", "a/vendor/foo.go"),
-		"**/vendor/ should glob-match nested vendor dirs")
+	// "**/vendor/" should NOT match file paths — trailing slash means directory-only
+	assert.False(t, matchGitPattern("**/vendor/", "a/vendor/foo.go"),
+		"**/vendor/ should not match file paths")
+	// But should match a directory path
+	assert.True(t, matchGitPattern("**/vendor/", "a/vendor/"),
+		"**/vendor/ should match directory paths")
 }
 
 // ---------------------------------------------------------------------------
