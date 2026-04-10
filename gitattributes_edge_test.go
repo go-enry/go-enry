@@ -67,7 +67,7 @@ func TestEdgeTrailingSlashDirectory(t *testing.T) {
 		{"vendor/", "vendor/", true, "the directory path itself should match"},
 
 		// These should also not match
-		{"vendor/", "src/vendor/foo.go", false, "files in src/vendor/ should not match"},
+		{"vendor/", "src/vendor/foo.go", false, "not a directory path, trailing-slash only matches dirs"},
 		{"vendor/", "notvendor/foo.go", false, "files in notvendor/ should not match"},
 		{"vendor/", "vendor", false, "bare 'vendor' without trailing slash should not match"},
 	}
