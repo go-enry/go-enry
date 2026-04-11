@@ -75,6 +75,11 @@ func ParseGitAttributes(content []byte) (GitAttributes, error) {
 			continue
 		}
 
+		// Negative patterns are ignored in gitattributes (Git warns and skips).
+		if strings.HasPrefix(fields[0], "!") {
+			continue
+		}
+
 		if len(fields) < 2 {
 			continue
 		}
@@ -327,30 +332,46 @@ func matchGitPattern(pattern, path string) bool {
 	return globMatch(pattern, path)
 }
 
-// globMatch performs recursive glob matching with support for *, **, and ?.
+// globMatch performs recursive glob matching with support for *, **, ?, and \.
 func globMatch(pattern, str string) bool {
+	return globMatchInternal(pattern, str, 0)
+}
+
+// prev tracks the raw pattern byte immediately before the current pattern
+// position. It is 0 at the start of a pattern context. This is used for
+// the ** boundary check (Git wildmatch.c:95 "prev_p - pattern < 2").
+func globMatchInternal(pattern, str string, prev byte) bool {
 	for len(pattern) > 0 {
 		switch pattern[0] {
 		case '*':
 			if len(pattern) > 1 && pattern[1] == '*' {
-				// "**" matches everything including "/"
-				rest := pattern[2:]
-				// Consume optional trailing slash after **
-				if len(rest) > 0 && rest[0] == '/' {
-					rest = rest[1:]
-				}
-				if len(rest) == 0 {
-					return true
-				}
-				// Try matching rest at path-component boundaries only
-				for i := 0; i <= len(str); i++ {
-					if i == 0 || str[i-1] == '/' {
-						if globMatch(rest, str[i:]) {
-							return true
+				// Check if ** is at a path boundary:
+				// preceded by start-of-pattern or '/'
+				// AND followed by end-of-pattern, '/', or '\/'
+				atBoundary := (prev == 0 || prev == '/') &&
+					(len(pattern) == 2 || pattern[2] == '/' ||
+						(len(pattern) > 3 && pattern[2] == '\\' && pattern[3] == '/'))
+				if atBoundary {
+					rest := pattern[2:]
+					restPrev := byte('*')
+					if len(rest) > 0 && rest[0] == '/' {
+						restPrev = '/'
+						rest = rest[1:]
+					}
+					if len(rest) == 0 {
+						return true
+					}
+					for i := 0; i <= len(str); i++ {
+						if i == 0 || str[i-1] == '/' {
+							if globMatchInternal(rest, str[i:], restPrev) {
+								return true
+							}
 						}
 					}
+					return false
 				}
-				return false
+				// ** not at boundary: skip extra * and treat as single *
+				pattern = pattern[1:]
 			}
 			// "*" matches anything except "/"
 			rest := pattern[1:]
@@ -358,7 +379,7 @@ func globMatch(pattern, str string) bool {
 				if i > 0 && str[i-1] == '/' {
 					break
 				}
-				if globMatch(rest, str[i:]) {
+				if globMatchInternal(rest, str[i:], '*') {
 					return true
 				}
 			}
@@ -367,6 +388,7 @@ func globMatch(pattern, str string) bool {
 			if len(str) == 0 || str[0] == '/' {
 				return false
 			}
+			prev = '?'
 			pattern = pattern[1:]
 			str = str[1:]
 		case '[':
@@ -381,6 +403,7 @@ func globMatch(pattern, str string) bool {
 				if str[0] != pattern[0] {
 					return false
 				}
+				prev = pattern[0]
 				pattern = pattern[1:]
 				str = str[1:]
 				continue
@@ -401,12 +424,25 @@ func globMatch(pattern, str string) bool {
 			if !matched {
 				return false
 			}
+			prev = ']'
 			pattern = pattern[end+1:]
+			str = str[1:]
+		case '\\':
+			pattern = pattern[1:]
+			if len(pattern) == 0 {
+				return false
+			}
+			if len(str) == 0 || pattern[0] != str[0] {
+				return false
+			}
+			prev = pattern[0]
+			pattern = pattern[1:]
 			str = str[1:]
 		default:
 			if len(str) == 0 || pattern[0] != str[0] {
 				return false
 			}
+			prev = pattern[0]
 			pattern = pattern[1:]
 			str = str[1:]
 		}
@@ -416,24 +452,41 @@ func globMatch(pattern, str string) bool {
 
 // findClosingBracket returns the index of the closing ']' in a bracket
 // expression starting at pattern[0] == '[', skipping POSIX classes [:name:].
+// Per POSIX/Git wildmatch: ']' immediately after '[' (or '[!' / '[^') is a
+// literal class member, not the closing bracket. Backslash escapes are also
+// handled: '\]' inside a bracket is a literal ']'.
 func findClosingBracket(pattern string) int {
-	for i := 1; i < len(pattern); i++ {
+	i := 1
+	if i < len(pattern) && (pattern[i] == '!' || pattern[i] == '^') {
+		i++
+	}
+	// ] immediately after [ (or [!/[^) is a literal class member
+	if i < len(pattern) && pattern[i] == ']' {
+		i++
+	}
+	for i < len(pattern) {
+		if pattern[i] == '\\' && i+1 < len(pattern) {
+			i += 2 // skip escaped character
+			continue
+		}
 		if pattern[i] == '[' && i+1 < len(pattern) && pattern[i+1] == ':' {
 			if end := strings.Index(pattern[i+2:], ":]"); end != -1 {
-				i += end + 3
+				i += end + 4
 				continue
 			}
 		}
 		if pattern[i] == ']' {
 			return i
 		}
+		i++
 	}
 	return -1
 }
 
 // matchCharClass returns (matched, valid). valid is false if the class
 // contains an unknown POSIX class name, in which case the caller should
-// treat the entire pattern as non-matching.
+// treat the entire pattern as non-matching. Backslash escapes are handled:
+// '\x' inside a class is treated as literal 'x'.
 func matchCharClass(class string, ch byte) (bool, bool) {
 	if !hasValidPOSIXClasses(class) {
 		return false, false
@@ -449,17 +502,32 @@ func matchCharClass(class string, ch byte) (bool, bool) {
 				continue
 			}
 		}
-		if len(class) >= 3 && class[1] == '-' {
-			if ch >= class[0] && ch <= class[2] {
+		// Get current character, handling escape
+		cur := class[0]
+		advance := 1
+		if cur == '\\' && len(class) > 1 {
+			cur = class[1]
+			advance = 2
+		}
+		// Check for range: cur-high
+		rest := class[advance:]
+		if len(rest) >= 2 && rest[0] == '-' && rest[1] != ']' {
+			high := rest[1]
+			highAdv := 2
+			if high == '\\' && len(rest) > 2 {
+				high = rest[2]
+				highAdv = 3
+			}
+			if ch >= cur && ch <= high {
 				return true, true
 			}
-			class = class[3:]
+			class = rest[highAdv:]
 			continue
 		}
-		if class[0] == ch {
+		if cur == ch {
 			return true, true
 		}
-		class = class[1:]
+		class = rest
 	}
 	return false, true
 }

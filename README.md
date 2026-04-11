@@ -234,6 +234,14 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 
 In all the cases above that have an issue number - we plan to update enry to match Linguist behavior.
 
+### `.gitattributes` pattern matching
+
+go-enry's `.gitattributes` glob matching covers all common patterns. The following features from Git's [wildmatch](https://github.com/git/git/blob/master/wildmatch.c) spec are not implemented:
+
+- **C-style quoted patterns**: patterns starting with `"` for paths containing spaces are not supported.
+- **Case-insensitive matching**: the `core.ignorecase` / `WM_CASEFOLD` mode is not implemented.
+- **Nested `.gitattributes` files**: only the root `.gitattributes` is read; subdirectory-level files are not loaded.
+
 > All the issues related to heuristics' regexp  syntax incompatibilities with the RE2 engine can be avoided by using `oniguruma` instead (see [instuctions](#misc))
 
 ## Benchmarks
