@@ -842,3 +842,161 @@ func TestEdgePatternOnlyLines(t *testing.T) {
 		})
 	}
 }
+
+// ---------------------------------------------------------------------------
+// EC-18: Backslash escaping in patterns
+// All expected values verified against Git's test-tool wildmatch binary.
+// ---------------------------------------------------------------------------
+
+func TestEdgeBackslashEscaping(t *testing.T) {
+	tests := []struct {
+		pattern string
+		path    string
+		want    bool
+		note    string
+	}{
+		{`foo\*`, "foo*", true, `\* matches literal *`},
+		{`foo\*`, "foobar", false, `\* does not match wildcard`},
+		{`foo\*bar`, "foobar", false, `\* requires literal * between foo and bar`},
+		{`foo\*bar`, "foo*bar", true, `\* matches literal * in text`},
+		{`\a\b\c`, "abc", true, `escape of non-special chars`},
+		{`foo\\`, `foo\`, true, `\\ matches literal \`},
+		{`foo\`, "foo", false, `trailing \ is invalid`},
+		{`\[ab]`, "[ab]", true, `\[ matches literal [`},
+		{`\?a\?b`, "?a?b", true, `\? matches literal ?`},
+		{`\#readme`, "#readme", true, `\# matches literal #`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.pattern+"__"+tt.path, func(t *testing.T) {
+			got := globMatch(tt.pattern, tt.path)
+			assert.Equal(t, tt.want, got, "%s: globMatch(%q, %q)", tt.note, tt.pattern, tt.path)
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// EC-19: ** boundary rules — ** not at path boundary treated as single *
+// All expected values verified against Git's test-tool wildmatch binary.
+// ---------------------------------------------------------------------------
+
+func TestEdgeDoubleStarBoundary(t *testing.T) {
+	tests := []struct {
+		pattern string
+		path    string
+		want    bool
+		note    string
+	}{
+		// ** NOT at boundary → treated as single * (cannot cross /)
+		{"foo**bar", "foobazbar", true, "** as *: matches baz substring"},
+		{"foo**bar", "foo/baz/bar", false, "** as *: can't cross /"},
+		{"a**f", "af", true, "** as *: matches empty"},
+		{"a**f", "axf", true, "** as *: matches x"},
+		{"a**f", "a/f", false, "** as *: can't cross /"},
+		{"a**f", "a/b/f", false, "** as *: can't cross multiple /"},
+		{"foo**/bar", "foo/bar", true, "foo** not at boundary, * matches empty before /"},
+		{"foo**/bar", "foo/baz/bar", false, "foo** as *: can't cross /"},
+		{"foo/**arr", "foo/bba/arr", false, "**arr not at boundary: can't cross /"},
+		{"bar**", "bar/baz", false, "bar** not at boundary: can't cross /"},
+
+		// ** AT boundary → crosses / (should still work)
+		{"**/foo", "foo", true, "** at start: matches root"},
+		{"**/foo", "a/b/foo", true, "** at start: matches deep"},
+		{"foo/**", "foo/bar/baz", true, "** at end: matches deep"},
+		{"foo/**/bar", "foo/bar", true, "** in middle: zero dirs"},
+		{"foo/**/bar", "foo/a/b/bar", true, "** in middle: multiple dirs"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.pattern+"__"+tt.path, func(t *testing.T) {
+			got := globMatch(tt.pattern, tt.path)
+			assert.Equal(t, tt.want, got, "%s: globMatch(%q, %q)", tt.note, tt.pattern, tt.path)
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// EC-20: ] as literal first character in bracket class
+// All expected values verified against Git's test-tool wildmatch binary.
+// ---------------------------------------------------------------------------
+
+func TestEdgeBracketLiteralClose(t *testing.T) {
+	tests := []struct {
+		pattern string
+		path    string
+		want    bool
+		note    string
+	}{
+		{"a[]]b", "a]b", true, "] after [ is literal class member (spec #24)"},
+		{"a[]-]b", "a-b", true, "class {], -} matches - (spec #25)"},
+		{"a[]-]b", "a]b", true, "class {], -} matches ] (spec #26)"},
+		{"a[]-]b", "aab", false, "a not in {], -} (spec #27)"},
+		{"a[]a-]b", "aab", true, "class {], a, -} matches a (spec #28)"},
+		{"[!]-]", "a", true, "negated {], -}: a is not in set (spec #61)"},
+		{"[!]-]", "]", false, "negated {], -}: ] is in set (spec #60)"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.pattern+"__"+tt.path, func(t *testing.T) {
+			got := globMatch(tt.pattern, tt.path)
+			assert.Equal(t, tt.want, got, "%s: globMatch(%q, %q)", tt.note, tt.pattern, tt.path)
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// EC-21: Escape sequences in character classes
+// All expected values verified against Git's test-tool wildmatch binary.
+// ---------------------------------------------------------------------------
+
+func TestEdgeBracketEscape(t *testing.T) {
+	tests := []struct {
+		pattern string
+		path    string
+		want    bool
+		note    string
+	}{
+		{`[\]]`, "]", true, `\] is literal ] in class (spec #99)`},
+		{`[\]]`, `\`, false, `\ does not match [\]] (spec #101)`},
+		{`[\\\\]`, `\`, true, `\\\\ in class matches \ (spec #128)`},
+		{`[\1-\3]`, "2", true, `escaped range \1-\3 matches 2 (spec #139)`},
+		{`[\1-\3]`, "3", true, `escaped range \1-\3 matches 3 (spec #140)`},
+		{`[\1-\3]`, "4", false, `escaped range \1-\3 excludes 4 (spec #141)`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.pattern+"__"+tt.path, func(t *testing.T) {
+			got := globMatch(tt.pattern, tt.path)
+			assert.Equal(t, tt.want, got, "%s: globMatch(%q, %q)", tt.note, tt.pattern, tt.path)
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// EC-22: Negative pattern rejection in .gitattributes
+// Verified against git check-attr.
+// ---------------------------------------------------------------------------
+
+func TestEdgeNegativePatternRejection(t *testing.T) {
+	t.Run("negative_pattern_rejected", func(t *testing.T) {
+		ga, err := ParseGitAttributes([]byte("!foo test=bar\n"))
+		require.NoError(t, err)
+		assert.Len(t, ga.rules, 0, "!foo pattern should be rejected")
+	})
+
+	t.Run("escaped_bang_not_rejected", func(t *testing.T) {
+		ga, err := ParseGitAttributes([]byte("\\!foo test=bar\n"))
+		require.NoError(t, err)
+		assert.Len(t, ga.rules, 1, "\\!foo should not be rejected")
+		assert.Equal(t, "\\!foo", ga.rules[0].pattern)
+	})
+
+	t.Run("negative_pattern_does_not_affect_other_rules", func(t *testing.T) {
+		ga, err := ParseGitAttributes([]byte("!foo test=bar\n*.go linguist-language=Go\n"))
+		require.NoError(t, err)
+		assert.Len(t, ga.rules, 1, "only the non-negative rule should be kept")
+		lang, ok := ga.GetLanguage("main.go")
+		assert.True(t, ok)
+		assert.Equal(t, "Go", lang)
+	})
+}
