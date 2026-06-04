@@ -301,6 +301,9 @@ var (
 func getInterpreter(data []byte) string {
 	line := getFirstLine(data)
 	if !hasShebang(line) {
+		if bytes.HasPrefix(line, []byte("%!PS")) {
+			return "gs"
+		}
 		return ""
 	}
 

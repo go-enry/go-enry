@@ -60,6 +60,7 @@ var LanguagesByInterpreter = map[string][]string{
 	"gojq":              {"jq"},
 	"gosh":              {"Scheme"},
 	"groovy":            {"Groovy"},
+	"gs":                {"PostScript"},
 	"gsed":              {"sed"},
 	"guile":             {"Scheme"},
 	"hy":                {"Hy"},
