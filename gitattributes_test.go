@@ -3,6 +3,7 @@ package enry
 import (
 	"testing"
 
+	"github.com/go-enry/go-enry/v2/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -114,6 +115,53 @@ func TestGitAttributesUnspecifiedVsStringValue(t *testing.T) {
 
 	assert.False(t, ga.IsVendor("clear.go"), "unspecified should fall back to default detection")
 	assert.True(t, ga.IsVendor("string.go"), "string value 'unspecified' should not be treated as reset")
+}
+
+func TestGitAttributeLinguistAliasMapHasNoConflicts(t *testing.T) {
+	seen := map[string]string{}
+	for _, info := range data.LanguageInfoByID {
+		assertNoGitAttributeAliasConflict(t, seen, info.Name, info.Name)
+		for _, alias := range info.Aliases {
+			assertNoGitAttributeAliasConflict(t, seen, alias, info.Name)
+		}
+	}
+}
+
+func assertNoGitAttributeAliasConflict(t *testing.T, seen map[string]string, alias string, lang string) {
+	t.Helper()
+	key := gitAttributeLinguistAlias(alias)
+	if existing, exists := seen[key]; exists && existing != lang {
+		t.Fatalf("git attribute alias %q maps to both %q and %q", key, existing, lang)
+	}
+	seen[key] = lang
+}
+
+func TestGitAttributesGetLanguageLinguistAliases(t *testing.T) {
+	tests := []struct {
+		attrValue string
+		want      string
+	}{
+		{"OpenStep-Property-List", "OpenStep Property List"},
+		{"Common-Lisp", "Common Lisp"},
+		{"common-lisp", "Common Lisp"},
+		{"common_lisp", "Common Lisp"},
+		{"Emacs-Lisp", "Emacs Lisp"},
+		{"POV-Ray-SDL", "POV-Ray SDL"},
+		{"Tree-sitter-Query", "Tree-sitter Query"},
+		{"coffee-script", "CoffeeScript"},
+		{"Definitely-Not-A-Language", "Definitely-Not-A-Language"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.attrValue, func(t *testing.T) {
+			ga, err := ParseGitAttributes([]byte("*.x linguist-language=" + tt.attrValue + "\n"))
+			require.NoError(t, err)
+
+			lang, ok := ga.GetLanguage("file.x")
+			require.True(t, ok)
+			assert.Equal(t, tt.want, lang)
+		})
+	}
 }
 
 func TestMatchGitPattern(t *testing.T) {

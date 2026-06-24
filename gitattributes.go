@@ -5,6 +5,9 @@ import (
 	"bytes"
 	"path/filepath"
 	"strings"
+	"sync"
+
+	"github.com/go-enry/go-enry/v2/data"
 )
 
 // GitAttributes holds parsed .gitattributes rules for overriding language detection.
@@ -41,6 +44,11 @@ type gitAttributeRawRule struct {
 	pattern     string
 	assignments []gitAttributeAssignment
 }
+
+var (
+	gitAttributeLinguistAliasOnce sync.Once
+	gitAttributeLinguistAliasMap  map[string]string
+)
 
 // ParseGitAttributes parses the content of a .gitattributes file.
 // Each non-comment, non-empty line has the form:
@@ -270,16 +278,59 @@ func (ga GitAttributes) IsDetectable(path string) (bool, bool) {
 	return false, false
 }
 
+// getLanguageByGitAttributeAlias resolves linguist-language values using the
+// current enry alias normalization first, and then Linguist's hyphen alias convention.
+// TODO(#200): remove the second lookup once GetLanguageByAlias accepts
+// Linguist-style aliases directly.
+func getLanguageByGitAttributeAlias(text string) (string, bool) {
+	if lang, ok := GetLanguageByAlias(text); ok {
+		return lang, true
+	}
+
+	gitAttributeLinguistAliasOnce.Do(buildGitAttributeLinguistAliasMap)
+	lang, ok := gitAttributeLinguistAliasMap[gitAttributeLinguistAlias(text)]
+	return lang, ok
+}
+
+// buildGitAttributeLinguistAliasMap builds the second alias lookup table used only
+// for Linguist's alias normalization with hyphen https://github.com/github-linguist/linguist/blob/2409807814a3ff386294b1f217b886a1594642cd/docs/overrides.md#using-gitattributes .
+func buildGitAttributeLinguistAliasMap() {
+	aliases := make(map[string]string, len(data.LanguageInfoByID)*2)
+	for _, info := range data.LanguageInfoByID {
+		addGitAttributeLinguistAlias(aliases, info.Name, info.Name)
+		for _, alias := range info.Aliases {
+			addGitAttributeLinguistAlias(aliases, alias, info.Name)
+		}
+	}
+	gitAttributeLinguistAliasMap = aliases
+}
+
+// addGitAttributeLinguistAlias adds an alias unless it already belongs to a different language.
+func addGitAttributeLinguistAlias(aliases map[string]string, alias string, lang string) {
+	key := gitAttributeLinguistAlias(alias)
+	if existing, exists := aliases[key]; !exists || existing == lang {
+		aliases[key] = lang
+	}
+}
+
+func gitAttributeLinguistAlias(text string) string {
+	text = strings.ReplaceAll(text, " ", "-")
+	return strings.ToLower(text)
+}
+
 // GetLanguage checks the linguist-language attribute for path.
-// If set, the language name is resolved via GetLanguageByAlias for canonical naming.
+// If set, the language name is resolved via current enry aliases first, then
+// a scoped Linguist-style .gitattributes alias fallback for canonical naming.
 // Returns the language and true if an override was found.
 func (ga GitAttributes) GetLanguage(path string) (string, bool) {
 	if val, ok := ga.getAttr(path, "linguist-language"); ok {
-		if lang, ok := GetLanguageByAlias(val.textValue()); ok {
+		text := val.textValue()
+		// TODO(#200): replace with GetLanguageByAlias once alias normalization is changed
+		if lang, ok := getLanguageByGitAttributeAlias(text); ok {
 			return lang, true
 		}
 		// Return as-is if alias resolution fails (could be a valid language name)
-		return val.textValue(), true
+		return text, true
 	}
 	return "", false
 }
