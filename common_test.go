@@ -569,6 +569,9 @@ func (s *enryTestSuite) TestGetLanguageByAlias() {
 		{name: "TestGetLanguageByAlias_8", alias: "bsdmake", expectedLang: "Makefile", expectedOk: true},
 		{name: "TestGetLanguageByAlias_9", alias: "xhTmL", expectedLang: "HTML", expectedOk: true},
 		{name: "TestGetLanguageByAlias_10", alias: "python", expectedLang: "Python", expectedOk: true},
+		{name: "TestGetLanguageByAlias_11", alias: "common_lisp", expectedLang: "Common Lisp", expectedOk: true},
+		// TODO(#200): change this once alias normalization in GetLanguageByAlias follows Linguist-style aliases.
+		{name: "TestGetLanguageByAlias_12", alias: "common-lisp", expectedLang: OtherLanguage, expectedOk: false},
 	}
 
 	for _, test := range tests {
