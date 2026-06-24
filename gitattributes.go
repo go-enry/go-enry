@@ -383,15 +383,36 @@ func matchGitPattern(pattern, path string) bool {
 	return globMatch(pattern, path)
 }
 
+// maxGlobMatchSteps bounds exponential wildcard backtracking. Exhausted
+// patterns are treated as non-matches.
+const maxGlobMatchSteps = 100000
+
+type globMatchBudget struct {
+	remaining int
+}
+
+func (b *globMatchBudget) consume() bool {
+	if b.remaining <= 0 {
+		return false
+	}
+	b.remaining--
+	return true
+}
+
 // globMatch performs recursive glob matching with support for *, **, ?, and \.
 func globMatch(pattern, str string) bool {
-	return globMatchInternal(pattern, str, 0)
+	budget := globMatchBudget{remaining: maxGlobMatchSteps}
+	return globMatchInternal(pattern, str, 0, &budget)
 }
 
 // prev tracks the raw pattern byte immediately before the current pattern
 // position. It is 0 at the start of a pattern context. This is used for
 // the ** boundary check (Git wildmatch.c:95 "prev_p - pattern < 2").
-func globMatchInternal(pattern, str string, prev byte) bool {
+func globMatchInternal(pattern, str string, prev byte, budget *globMatchBudget) bool {
+	if !budget.consume() {
+		return false
+	}
+
 	for len(pattern) > 0 {
 		switch pattern[0] {
 		case '*':
@@ -414,8 +435,11 @@ func globMatchInternal(pattern, str string, prev byte) bool {
 					}
 					for i := 0; i <= len(str); i++ {
 						if i == 0 || str[i-1] == '/' {
-							if globMatchInternal(rest, str[i:], restPrev) {
+							if globMatchInternal(rest, str[i:], restPrev, budget) {
 								return true
+							}
+							if budget.remaining <= 0 {
+								return false
 							}
 						}
 					}
@@ -430,8 +454,11 @@ func globMatchInternal(pattern, str string, prev byte) bool {
 				if i > 0 && str[i-1] == '/' {
 					break
 				}
-				if globMatchInternal(rest, str[i:], '*') {
+				if globMatchInternal(rest, str[i:], '*', budget) {
 					return true
+				}
+				if budget.remaining <= 0 {
+					return false
 				}
 			}
 			return false
