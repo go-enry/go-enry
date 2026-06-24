@@ -3,6 +3,7 @@ package enry
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -65,6 +66,7 @@ func TestEdgeTrailingSlashDirectory(t *testing.T) {
 		{"vendor/", "vendor/foo.go", false, "trailing-slash does NOT match files inside directory"},
 		{"vendor/", "vendor/lib/bar.go", false, "trailing-slash does NOT match nested files"},
 		{"vendor/", "vendor/", true, "the directory path itself should match"},
+		{"vendor/", "src/vendor/", true, "nested directory matches non-anchored pattern"},
 
 		// These should also not match
 		{"vendor/", "src/vendor/foo.go", false, "not a directory path, trailing-slash only matches dirs"},
@@ -627,6 +629,47 @@ func TestEdgeMatchPatternNoPanic(t *testing.T) {
 			assert.NotPanics(t, func() {
 				_ = matchGitPattern(tt.pattern, tt.path)
 			})
+		})
+	}
+}
+
+func TestEdgeGlobMatchPathologicalBacktrackingBounded(t *testing.T) {
+	done := make(chan bool, 1)
+
+	go func() {
+		done <- matchGitPattern(
+			"*x*x*x*x*x*x*x*x*x*xz",
+			"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.go",
+		)
+	}()
+
+	select {
+	case got := <-done:
+		assert.False(t, got)
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("pathological glob match exceeded timeout")
+	}
+}
+
+func TestEdgeGlobMatchBacktrackingRegression(t *testing.T) {
+	tests := []struct {
+		pattern string
+		path    string
+		want    bool
+	}{
+		{"*.go", "main.go", true},
+		{"*x*z", "xxz", true},
+		{"*x*z", "xx.go", false},
+		{"foo**bar", "foobazbar", true},
+		{"foo**bar", "foo/baz/bar", false},
+		{"**/*.go", "src/main.go", true},
+		{"**/*.go", "main.go", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.pattern+"__"+tt.path, func(t *testing.T) {
+			got := globMatch(tt.pattern, tt.path)
+			assert.Equal(t, tt.want, got, "globMatch(%q, %q)", tt.pattern, tt.path)
 		})
 	}
 }
