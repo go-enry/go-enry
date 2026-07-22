@@ -283,6 +283,9 @@ func TestIsGenerated(t *testing.T) {
 		//Composer generated composer.lock file
 		{"JSON/composer.lock", false, true},
 
+		// Mise lock file
+		{"Dummy/mise.lock", false, true},
+
 		//Node modules
 		{"Dummy/node_modules/foo.js", false, true},
 

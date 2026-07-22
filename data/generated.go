@@ -1,3 +1,10 @@
+// Package data contains generated-file detection rules used by enry.
+//
+// NOTE: This file is NOT produced by `make code-generate`.
+//       Unlike other files such as `extension.go`, `content.go`, `vendor.go`, and `documentation.go`,
+//       the generated-file rules here are maintained manually. As a result, upstream Linguist
+//       changes to generated-file detection like `lib/linguist/generated.rb` may need
+//       to be ported here separately, with corresponding tests in `utils_test.go`.
 package data
 
 import (
@@ -81,6 +88,9 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 
 	// Deno lock
 	nameEndsWith("deno.lock"),
+
+	// Mise lock
+	nameMatches("(^|\/)mise(\.[^\/]+)?\.lock$"),
 
 	// NPM shrinkwrap
 	nameEndsWith("npm-shrinkwrap.json"),
