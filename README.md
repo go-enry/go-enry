@@ -172,6 +172,56 @@ For more details, see [python/README.md](https://github.com/go-enry/go-enry/blob
 Generated Rust bindings using a C static library are available at https://github.com/go-enry/rs-enry.
 
 
+## `.gitattributes` Support
+
+go-enry supports overriding language detection via `.gitattributes`, compatible with [Linguist's override system](https://github.com/github/linguist/blob/master/docs/overrides.md).
+
+### Supported attributes
+
+| Attribute | Example | Description |
+|-----------|---------|-------------|
+| `linguist-language` | `*.rb linguist-language=Ruby` | Override detected language |
+| `linguist-vendored` | `vendor/** linguist-vendored` | Mark/unmark as vendored |
+| `linguist-documentation` | `docs/** linguist-documentation` | Mark/unmark as documentation |
+| `linguist-generated` | `*.pb.go linguist-generated` | Mark/unmark as generated |
+| `linguist-detectable` | `*.sql linguist-detectable` | Force inclusion of data/prose languages |
+
+Use `-` prefix to unset: `-linguist-vendored`
+
+Use `!` prefix to reset an attribute to the default behavior: `!linguist-vendored`
+
+Git-style attribute macros are also supported, for example:
+
+```text
+[attr]linguist-go linguist-language=Go
+*.myext linguist-go
+```
+
+### API usage
+
+```go
+content, _ := ioutil.ReadFile(".gitattributes")
+gitAttrs, _ := enry.ParseGitAttributes(content)
+
+// Override checks (fall back to defaults when no rule matches)
+gitAttrs.IsVendor("vendor/lib.go")          // true
+gitAttrs.IsDocumentation("docs/guide.md")   // true
+gitAttrs.IsGenerated("api.pb.go", content)  // true
+
+// Detectable override (tri-state: value, hasOverride)
+detectable, ok := gitAttrs.IsDetectable("schema.sql")
+// detectable: true, ok: true (explicitly marked detectable)
+
+// Language override
+lang, ok := gitAttrs.GetLanguage("Vagrantfile")
+// lang: "Ruby", ok: true
+```
+
+The `enry` CLI automatically reads `.gitattributes` from the root of the analyzed directory.
+
+**Known limitations:**
+- Only the root `.gitattributes` file is read. Git and Linguist support nested `.gitattributes` files in subdirectories; go-enry does not.
+
 ## Divergences from Linguist
 
 The `enry` library is based on the data from `github/linguist` version **v9.5.0**.
@@ -198,11 +248,17 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 
 - Bayesian classifier can't distinguish "SQL" from "PLpgSQL. See [#194](https://github.com/src-d/enry/issues/194).
 
-- Overriding languages and types though `.gitattributes` is not yet supported. See [#18](https://github.com/src-d/enry/issues/18).
-
 - `enry` CLI output does NOT exclude `.gitignore`ed files and git submodules, as Linguist does
 
 In all the cases above that have an issue number - we plan to update enry to match Linguist behavior.
+
+### `.gitattributes` pattern matching
+
+go-enry's `.gitattributes` glob matching covers all common patterns. The following features from Git's [wildmatch](https://github.com/git/git/blob/master/wildmatch.c) spec are not implemented:
+
+- **C-style quoted patterns**: patterns starting with `"` for paths containing spaces are not supported.
+- **Case-insensitive matching**: the `core.ignorecase` / `WM_CASEFOLD` mode is not implemented.
+- **Nested `.gitattributes` files**: only the root `.gitattributes` is read; subdirectory-level files are not loaded.
 
 > All the issues related to heuristics' regexp  syntax incompatibilities with the RE2 engine can be avoided by using `oniguruma` instead (see [instuctions](#misc))
 

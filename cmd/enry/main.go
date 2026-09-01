@@ -50,80 +50,33 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Determine the directory to use for .gitattributes lookup.
+	rootDir := root
 	if fileInfo.Mode().IsRegular() {
-		err = printFileAnalysis(root, limit, *jsonFlag)
+		rootDir = filepath.Dir(root)
+	}
+
+	// Parse .gitattributes if present
+	var gitAttrs enry.GitAttributes
+	gaContent, err := ioutil.ReadFile(filepath.Join(rootDir, ".gitattributes"))
+	if err == nil {
+		gitAttrs, err = enry.ParseGitAttributes(gaContent)
+		if err != nil {
+			log.Printf("warning: could not parse .gitattributes: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		log.Printf("warning: could not read .gitattributes: %v", err)
+	}
+
+	if fileInfo.Mode().IsRegular() {
+		err = printFileAnalysis(root, rootDir, limit, *jsonFlag, gitAttrs)
 		if err != nil {
 			fmt.Println(err)
 		}
 		return
 	}
 
-	out := make(map[string][]string, 0)
-	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
-		if err != nil {
-			log.Println(err)
-			return filepath.SkipDir
-		}
-
-		if !f.Mode().IsDir() && !f.Mode().IsRegular() {
-			return nil
-		}
-
-		relativePath, err := filepath.Rel(root, path)
-		if err != nil {
-			log.Println(err)
-			return nil
-		}
-
-		if relativePath == "." {
-			return nil
-		}
-
-		if f.IsDir() {
-			relativePath = relativePath + "/"
-		}
-
-		if enry.IsVendor(relativePath) || enry.IsDotFile(relativePath) ||
-			enry.IsDocumentation(relativePath) || enry.IsConfiguration(relativePath) {
-			// TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
-			if f.IsDir() {
-				return filepath.SkipDir
-			}
-
-			return nil
-		}
-
-		if f.IsDir() {
-			return nil
-		}
-
-		// TODO(bzz): provide API that mimics linguist CLI output for
-		// - running ByExtension & ByFilename
-		// - reading the file, if that did not work
-		// - GetLanguage([]Strategy)
-		content, err := readFile(path, limit)
-		if err != nil {
-			log.Println(err)
-			return nil
-		}
-		// TODO(bzz): skip enry.IsGeneratedContent() as well, after https://github.com/src-d/enry/issues/213
-
-		language := enry.GetLanguage(filepath.Base(path), content)
-		if language == enry.OtherLanguage {
-			return nil
-		}
-
-		// If we are not asked to display all, do as
-		// https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/blob_helper.rb#L382
-		if !*allLangs &&
-			enry.GetLanguageType(language) != enry.Programming &&
-			enry.GetLanguageType(language) != enry.Markup {
-			return nil
-		}
-
-		out[language] = append(out[language], relativePath)
-		return nil
-	})
+	out, err := analyzeDir(root, limit, *allLangs, gitAttrs)
 
 	if err != nil {
 		log.Fatal(err)
@@ -144,6 +97,100 @@ func main() {
 	}
 
 	fmt.Print(buf.String())
+}
+
+func analyzeDir(root string, limit int64, allLangs bool, gitAttrs enry.GitAttributes) (map[string][]string, error) {
+	out := make(map[string][]string, 0)
+	canPruneVendoredDirs := !gitAttrs.HasPotentialOverride("linguist-vendored")
+	canPruneDocumentationDirs := !gitAttrs.HasPotentialOverride("linguist-documentation")
+
+	err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			log.Println(err)
+			return filepath.SkipDir
+		}
+
+		if !f.Mode().IsDir() && !f.Mode().IsRegular() {
+			return nil
+		}
+
+		relativePath, err := filepath.Rel(root, path)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+
+		relativePath = filepath.ToSlash(relativePath)
+		if relativePath == "." {
+			return nil
+		}
+
+		isDir := f.IsDir()
+		if isDir {
+			relativePath += "/"
+		}
+
+		vendored := gitAttrs.IsVendor(relativePath)
+		documentation := gitAttrs.IsDocumentation(relativePath)
+		dotFile := enry.IsDotFile(relativePath)
+		configuration := enry.IsConfiguration(relativePath)
+
+		if isDir {
+			// Descendant -linguist-vendored / !linguist-vendored rules mean the
+			// parent cannot be pruned safely even if it is vendored itself.
+			if (vendored && canPruneVendoredDirs) ||
+				(documentation && canPruneDocumentationDirs) ||
+				dotFile || configuration {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		if vendored || documentation || dotFile || configuration {
+			// TODO(bzz): skip enry.IsGeneratedPath() after https://github.com/src-d/enry/issues/213
+			return nil
+		}
+
+		// TODO(bzz): provide API that mimics linguist CLI output for
+		// - running ByExtension & ByFilename
+		// - reading the file, if that did not work
+		// - GetLanguage([]Strategy)
+		content, err := readFile(path, limit)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		// TODO(bzz): skip enry.IsGeneratedContent() as well, after https://github.com/src-d/enry/issues/213
+
+		// Check .gitattributes language override first
+		language, overridden := gitAttrs.GetLanguage(relativePath)
+		if !overridden {
+			language = enry.GetLanguage(filepath.Base(path), content)
+		}
+		if language == enry.OtherLanguage {
+			return nil
+		}
+
+		// If we are not asked to display all, do as
+		// https://github.com/github/linguist/blob/bf95666fc15e49d556f2def4d0a85338423c25f3/lib/linguist/blob_helper.rb#L382
+		if !allLangs {
+			detectable, hasOverride := gitAttrs.IsDetectable(relativePath)
+			if hasOverride {
+				if !detectable {
+					return nil
+				}
+				// detectable=true: include regardless of language type
+			} else if enry.GetLanguageType(language) != enry.Programming &&
+				enry.GetLanguageType(language) != enry.Markup {
+				return nil
+			}
+		}
+
+		out[language] = append(out[language], relativePath)
+		return nil
+	})
+
+	return out, err
 }
 
 func usage() {
@@ -261,7 +308,7 @@ func byteCountValues(root string, files []string) (float64, filelistError) {
 	return t, filesErr
 }
 
-func printFileAnalysis(file string, limit int64, isJSON bool) error {
+func printFileAnalysis(file string, rootDir string, limit int64, isJSON bool, gitAttrs enry.GitAttributes) error {
 	data, err := readFile(file, limit)
 	if err != nil {
 		return err
@@ -277,11 +324,21 @@ func printFileAnalysis(file string, limit int64, isJSON bool) error {
 
 	totalLines, nonBlank := getLines(file, full)
 
+	// Compute relative path for .gitattributes matching
+	relativePath, relErr := filepath.Rel(rootDir, file)
+	if relErr != nil {
+		relativePath = filepath.Base(file)
+	}
+	relativePath = filepath.ToSlash(relativePath)
+
 	// functions below can work on a sample
 	fileType := getFileType(file, data)
-	language := enry.GetLanguage(file, data)
+	language, overridden := gitAttrs.GetLanguage(relativePath)
+	if !overridden {
+		language = enry.GetLanguage(file, data)
+	}
 	mimeType := enry.GetMIMEType(file, language)
-	vendored := enry.IsVendor(file)
+	vendored := gitAttrs.IsVendor(relativePath)
 
 	if isJSON {
 		return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
