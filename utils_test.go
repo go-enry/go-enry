@@ -436,6 +436,13 @@ func TestIsGenerated(t *testing.T) {
 
 		//Terraform lock
 		{"Dummy/.terraform.lock.hcl", false, true},
+
+		//mise lock
+		{"mise/mise.lock", false, true},
+		{"mise/mise.local.lock", false, true},
+		{"mise/mise.some-env.lock", false, true},
+		{"mise/mise.some-env.local.lock", false, true},
+		{"mise/.mise/locks/foo.toml", false, true},
 	}
 
 	for _, tt := range testCases {

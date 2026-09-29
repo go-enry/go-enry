@@ -335,6 +335,8 @@ var LanguagesByFilename = map[string][]string{
 	"md5sum.txt":                   {"Checksums"},
 	"meson.build":                  {"Meson"},
 	"meson_options.txt":            {"Meson"},
+	"mise.local.lock":              {"TOML"},
+	"mise.lock":                    {"TOML"},
 	"mix.lock":                     {"Elixir"},
 	"mkfile":                       {"Makefile"},
 	"mmn":                          {"Roff"},

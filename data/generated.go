@@ -132,6 +132,9 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 
 	// SQLx query file
 	nameMatches(`(?:^|.*\/)\.sqlx\/query-.+\.json$`),
+
+	// mise lock
+	nameMatches(`(?:^|\/)(?:mise\.(?:[^/]+\.)?(?:local\.)?lock$|\.mise/locks/)`),
 }
 
 // GeneratedCodeMatcher checks whether the file with the given data is
