@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	yaml "gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 const (

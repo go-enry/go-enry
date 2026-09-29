@@ -5,7 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	yaml "gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // ID generates a map in Go with language name -> language ID.

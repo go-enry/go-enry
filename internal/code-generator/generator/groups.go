@@ -5,7 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // Groups generates a map in Go with language name -> group name.

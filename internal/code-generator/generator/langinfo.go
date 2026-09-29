@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"sort"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 type languageInfo struct {

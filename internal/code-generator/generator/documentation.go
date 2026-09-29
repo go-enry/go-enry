@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // Documentation generates regex matchers in Go for documentation files/dirs.

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	yaml "gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 type extensionsInfo struct {

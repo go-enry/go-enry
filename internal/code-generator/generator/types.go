@@ -5,7 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 var typeToTypeConst = map[string]int{

@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // Aliases reads from fileToParse and builds source file from tmplPath. It complies with type File signature.

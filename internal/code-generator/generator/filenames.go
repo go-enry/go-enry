@@ -10,7 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	yaml "gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // Filenames reads from fileToParse and builds source file from tmplPath. It complies with type File signature.

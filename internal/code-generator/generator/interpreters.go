@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // Interpreters reads from fileToParse and builds source file from tmplPath. It complies with type File signature.
