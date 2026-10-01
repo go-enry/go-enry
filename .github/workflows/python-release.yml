@@ -40,7 +40,8 @@ jobs:
 
   build-release:
     needs: release
-    if: needs.release.outputs.created == 'true'
+    # A failure preparing the next PR must not strand an already-created tag.
+    if: ${{ !cancelled() && needs.release.outputs.created == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

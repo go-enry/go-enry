@@ -97,3 +97,55 @@ test('release outputs preserve the workflow dispatch contract', () => {
     assert.ok(workflow.includes('tag: ${{ steps.release.outputs.tag }}'));
   } finally {fs.rmSync(directory,{recursive:true});}
 });
+
+for (const created of [false, true]) {
+  test(`reconcile next release PR after tag creation: ${created}`, async () => {
+    const {runReleaseCycle} = require('./run.cjs');
+    const directory=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'enry-cycle-'));
+    const output=path.join(directory,'output');
+    const calls=[];
+    let loads=0;
+    const load=async()=>{
+      const snapshot=++loads;
+      return {
+        createReleases:async()=>{calls.push('release');return created?[{tagName:'python-v0.4.0'}]:[undefined];},
+        createPullRequests:async()=>{
+          assert.equal(snapshot,2,'prepare the PR using a freshly loaded manifest');
+          calls.push('next PR');
+          return [{title:'chore(python): release 0.5.0'}];
+        },
+      };
+    };
+    try {
+      await runReleaseCycle(load,output);
+      assert.deepEqual(calls,['release','next PR']);
+      assert.equal(fs.existsSync(output),created);
+      if(created) assert.equal(fs.readFileSync(output,'utf8'),'release_created=true\ntag=python-v0.4.0\n');
+    } finally {fs.rmSync(directory,{recursive:true});}
+  });
+}
+
+test('next PR failure retains tag dispatch outputs and propagates the error', async () => {
+  const {runReleaseCycle} = require('./run.cjs');
+  const directory=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'enry-cycle-'));
+  const output=path.join(directory,'output');
+  const load=async()=>({
+    createReleases:async()=>[{tagName:'python-v0.4.0'}],
+    createPullRequests:async()=>{throw new Error('PR API unavailable');},
+  });
+  try {
+    await assert.rejects(runReleaseCycle(load,output),/PR API unavailable/);
+    assert.equal(fs.readFileSync(output,'utf8'),'release_created=true\ntag=python-v0.4.0\n');
+    const workflow=fs.readFileSync(path.join(root,'.github/workflows/python-release.yml'),'utf8');
+    assert.ok(workflow.includes("if: ${{ !cancelled() && needs.release.outputs.created == 'true' }}"));
+  } finally {fs.rmSync(directory,{recursive:true});}
+});
+
+test('failed tag creation cannot dispatch or prepare a new PR', async () => {
+  const {runReleaseCycle} = require('./run.cjs');
+  const load=async()=>({
+    createReleases:async()=>{throw new Error('release API unavailable');},
+    createPullRequests:async()=>assert.fail('must not continue after failed tag creation'),
+  });
+  await assert.rejects(runReleaseCycle(load,undefined),/release API unavailable/);
+});

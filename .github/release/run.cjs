@@ -20,8 +20,13 @@ async function main() {
     return;
   }
   if (process.env.GITHUB_REF !== 'refs/heads/master') throw new Error('Releases require master');
+  await runReleaseCycle(load, process.env.GITHUB_OUTPUT);
+}
+async function runReleaseCycle(load, outputFile) {
   const releases = (await (await load()).createReleases()).filter(Boolean);
-  if (writeReleaseOutputs(releases, process.env.GITHUB_OUTPUT)) return;
+  writeReleaseOutputs(releases, outputFile);
+  // Reload after creating tags so newer commits are compared with the new release.
+  // Always reconcile the next PR, including when queued pushes were coalesced.
   await (await load()).createPullRequests();
 }
 function writeReleaseOutputs(releases, outputFile) {
@@ -32,7 +37,7 @@ function writeReleaseOutputs(releases, outputFile) {
   fs.appendFileSync(outputFile, `release_created=true\ntag=${tag}\n`);
   return true;
 }
-module.exports = {writeReleaseOutputs};
+module.exports = {writeReleaseOutputs, runReleaseCycle};
 if (require.main === module) {
   main().catch(error => { console.error(error); process.exitCode = 1; });
 }
