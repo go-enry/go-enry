@@ -32,3 +32,11 @@ python/.pytest_cache/
 
 __pycache__/
 .pytest_cache/
+
+# Java build output and launcher cache
+java/target/
+java/project/target/
+java/project/project/
+java/.sbt-launch/
+
+.github/release/node_modules/

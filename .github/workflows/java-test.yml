@@ -1,0 +1,46 @@
+name: Java Bindings
+on:
+  pull_request:
+    paths: ['java/**', '**.go', 'go.mod', 'go.sum', '.github/workflows/java-test.yml']
+  push:
+    branches: [master]
+    paths: ['java/**', '**.go', 'go.mod', 'go.sum', '.github/workflows/java-test.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            java: '17'
+          - os: macos-14
+            java: '21'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.26.x'
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - name: Test bindings and package the native library
+        working-directory: java
+        run: ./sbt test assembly
+      - name: Test the assembled jar outside the checkout
+        shell: bash
+        run: |
+          cp java/target/enry-java-assembly-*.jar "$RUNNER_TEMP/enry-java.jar"
+          cp java/src/test/smoke/EnrySmoke.java "$RUNNER_TEMP/EnrySmoke.java"
+          cd "$RUNNER_TEMP"
+          java -Djna.nosys=true -cp enry-java.jar EnrySmoke.java

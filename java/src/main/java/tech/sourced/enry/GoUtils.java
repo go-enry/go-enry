@@ -1,88 +1,42 @@
 package tech.sourced.enry;
 
-import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
-import tech.sourced.enry.nativelib.GoSlice;
-import tech.sourced.enry.nativelib._GoString_;
-import com.ochafik.lang.jnaerator.runtime.NativeSize;
 
-import java.io.UnsupportedEncodingException;
+/** Conversion and ownership rules for the shared library's C ABI. */
+final class GoUtils {
+    private GoUtils() {}
 
-class GoUtils {
+    static String cString(String value) {
+        if (value == null) return "";
+        if (value.indexOf('\0') >= 0) {
+            throw new IllegalArgumentException("C string arguments cannot contain NUL");
+        }
+        return value;
+    }
 
-    static _GoString_.ByValue toGoString(String str) {
-        byte[] bytes;
+    static int length(byte[] value) {
+        return value == null ? 0 : value.length;
+    }
+
+    static String toJavaString(Pointer value) {
+        if (value == null) return "";
         try {
-            bytes = str.getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            bytes = str.getBytes();
-        } catch (NullPointerException e) {
-            bytes = null;
+            return value.getString(0, "UTF-8");
+        } finally {
+            EnryLibrary.INSTANCE.FreeCString(value);
         }
-
-        int length = 0;
-        Pointer ptr = null;
-        if (bytes != null) {
-            length = bytes.length;
-            ptr = ptrFromBytes(bytes);
-        }
-
-        _GoString_.ByValue val = new _GoString_.ByValue();
-        val.n = new NativeSize(length);
-        val.p = ptr;
-        return val;
     }
 
-    static String toJavaString(_GoString_ str) {
-        if (str.n.intValue() == 0) {
-            return "";
-        }
-
-        byte[] bytes = new byte[(int) str.n.intValue()];
-        str.p.read(0, bytes, 0, (int) str.n.intValue());
+    static String[] toJavaStringArray(Pointer value) {
+        if (value == null) return new String[0];
         try {
-            return new String(bytes, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("utf-8 encoding is not supported");
+            return value.getStringArray(0, "UTF-8");
+        } finally {
+            EnryLibrary.INSTANCE.FreeStringArray(value);
         }
     }
 
-    static String[] toJavaStringArray(GoSlice slice) {
-        String[] result = new String[(int) slice.len];
-        Pointer[] ptrArr = slice.data.getPointerArray(0, (int) slice.len);
-        for (int i = 0; i < (int) slice.len; i++) {
-            result[i] = ptrArr[i].getString(0);
-        }
-        return result;
+    static boolean toJavaBool(int value) {
+        return value != 0;
     }
-
-    static GoSlice.ByValue toGoByteSlice(byte[] bytes) {
-        int length = 0;
-        Pointer ptr = null;
-        if (bytes != null && bytes.length > 0) {
-            length = bytes.length;
-            ptr = ptrFromBytes(bytes);
-        }
-
-        return sliceFromPtr(length, ptr);
-    }
-
-    static GoSlice.ByValue sliceFromPtr(int len, Pointer ptr) {
-        GoSlice.ByValue val = new GoSlice.ByValue();
-        val.cap = len;
-        val.len = len;
-        val.data = ptr;
-        return val;
-    }
-
-    static Pointer ptrFromBytes(byte[] bytes) {
-        Pointer ptr = new Memory(bytes.length);
-        ptr.write(0, bytes, 0, bytes.length);
-        return ptr;
-    }
-
-    static boolean toJavaBool(byte goBool) {
-        return goBool == 1;
-    }
-
 }
