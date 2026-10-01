@@ -1,6 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -34,5 +39,59 @@ func TestGetLines(t *testing.T) {
 					gotTotal, gotNonBlank, test.wantTotal, test.wantNonBlank)
 			}
 		})
+	}
+}
+
+func TestPrintPercentsZeroTotals(t *testing.T) {
+	for _, mode := range []string{"byte", "line"} {
+		t.Run(mode, func(t *testing.T) {
+			root := t.TempDir()
+			if err := os.WriteFile(filepath.Join(root, "empty.py"), nil, 0600); err != nil {
+				t.Fatal(err)
+			}
+			var output bytes.Buffer
+			printPercents(root, map[string][]string{"Python": {"empty.py"}}, &output, mode)
+			if got, want := output.String(), "0.00%\tPython\n"; got != want {
+				t.Fatalf("got %q; want %q", got, want)
+			}
+		})
+	}
+}
+
+func TestPrintPercentsNonzeroTotals(t *testing.T) {
+	root := t.TempDir()
+	for name, content := range map[string]string{"a.py": "x", "b.rb": "xxx"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(content), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var output bytes.Buffer
+	printPercents(root, map[string][]string{"Python": {"a.py"}, "Ruby": {"b.rb"}}, &output, "byte")
+	if got, want := output.String(), "75.00%\tRuby\n25.00%\tPython\n"; got != want {
+		t.Fatalf("got %q; want %q", got, want)
+	}
+}
+
+func TestGetLinesBufferBoundaries(t *testing.T) {
+	for _, size := range []int{4095, 4096, 4097, 8192} {
+		for _, suffix := range []string{"", "\n", "\r\n", "\nnext"} {
+			t.Run(fmt.Sprintf("%d/%q", size, suffix), func(t *testing.T) {
+				content := strings.Repeat("x", size) + suffix
+				want := 1
+				if suffix == "\nnext" {
+					want = 2
+				}
+				path := filepath.Join(t.TempDir(), "long.txt")
+				if err := os.WriteFile(path, []byte(content), 0600); err != nil {
+					t.Fatal(err)
+				}
+				for _, input := range [][]byte{[]byte(content), nil} {
+					total, code := getLines(path, input)
+					if total != want || code != want {
+						t.Errorf("got %d/%d; want %d/%d", total, code, want, want)
+					}
+				}
+			})
+		}
 	}
 }
