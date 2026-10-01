@@ -148,9 +148,10 @@ Python bindings using a C shared library and cffi are available for Python 3.9+.
 
 **Installation:**
 ```bash
-pip install enry
+pip install enry-python
 ```
 
+This fork publishes `enry-python` for Python 3.12+; the import remains `enry`.
 Pre-built wheels are available for Linux (x86_64) and macOS (Intel + Apple Silicon).
 
 **Usage:**

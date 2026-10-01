@@ -8,3 +8,11 @@ updates:
       actions:
         patterns: ['*']
     open-pull-requests-limit: 1
+  - package-ecosystem: npm
+    directory: /.github/release
+    schedule:
+      interval: monthly
+    groups:
+      release-tooling:
+        patterns: ['*']
+    open-pull-requests-limit: 1

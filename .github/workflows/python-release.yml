@@ -19,16 +19,24 @@ jobs:
       contents: write
       pull-requests: write
     outputs:
-      tag: ${{ steps.release.outputs.tag_name }}
+      tag: ${{ steps.release.outputs.tag }}
       created: ${{ steps.release.outputs.release_created }}
     steps:
-      # This job uses the GitHub API; it never checks out or executes project code.
-      - uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4.4.1
-        id: release
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          target-branch: master
-          config-file: .github/release-please-config.json
-          manifest-file: .github/.release-please-manifest.json
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      # No dependency install scripts or caches in this privileged job.
+      - run: npm ci --prefix .github/release --ignore-scripts --no-audit --no-fund
+      - name: Prepare release with native-change policy
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/release/run.cjs
 
   build-release:
     needs: release

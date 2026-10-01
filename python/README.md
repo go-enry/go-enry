@@ -74,7 +74,18 @@ Please opens or updates a release PR with the next version and changelog.
 Review and merge that PR when ready to publish: the workflow then creates the
 `python-vX.Y.Z` tag and GitHub release, and explicitly starts **Build Python
 Wheels** at that tag. All wheel and source tests must pass before PyPI upload.
-The first proposed release after adopting this workflow is `python-v0.3.0`.
+Changes to bundled Go/native detector code, Go dependencies or language data
+request at least a **minor** Python release, including non-conventional upstream
+merges and `chore(data)` Linguist syncs. Multiple changes since the last Python
+release are collected into one release PR. For example, native changes after
+`0.3.0` propose `0.4.0`. Breaking changes retain their normal versioning precedence.
+
+Like Sync Linguist, this automation opens/updates a PR for review; it does not
+merge it automatically. Merging the release PR authorizes publication. Java,
+CLI, generator-source, native-test-only, docs and general CI changes do not
+request a Python release. Python source/packaging and its wheel workflow retain
+conventional-commit versioning. The policy lives in `.github/release/` and is
+tested with the pinned Release Please library; dependency updates are lockfile-backed.
 
 Use conventional commit titles when merging changes:
 
@@ -231,7 +242,7 @@ Older Python installations must use an older compatible enry release.
 ## Known Issues
 
 - Memory leak fixed in version 0.2.0 (see [#36](https://github.com/go-enry/go-enry/issues/36))
-- Java bindings still target an older shared-library ABI and need a separate migration.
+- Java bindings use the same C ABI; see `../java/README.md` for build instructions.
 
 
 

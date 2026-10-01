@@ -1,0 +1,7 @@
+{
+  "name": "enry-release-policy",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {"test": "node --test test-policy.cjs"},
+  "dependencies": {"release-please": "17.3.0"}
+}
