@@ -1,4 +1,0 @@
-# Keep this aligned with the cibuildwheel action.
-cibuildwheel==3.3.1
-build>=1.2.2
-twine>=6.1

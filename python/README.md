@@ -4,14 +4,13 @@ Python bindings through cFFI (ABI, out-of-line) for calling enry Go functions ex
 
 ## Build
 
-```
+```bash
 # from python/
-$ pushd .. && make shared && popd
-$ pip install -r requirements.txt
-$ python build_enry.py
+python -m pip install -e .
 ```
 
-Builds the Go **shared** library for the CGo wrapper (`libenry.so` / `libenry.dylib`), then generates the CFFI out-of-line Python module (`enry/_c_enry.py`) that provides the Python bindings.
+The editable install builds the Go shared library and CFFI bindings automatically.
+Build requirements and runtime dependencies come from `pyproject.toml`.
 
 ### Why a shared library?
 
@@ -111,14 +110,35 @@ For a local validation build, use the default build command: it creates an sdist
 ```bash
 # from repo root
 cd python
-python -m pip install --upgrade build
+python -m pip install --upgrade pip
+python -m pip install --group ci
 python -m build
 
-python -m pip install --upgrade twine
 TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-***' python -m twine upload dist/*
 ```
 
 This requires Go locally and only produces a wheel for the current OS/arch.
+
+## Development dependencies
+
+`python/pyproject.toml` is the source of truth: `[build-system].requires` supplies
+isolated build environments, `[project].dependencies` supplies runtime packages,
+and `[dependency-groups]` defines `test` and `ci` tools. Requirements files are
+no longer needed. CFFI is declared for both build and runtime because both use it.
+
+```bash
+# from python/; dependency groups require pip 25.1 or later
+python -m pip install --upgrade pip
+python -m pip install --group test -e .
+python -m pytest tests -q
+python -m pip install --group ci
+python -m unittest discover -s packaging_tests -v
+```
+
+The workflows use these same groups; cibuildwheel reads `test-groups` directly.
+The SHA-pinned cibuildwheel action owns its tool version, updated by Dependabot,
+so there is no second cibuildwheel pin in a requirements file. Runner operating
+systems and Go versions remain workflow settings.
 
 ## Usage
 ```python

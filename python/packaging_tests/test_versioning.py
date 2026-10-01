@@ -3,14 +3,24 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
+import tomllib
 import tempfile
 import unittest
 
+from build.env import DefaultIsolatedEnv
 from packaging.version import Version
 
 
 class VersioningTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Use the declared backend requirements once for all metadata fixtures.
+        # No native build or runtime/test dependency installation is needed here.
+        project = Path(__file__).resolve().parents[1] / "pyproject.toml"
+        requirements = tomllib.loads(project.read_text())["build-system"]["requires"]
+        cls.backend = cls.enterClassContext(DefaultIsolatedEnv())
+        cls.backend.install(requirements)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -35,7 +45,7 @@ class VersioningTests(unittest.TestCase):
                               check=True, capture_output=True, text=True)
 
     def version(self):
-        result = subprocess.run([sys.executable, "setup.py", "--version"],
+        result = subprocess.run([self.backend.python_executable, "setup.py", "--version"],
                                 cwd=self.package, env=self.env, check=True,
                                 capture_output=True, text=True)
         return Version(result.stdout.strip().splitlines()[-1])
