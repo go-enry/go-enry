@@ -28,10 +28,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Esoiya/go-enry"
-Repository = "https://github.com/Esoiya/go-enry"
-Issues = "https://github.com/Esoiya/go-enry/issues"
-Documentation = "https://github.com/Esoiya/go-enry/tree/master/python"
+Homepage = "https://github.com/go-enry/go-enry"
+Repository = "https://github.com/go-enry/go-enry"
+Issues = "https://github.com/go-enry/go-enry/issues"
+Documentation = "https://github.com/go-enry/go-enry/tree/master/python"
 
 [dependency-groups]
 test = ["pytest>=7.0.0", "psutil>=5.9.0"]
