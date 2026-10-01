@@ -3,8 +3,8 @@
 
 // NOTE: Many enry APIs return (value, safe). The shared-library exports intentionally
 // return only the primary string to keep the C ABI minimal (char* in/out).
-// The `safe` signal is currently not exposed over the ABI; bindings may implement
-// "safe mode" policy at the language layer, or we can add explicit ...WithSafety exports.
+// Additive ...WithSafety exports preserve ambiguity information for Python.
+// The original string-only exports remain available to existing consumers.
 
 package main
 
@@ -89,7 +89,7 @@ func GetLanguageByContent(filename *C.char, content *C.char, length C.int) *C.ch
 
 //export GetLanguageByEmacsModeline
 func GetLanguageByEmacsModeline(content *C.char, length C.int) *C.char {
-	lang, _ := enry.GetLanguageByModeline(toGoBytes(content, length))
+	lang, _ := enry.GetLanguageByEmacsModeline(toGoBytes(content, length))
 	return C.CString(lang)
 }
 
@@ -136,6 +136,65 @@ func GetColor(language *C.char) *C.char {
 //export GetLanguageType
 func GetLanguageType(language *C.char) *C.char {
 	return C.CString(data.Type(enry.GetLanguageType(C.GoString(language))).String())
+}
+
+// setSafety writes the Go ambiguity flag without returning a C struct.
+func setSafety(out *C.int, safe bool) {
+	if out != nil {
+		*out = 0
+		if safe {
+			*out = 1
+		}
+	}
+}
+
+//export GetLanguageByContentWithSafety
+func GetLanguageByContentWithSafety(filename *C.char, content *C.char, length C.int, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByContent(C.GoString(filename), toGoBytes(content, length))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
+}
+
+//export GetLanguageByEmacsModelineWithSafety
+func GetLanguageByEmacsModelineWithSafety(content *C.char, length C.int, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByEmacsModeline(toGoBytes(content, length))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
+}
+
+//export GetLanguageByExtensionWithSafety
+func GetLanguageByExtensionWithSafety(filename *C.char, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByExtension(C.GoString(filename))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
+}
+
+//export GetLanguageByFilenameWithSafety
+func GetLanguageByFilenameWithSafety(filename *C.char, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByFilename(C.GoString(filename))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
+}
+
+//export GetLanguageByModelineWithSafety
+func GetLanguageByModelineWithSafety(content *C.char, length C.int, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByModeline(toGoBytes(content, length))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
+}
+
+//export GetLanguageByShebangWithSafety
+func GetLanguageByShebangWithSafety(content *C.char, length C.int, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByShebang(toGoBytes(content, length))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
+}
+
+//export GetLanguageByVimModelineWithSafety
+func GetLanguageByVimModelineWithSafety(content *C.char, length C.int, outSafe *C.int) *C.char {
+	lang, safe := enry.GetLanguageByVimModeline(toGoBytes(content, length))
+	setSafety(outSafe, safe)
+	return C.CString(lang)
 }
 
 // --- Boolean API (Bools return C.int: 1 for true, 0 for false) ---
