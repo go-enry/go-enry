@@ -152,7 +152,7 @@ Python bindings using a C shared library and cffi are available for Python 3.12+
 pip install enry-python
 ```
 
-This fork publishes `enry-python` for Python 3.12+; the import remains `enry`.
+The Python distribution is named `enry-python`; the import remains `enry`.
 Pre-built wheels are available for Linux (x86_64) and macOS (Intel + Apple Silicon).
 
 **Usage:**
@@ -163,8 +163,8 @@ language = enry.get_language("example.go", b"package main")
 print(language)  # Output: Go
 ```
 
-This fork publishes [enry-python](https://pypi.org/project/enry-python/) on PyPI for
-macOS and linux platforms.
+The [enry-python](https://pypi.org/project/enry-python/) package is available on PyPI
+for macOS and Linux.
 
 For more details, see [python/README.md](python/README.md).
 

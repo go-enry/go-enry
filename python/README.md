@@ -41,7 +41,7 @@ No Go compiler required! Pre-built wheels are available for:
 
 If you need to build from source or use an unsupported platform, you'll need Go installed:
 ```bash
-git clone https://github.com/Esoiya/go-enry.git
+git clone https://github.com/go-enry/go-enry.git
 cd go-enry
 cd python
 pip install -e .
@@ -121,7 +121,7 @@ If the dispatch job fails, rerun that failed job. To retry the complete tagged
 build, run:
 
 ```bash
-gh workflow run python-wheels.yml --repo Esoiya/go-enry --ref python-vX.Y.Z
+gh workflow run python-wheels.yml --repo go-enry/go-enry --ref python-vX.Y.Z
 ```
 
 This command can publish to PyPI once tests pass. Reuse the existing tag when
