@@ -29,3 +29,6 @@ python/*.so
 python/dist/
 python/*.egg-info/
 python/.pytest_cache/
+
+__pycache__/
+.pytest_cache/

@@ -1,3 +1,4 @@
-# CI-only dependencies
-cibuildwheel>=2.21,<3
-build>=1.0.0
+# Keep this aligned with the cibuildwheel action.
+cibuildwheel==3.3.1
+build>=1.2.2
+twine>=6.1

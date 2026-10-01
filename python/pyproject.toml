@@ -1,11 +1,11 @@
 [build-system]
-# We need cffi 1.15+ for 3.11/3.12 support and setuptools for 3.12+
-requires = ["setuptools>=77.0.0", "cffi>=1.15.0", "wheel"]
+# CFFI 2 supports Python 3.14; setuptools 77 supports SPDX license metadata.
+requires = ["setuptools>=77.0.0", "cffi>=2.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "enry"
-version = "0.2.0"
+version = "0.3.0"
 description = "Python bindings for go-enry language detector"
 readme = "README.md"
 authors = [
@@ -13,9 +13,9 @@ authors = [
 ]
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
-    "cffi>=1.15.0",
+    "cffi>=2.0.0",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -23,26 +23,24 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries",
 ]
 
 [project.urls]
-Homepage = "https://github.com/go-enry/go-enry"
-Repository = "https://github.com/go-enry/go-enry"
-Issues = "https://github.com/go-enry/go-enry/issues"
-Documentation = "https://github.com/go-enry/go-enry/tree/master/python"
+Homepage = "https://github.com/Esoiya/go-enry"
+Repository = "https://github.com/Esoiya/go-enry"
+Issues = "https://github.com/Esoiya/go-enry/issues"
+Documentation = "https://github.com/Esoiya/go-enry/tree/master/python"
 
 [tool.setuptools]
 packages = ["enry"]
 # Ensure the build script is included in the sdist so others can build it
 include-package-data = true
 
-[tool.setuptools.package-data]
-# This ensures the binary is included in the wheel for all versions.
-enry = ["*.so", "*.dylib", "*.dll", "*.h", "*.py"]
+# Native code is generated directly in build_lib, never copied from the checkout.
+[tool.setuptools.exclude-package-data]
+enry = ["*.so", "*.dylib", "*.dll", "*.h"]

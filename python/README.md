@@ -11,7 +11,7 @@ $ pip install -r requirements.txt
 $ python build_enry.py
 ```
 
-Builds the Go **shared** library for the CGo wrapper (`libenry.so` / `libenry.dylib`), then generates and builds the CFFI out-of-line module (`enry.c`) that provides the Python bindings.
+Builds the Go **shared** library for the CGo wrapper (`libenry.so` / `libenry.dylib`), then generates the CFFI out-of-line Python module (`enry/_c_enry.py`) that provides the Python bindings.
 
 ### Why a shared library?
 
@@ -19,7 +19,7 @@ Historically, the Python package shipped a **static** library and used CFFI **AP
 That approach relied on Go-generated headers/types (e.g. `GoString`, `GoSlice`, and struct return wrappers) and a locally-built archive at build time, which made builds and cross-platform packaging more fragile.
 
 We now build a Go-built **shared** library (`-buildmode=c-shared`) that is bundled inside the wheel and loaded via CFFI **out-of-line (ABI)** mode.
-This makes installation simpler and allows `pip install enry` without requiring a Go toolchain.
+This makes installation simpler and allows `pip install enry` without requiring a Go toolchain. Source builds require Go and a C compiler; the sdist bundles its Go sources under `_go/`.
 
 **Implementation note:** the shared library is located and loaded at import time in `enry/definitions.py` (see `_load_library()`), which prefers the packaged `enry/libenry.*` shipped in wheels and falls back to local dev build locations.
 
@@ -29,30 +29,29 @@ This makes installation simpler and allows `pip install enry` without requiring 
 
 ### From PyPI (Recommended)
 
-For Python 3.9+, install pre-built wheels:
+For Python 3.12+, install pre-built wheels:
 ```bash
 pip install enry
 ```
 
 No Go compiler required! Pre-built wheels are available for:
 - **Linux**: x86_64 (manylinux)
-- **macOS**: x86_64 (Intel) and arm64 (Apple Silicon)
+- **macOS 12+**: x86_64 (Intel) and arm64 (Apple Silicon)
 
 ### From Source
 
 If you need to build from source or use an unsupported platform, you'll need Go installed:
 ```bash
-git clone https://github.com/go-enry/go-enry.git
+git clone https://github.com/Esoiya/go-enry.git
 cd go-enry
-make shared
 cd python
 pip install -e .
 ```
 
 **Requirements for building:**
-- Go 1.21 or later
+- Go 1.26.x (used by release CI)
 - GCC or compatible C compiler
-- Python 3.9 or later
+- Python 3.12 or later
 
 ## Developer: publishing to PyPI
 
@@ -65,7 +64,7 @@ Until that is configured, you can publish manually using a [PyPI API token](http
 ### Versioning
 
 Before tagging a release, bump the Python package version in `python/pyproject.toml` (`[project].version`) and commit it.
-The git tag should match the package version (e.g. `version = "0.2.1"` and tag `python-v0.2.1`).
+The git tag should match the package version (e.g. `version = "0.3.0"` and tag `python-v0.3.0`).
 
 ### Manual publish (recommended): upload CI-built artifacts
 
@@ -98,16 +97,13 @@ Notes:
 
 ### Manual publish (local, single-platform only)
 
-If you only need to build and upload artifacts for your current machine, you should build the Go shared library first (mirrors the CI’s make shared step):
+For a local validation build, use the default build command: it creates an sdist, then builds the wheel from that archive. Native build failures abort packaging.
 
 ```bash
-# from repo root: builds and copies libenry.* into python/enry/
-make shared
-
+# from repo root
 cd python
-cp ../LICENSE .
 python -m pip install --upgrade build
-python -m build --sdist --wheel
+python -m build
 
 python -m pip install --upgrade twine
 TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-***' python -m twine upload dist/*
@@ -126,32 +122,32 @@ print(f"Detected language: {language}")
 
 ### FFI / API design notes
 
-Some upstream Go `enry` functions return `(value, safe)` where `safe` indicates whether the result is considered unambiguous.
-The shared library (`libenry`) exports used by these Python bindings intentionally return **only the primary string value** and do not currently expose the `safe` flag.
-
-**Rationale:** keeping the C ABI to simple primitives (`char*` in/out + explicit free) avoids returning structs/tuples across the language boundary and reduces ABI + memory-ownership pitfalls. It also keeps the shared library broadly usable by non-Python consumers without committing the core ABI to a particular “safe mode” policy.
-
-**Tradeoff:** the Python bindings cannot directly access the Go `safe` signal via the current exports. If we decide we need it, an ABI-friendly extension would be to add parallel exports that surface safety without structs (e.g. `...WithSafety(..., int* out_safe)`), while keeping the existing string-only exports for backwards compatibility.
-
+The Python `get_language_by_*` functions return `Guess(language, safe)`.
+`safe` is true only when Go reports an unambiguous result. The shared library
+provides additive `...WithSafety(..., int* out_safe)` exports; the original
+string-only exports remain available for existing C consumers. Returned strings
+and string arrays are freed by the bindings, including when decoding fails.
 
 ## Supported Python Versions
 
-- Python 3.9+
+- Python 3.12+
 - CPython only (PyPy not yet supported)
 
-**Note:** Python 3.6, 3.7 and 3.8 reached end-of-life and are no longer supported. 
-Use enry 0.1.1 if you must use these versions (not recommended for security reasons).
+Version 0.3.0 requires Python 3.12 or later. Release CI builds and tests
+standard (GIL-enabled) CPython 3.12, 3.13 and 3.14. Python 3.11 and older,
+free-threaded CPython and PyPy are outside the tested support matrix.
+Older Python installations must use an older compatible enry release.
 
 ## Platform Support
 
 - ✅ Linux (x86_64)
-- ✅ macOS (Intel x86_64 and Apple Silicon arm64)
+- ✅ macOS 12+ (Intel x86_64 and Apple Silicon arm64)
 - ❌ Linux ARM/aarch64 (not yet available)
 
 ## Known Issues
 
 - Memory leak fixed in version 0.2.0 (see [#36](https://github.com/go-enry/go-enry/issues/36))
-- The current shared-library exports return only a string result and do not expose the Go `safe` flag (by design; see “FFI / API design notes” above).
+- Java bindings still target an older shared-library ABI and need a separate migration.
 
 
 
