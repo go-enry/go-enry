@@ -1,11 +1,11 @@
 [build-system]
 # CFFI 2 supports Python 3.14; setuptools 77 supports SPDX license metadata.
-requires = ["setuptools>=77.0.0", "cffi>=2.0.0", "wheel"]
+requires = ["setuptools>=77.0.0", "setuptools-scm>=9,<10", "cffi>=2.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "enry"
-version = "0.3.0"
+dynamic = ["version"]
 description = "Python bindings for go-enry language detector"
 readme = "README.md"
 authors = [
@@ -23,9 +23,6 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries",
 ]
@@ -44,3 +41,14 @@ include-package-data = true
 # Native code is generated directly in build_lib, never copied from the checkout.
 [tool.setuptools.exclude-package-data]
 enry = ["*.so", "*.dylib", "*.dll", "*.h"]
+
+# Python releases have their own namespace, separate from Go's v* tags.
+[tool.setuptools_scm]
+root = ".."
+tag_regex = '^python-v(?P<version>[0-9]+\.[0-9]+\.[0-9]+(?:a[0-9]+|b[0-9]+|rc[0-9]+)?)$'
+git_describe_command = "git describe --dirty --tags --long --match python-v[0-9]*"
+
+[tool.cibuildwheel]
+# requires-python supplies the lower bound. Prereleases stay disabled.
+build = "cp3*-*"
+skip = "cp3*t-* *-win* *-musllinux*"

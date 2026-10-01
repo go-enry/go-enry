@@ -63,8 +63,17 @@ Until that is configured, you can publish manually using a [PyPI API token](http
 
 ### Versioning
 
-Before tagging a release, bump the Python package version in `python/pyproject.toml` (`[project].version`) and commit it.
-The git tag should match the package version (e.g. `version = "0.3.0"` and tag `python-v0.3.0`).
+The package version is derived by setuptools-scm from `python-vX.Y.Z` tags;
+there is no version number to edit in `pyproject.toml`. For example, tagging
+`python-v0.3.0` builds version `0.3.0`. Go's `v*` tags are ignored. Untagged
+commits receive development versions and do not trigger publication.
+
+Choose the release number and push its tag after the changes are ready. This
+automates applying the version, not choosing semantic-version bumps or creating
+releases on every merge. CI fetches the full Git history and validates the built
+artifact versions against the release tag. Source distributions retain their
+version when rebuilt without Git. Build from a Git clone or a published sdist;
+unversioned source copies are not supported.
 
 ### Manual publish (recommended): upload CI-built artifacts
 
@@ -133,9 +142,18 @@ and string arrays are freed by the bindings, including when decoding fails.
 - Python 3.12+
 - CPython only (PyPy not yet supported)
 
-Version 0.3.0 requires Python 3.12 or later. Release CI builds and tests
-standard (GIL-enabled) CPython 3.12, 3.13 and 3.14. Python 3.11 and older,
-free-threaded CPython and PyPy are outside the tested support matrix.
+Python 3.12 remains the minimum in `requires-python`. Release CI builds and tests
+all stable standard (GIL-enabled) CPython versions supported by its pinned
+cibuildwheel release and satisfying that minimum (currently 3.12–3.14).
+New versions are selected automatically when supported by an updated
+cibuildwheel action; Dependabot proposes these updates, which still need to be
+merged. There is no per-version wheel list to maintain. A new Python release
+does not itself trigger a PyPI upload: push a new `python-vX.Y.Z` tag to publish
+a new enry release with the expanded wheel set.
+
+Python 3.11 and older, prerelease interpreters, free-threaded CPython and PyPy
+are outside the tested support matrix. Wheels do not upgrade the user's Python
+installation, and the minimum version is never raised automatically.
 Older Python installations must use an older compatible enry release.
 
 ## Platform Support
