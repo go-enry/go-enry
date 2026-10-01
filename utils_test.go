@@ -459,3 +459,14 @@ func TestFoo(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, IsGenerated(file, content))
 }
+
+func TestImageMIMETypes(t *testing.T) {
+	for path, want := range map[string]string{"photo.jpg": "image/jpeg", "photo.JPG": "image/jpeg", "photo.JPEG": "image/jpeg", "photo.PNG": "image/png", "photo.GIF": "image/gif"} {
+		if !IsImage(path) {
+			t.Errorf("%s not recognized as image", path)
+		}
+		if got := GetMIMEType(path, ""); got != want {
+			t.Errorf("%s: got %q; want %q", path, got, want)
+		}
+	}
+}

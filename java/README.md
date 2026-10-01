@@ -27,35 +27,32 @@ libraryDependencies += "tech.sourced" % "enry-java" % enryVersion
 
 ### Requirements
 
-* `sbt`
-* `Java` (tested with Java 1.8)
-* `wget`
-* `Go` (only for building the shared objects for your operating system)
+* JDK 17 or later to build (the Java API targets Java 8 bytecode)
+* Go 1.26.x and a C compiler
+* `curl` and `shasum` for the checksum-verified sbt launcher
+* Linux or macOS on x86_64 or arm64
 
-### Generate jar with Java bindings and shared libraries
+From `java/`:
 
-You need to do this before exporting the jar and/or testing.
-
-```
-make
-```
-
-This will download JNAerator jar to generate the code from the `libenry.h` header file, it will be placed under `lib`.
-The shared libraries for your operating system will be built if needed and copied inside the `shared` directory.
-
-For IntelliJ and other IDEs remember to mark `shared` folder as sources and add `lib/enry.jar` as library. If you use `sbt` from the command line directly that's already taken care of.
-
-### Run tests
-
-```
+```bash
 make test
-```
-
-### Export jar
-
-```
 make package
 ```
 
-Will build fatJar under `./target/enry-java-assembly-X.X.X.jar`.
-One can use `./sbt publish-local` to install enry-java dependency on local machine.
+The build compiles `../shared` using the current C ABI and packages its native
+library under JNA's platform-specific resource directory. JNA extracts the
+matching library from the jar at runtime; no external `libenry` installation or
+JNAerator-generated jar is needed. `make package` creates
+`target/enry-java-assembly-*.jar`, including JNA and the current platform's native
+library. Build separately on each target platform; one build is not a universal
+jar. `./sbt publishLocal` installs the platform build locally. Maven Central
+publication is not automated by this build.
+
+All string arguments use UTF-8. Null strings and byte arrays are treated as
+empty. NUL bytes are supported in content arrays, but rejected in string
+arguments because the C ABI uses NUL-terminated strings. Native string and array
+results are copied and freed, and `Guess.safe` retains the detector's ambiguity
+information through the `WithSafety` exports.
+
+The Maven coordinates above describe the existing published package; this
+binding repair must be released separately before those artifacts include it.

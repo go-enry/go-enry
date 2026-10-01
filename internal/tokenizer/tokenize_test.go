@@ -84,14 +84,13 @@ var (
 		"strict", "dtd", "<html>", "xmlns=", "<head>", "<title>", "id=", "class=", "</title>", "<style>", "type=",
 		"<![CDATA[>", "example", "background", "color", "yellow", "</style>", "</head>", "<body>", "<div>", "id=",
 		"<strong>", "</strong>", "</div>", "</body>", "</html>", "(", "[", "]", ")", "[", "]", "{", "(", ")", "(", ")",
-		"{", "}", "(", ")", ";", "#", "/usr/bin/ruby", "#", "/usr/bin/env", "node", "aaa", "#", "/usr/bin/env", "A",
-		"B", "foo", "bar", "awk", "f", "#", "python", "func", "Tokenize", "content", "byte", "string", "splitted",
+		"{", "}", "(", ")", ";", "aaa", "#", "python", "func", "Tokenize", "content", "byte", "string", "splitted",
 		"bytes.Fields", "content", "tokens", "othercode", "ppp", "no", "comment", "abb", "tokenByte",
 		"notcatchasanumber", "number", "*", "anotherNumber", "if", "isTrue", "isToo", "b", "return", "tokens",
 		"oneBool", "varBool", "#ifndef", "#i", "m", "not", "a", "comment", "if", "the", "single", "line", "comment",
 		"symbol", "is", "not", "followed", "by", "a", "white", "PyErr_SetString", "PyExc_RuntimeError", "This", "is",
-		"a", "XHTML", "sample", "file", "Just", "a", "simple", "XHTML", "test", "page.", "-", "|", "+", "&&", "<", "<",
-		"!", "!", "!", "=", "=", "!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">", "'", ","}
+		"a", "XHTML", "sample", "file", "Just", "a", "simple", "XHTML", "test", "page.", "|", "+", "&&", "<", "<",
+		"!", ":", "=", ":", "=", ",", ",", "=", ">", ">", "=", "=", "=", "=", ">", "'", ","}
 
 	tests = []struct {
 		name     string
@@ -175,5 +174,23 @@ func BenchmarkTokenizer(b *testing.B) {
 		for _, test := range tests {
 			Tokenize(test.content)
 		}
+	}
+}
+
+func TestTokenizeShebangOnce(t *testing.T) {
+	for _, test := range []struct {
+		content string
+		want    []string
+	}{
+		{"#!/usr/bin/python\nprint value", []string{"SHEBANG#!python", "print", "value"}},
+		{"#!/usr/bin/env ruby\nputs value", []string{"SHEBANG#!ruby", "puts", "value"}},
+		{"#!/usr/bin/env A=B awk -f\nvalue", []string{"SHEBANG#!awk", "value"}},
+		{"#!/bin/sh", []string{"SHEBANG#!sh"}},
+	} {
+		t.Run(test.content, func(t *testing.T) {
+			content := []byte(test.content)
+			require.Equal(t, test.want, Tokenize(content))
+			require.Equal(t, test.content, string(content), "must not mutate caller content")
+		})
 	}
 }

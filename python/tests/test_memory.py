@@ -3,6 +3,7 @@ import gc
 import time
 import platform
 import statistics
+import sys
 import psutil
 import enry
 import pytest
@@ -81,6 +82,56 @@ def _tail_median_growth_pct(checkpoints, tail_points: int = 5) -> float:
     return (med / start - 1) * 100
 
 
+def _assert_stable_growth(iterations, print_every, warmup, tail_points, total_limit):
+    total_growth, checkpoints, initial, final = _measure_growth(
+        iterations, print_every, warmup)
+    tail_growth = _tail_median_growth_pct(checkpoints, tail_points)
+    if tail_growth >= 1.0 and total_growth < total_limit:
+        # A retained allocator arena can produce one step followed by a plateau.
+        # Confirm stability over another full segment; keep the original baseline
+        # so this cannot reset away cumulative growth from a real leak.
+        _, checkpoints, _, final = _measure_growth(iterations, print_every, warmup=0)
+        total_growth = (final / initial - 1) * 100
+        tail_growth = _tail_median_growth_pct(checkpoints, tail_points)
+    assert tail_growth < 1.0, f"Tail median memory growth too large: {tail_growth:.2f}%"
+    assert total_growth < total_limit, (
+        f"Total memory growth too large: {total_growth:.2f}% "
+        f"(initial={initial}, final={final})"
+    )
+
+
+def test_allocator_step_requires_a_stable_confirmation(monkeypatch):
+    samples = iter([
+        (3.0, [(i, m) for i, m in enumerate([100, 100, 103, 103, 103])], 100, 103),
+        (0.0, [(i, 103) for i in range(5)], 103, 103),
+    ])
+    monkeypatch.setattr(sys.modules[__name__], "_measure_growth",
+                        lambda *args, **kwargs: next(samples))
+    _assert_stable_growth(100, 20, 0, 5, 5.0)
+
+
+def test_continuing_growth_fails_confirmation(monkeypatch):
+    samples = iter([
+        (3.0, [(i, m) for i, m in enumerate([100, 100, 103, 103, 103])], 100, 103),
+        (3.0, [(i, m) for i, m in enumerate([103, 104, 105, 106, 107])], 103, 107),
+    ])
+    monkeypatch.setattr(sys.modules[__name__], "_measure_growth",
+                        lambda *args, **kwargs: next(samples))
+    with pytest.raises(AssertionError):
+        _assert_stable_growth(100, 20, 0, 5, 5.0)
+
+
+def test_cumulative_growth_cannot_reset_at_confirmation(monkeypatch):
+    samples = iter([
+        (3.0, [(i, m) for i, m in enumerate([100, 100, 103, 103, 103])], 100, 103),
+        (3.0, [(i, 106) for i in range(5)], 103, 106),
+    ])
+    monkeypatch.setattr(sys.modules[__name__], "_measure_growth",
+                        lambda *args, **kwargs: next(samples))
+    with pytest.raises(AssertionError, match="Total memory growth"):
+        _assert_stable_growth(100, 20, 0, 5, 5.0)
+
+
 def test_no_memory_leak_short():
     """
     Fast regression test (runs in the normal CI matrix).
@@ -90,20 +141,12 @@ def test_no_memory_leak_short():
     iterations = int(os.getenv("ENRY_MEM_ITERS_SHORT", "2000"))
     print(f"running short memory test with {iterations} iterations")
 
-    total_growth, checkpoints, initial, final = _measure_growth(
+    _assert_stable_growth(
         iterations=iterations,
         print_every=max(1, iterations // 10),
         warmup=int(os.getenv("ENRY_MEM_WARMUP_SHORT", "200")),
-    )
-
-    # Primary: tail of run should be essentially flat (robust to one final-step jump).
-    tail_growth = _tail_median_growth_pct(checkpoints, tail_points=5)
-    assert tail_growth < 1.0, f"Tail median memory growth too large: {tail_growth:.2f}%"
-
-    # Secondary: guard against runaway growth (should never happen in 2k calls).
-    # Allow allocator steps; this is just a safety net.
-    assert total_growth < 10.0, (
-        f"Total memory growth too large: {total_growth:.2f}% (initial={initial}, final={final})"
+        tail_points=5,
+        total_limit=10.0,
     )
 
 
@@ -137,18 +180,10 @@ def test_no_memory_leak_long():
     iterations = int(os.getenv("ENRY_MEM_ITERS_LONG", "100000"))
     print(f"running long memory test with {iterations} iterations")
 
-    total_growth, checkpoints, initial, final = _measure_growth(
+    _assert_stable_growth(
         iterations=iterations,
-        print_every=max(1, iterations // 20),  # ~5% checkpoints
+        print_every=max(1, iterations // 20),
         warmup=int(os.getenv("ENRY_MEM_WARMUP_LONG", "500")),
-    )
-
-    # Long test can use stricter "end segment" notion by just comparing early/late medians.
-    tail_growth = _tail_median_growth_pct(checkpoints, tail_points=7)
-    assert tail_growth < 1.0, f"Tail median memory growth too large: {tail_growth:.2f}%"
-
-    # Allow some total allocator growth, especially on Linux, but keep it bounded.
-    assert total_growth < 5.0, (
-        f"Total memory growth too large: {total_growth:.2f}% "
-        f"(initial={initial}, final={final})"
+        tail_points=7,
+        total_limit=5.0,
     )

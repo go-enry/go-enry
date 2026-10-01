@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "go",
+      "component": "python",
+      "include-component-in-tag": true,
+      "include-v-in-tag": true,
+      "tag-separator": "-",
+      "bump-minor-pre-major": true,
+      "changelog-path": "python/CHANGELOG.md",
+      "pull-request-title-pattern": "chore(${component}): release ${version}",
+      "component-no-space": true
+    }
+  },
+  "last-release-sha": "7cb020c922c4d44d2036509938b6d630b93c4499"
+}

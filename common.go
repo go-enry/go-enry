@@ -294,8 +294,9 @@ func GetLanguagesByShebang(_ string, content []byte, _ []string) (languages []st
 var (
 	shebangExecHack = regex.MustCompile(`exec (\w+).+\$0.+\$@`)
 	pythonVersion   = regex.MustCompile(`python\d\.\d+`)
-	envOptArgs      = regex.MustCompile(`-[i0uCSv]*|--\S+`)
-	envVarArgs      = regex.MustCompile(`\S+=\S+`)
+	envOptArgs      = regex.MustCompile(`^-(?:[i0v]*[uCS].*|[i0v]*)$|^--\S+$`)
+	envOperandArgs  = regex.MustCompile(`^-[i0v]*[uC]$|^--(?:unset|chdir)$`)
+	envVarArgs      = regex.MustCompile(`^[^=\s]+=.*$`)
 )
 
 func getInterpreter(data []byte) string {
@@ -317,18 +318,10 @@ func getInterpreter(data []byte) string {
 
 	// #!/usr/bin/env [...]
 	if interpreter == "env" {
-		if len(splitted) == 1 {
-			// /usr/bin/env with no arguments
+		interpreter = path.Base(envInterpreter(string(bytes.TrimSpace(line[len(splitted[0]):]))))
+		if interpreter == "." {
 			return ""
 		}
-		for len(splitted) > 2 {
-			if envOptArgs.Match(splitted[1]) || envVarArgs.Match(splitted[1]) {
-				splitted = append(splitted[:1], splitted[2:]...)
-				continue
-			}
-			break
-		}
-		interpreter = path.Base(string(splitted[1]))
 	}
 
 	if interpreter == "sh" {

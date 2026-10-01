@@ -1,0 +1,59 @@
+name: Prepare Python Release
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: python-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      # No dependency install scripts or caches in this privileged job.
+      - run: npm ci --prefix .github/release --ignore-scripts --no-audit --no-fund
+      - name: Prepare release with native-change policy
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/release/run.cjs
+
+  build-release:
+    needs: release
+    # A failure preparing the next PR must not strand an already-created tag.
+    if: ${{ !cancelled() && needs.release.outputs.created == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      # Tag pushes made with GITHUB_TOKEN do not trigger another workflow.
+      # Explicit workflow_dispatch does, and builds the immutable release tag.
+      - name: Start tagged wheel build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^python-v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh workflow run python-wheels.yml --repo "$GH_REPO" --ref "$RELEASE_TAG"

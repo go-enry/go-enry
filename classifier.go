@@ -106,6 +106,12 @@ func (c *naiveBayes) tokenProbability(token, language string) float64 {
 
 type byScore []*scoredLanguage
 
-func (b byScore) Len() int           { return len(b) }
-func (b byScore) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
-func (b byScore) Less(i, j int) bool { return b[j].score < b[i].score }
+func (b byScore) Len() int      { return len(b) }
+func (b byScore) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
+func (b byScore) Less(i, j int) bool {
+	// Map iteration order must not decide between equally likely languages.
+	if b[i].score == b[j].score {
+		return b[i].language < b[j].language
+	}
+	return b[j].score < b[i].score
+}

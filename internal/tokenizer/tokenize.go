@@ -1,3 +1,4 @@
+//go:build !flex
 // +build !flex
 
 package tokenizer
@@ -110,7 +111,7 @@ func extractAndReplaceShebang(content []byte) ([]byte, [][]byte) {
 			shebangTokens = append(shebangTokens, shebangToken)
 		}
 
-		reShebang.ReplaceAll(content, []byte(` `))
+		content = reShebang.ReplaceAll(content, []byte(` `))
 	}
 
 	return content, shebangTokens

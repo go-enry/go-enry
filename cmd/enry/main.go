@@ -219,7 +219,10 @@ func printPercents(root string, fSummary map[string][]string, buff *bytes.Buffer
 	// Calculate and write percentages of each file type.
 	for _, fType := range keys {
 		val := fileValues[fType]
-		percent := val / total * 100.0
+		percent := 0.0
+		if total > 0 {
+			percent = val / total * 100.0
+		}
 		buff.WriteString(fmt.Sprintf("%.2f%%\t%s\n", percent, fType))
 		if unreadableFiles != nil {
 			buff.WriteString(fmt.Sprintf("\n%s", unreadableFiles.Error()))
@@ -347,20 +350,28 @@ func getLines(file string, content []byte) (total, blank int) {
 	br := bufio.NewReader(r)
 	lastBlank := true
 	empty := true
+	continued := false
 	for {
 		data, prefix, err := br.ReadLine()
 		if err == io.EOF {
+			if continued {
+				empty = false
+				total++
+				lastBlank = false
+			}
 			break
 		} else if err != nil {
 			fmt.Println(err)
 			break
 		}
 		if prefix {
+			continued = true
 			continue
 		}
 		empty = false
 		total++
-		lastBlank = len(data) == 0
+		lastBlank = !continued && len(data) == 0
+		continued = false
 		if lastBlank {
 			blank++
 		}

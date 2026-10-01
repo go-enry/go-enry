@@ -1,0 +1,153 @@
+const assert = require('node:assert/strict');
+const test = require('node:test');
+const fs = require('node:fs');
+const path = require('node:path');
+const {Manifest} = require('release-please/build/src/manifest');
+const {buildStrategy} = require('release-please/build/src/factory');
+const {parseConventionalCommits} = require('release-please/build/src/commit');
+const {Version} = require('release-please/build/src/version');
+const {TagName} = require('release-please/build/src/util/tag-name');
+const {affectsNativeLibrary, NativeMinorRelease} = require('./native-policy.cjs');
+const root = path.resolve(__dirname, '../..');
+const github = {repository: {owner: 'example', repo: 'enry'},
+  getFileJson: async file => JSON.parse(fs.readFileSync(path.join(root, file)))};
+
+async function propose(commits, version = '0.3.0') {
+  const manifest = await Manifest.fromManifest(github, 'master',
+    '.github/release-please-config.json', '.github/.release-please-manifest.json');
+  const strategy = await buildStrategy({...manifest.repositoryConfig['.'], github,
+    path: '.', targetBranch: 'master'});
+  const plugin = new NativeMinorRelease(github, 'master', manifest.repositoryConfig);
+  const byPath = {'.': commits};
+  await plugin.preconfigure({'.': strategy}, byPath, {});
+  return strategy.buildReleasePullRequest(parseConventionalCommits(byPath['.']),
+    {tag: new TagName(Version.parse(version), 'python', '-', true), sha: 'previous', notes: ''});
+}
+const commit = (message, files) => ({sha: 'abc123', message, files});
+
+test('native input boundaries', () => {
+  for (const file of ['common.go','data/content.go','data/rule/rule.go','shared/enry.go',
+    'regex/standard.go','internal/tokenizer/tokenizer.go','shared/helper.c','go.mod','go.sum']) {
+    assert.equal(affectsNativeLibrary(file), true, file);
+  }
+  for (const file of ['common_test.go','data/heuristics_test.go','README.md','java/Enry.java',
+    'cmd/enry/main.go','internal/code-generator/main.go','.github/workflows/goTest.yml',
+    '_testdata/Go/main.go','internal/tests/utils.go','python/setup.py']) {
+    assert.equal(affectsNativeLibrary(file), false, file);
+  }
+});
+for (const [name, message, files, expected] of [
+  ['native fix','fix(detector): handle marker',['common.go'],'0.4.0'],
+  ['Linguist sync','chore(data): update Linguist definitions',['data/content.go','README.md'],'0.4.0'],
+  ['unconventional upstream merge','Merge upstream release',['common.go'],'0.4.0'],
+  ['Python fix','fix(python): correct loader',['python/enry/definitions.py'],'0.3.1'],
+  ['Python feature','feat(python): add API',['python/enry/__init__.py'],'0.4.0'],
+  ['docs only','docs: explain bindings',['README.md'],null],
+  ['CI only','fix(ci): improve tests',['.github/workflows/goTest.yml'],null],
+  ['Java only','fix(java): repair ABI',['java/src/main/Enry.java'],null],
+  ['CLI only','feat(cli): add flag',['cmd/enry/main.go'],null],
+  ['generator only','fix(generator): adjust template',['internal/code-generator/main.go'],null],
+  ['native tests only','fix(tests): improve assertion',['common_test.go'],null],
+  ['native test helpers only','fix(tests): repair fixture checkout',['internal/tests/utils.go'],null],
+  ['mixed native and test helpers','fix(detector): correct detection',['common.go','internal/tests/utils.go'],'0.4.0'],
+  ['Python README fix','fix(docs): correct installation',['python/README.md'],null],
+  ['Python documentation feature','feat(docs): document releases',['python/docs/releases.rst'],null],
+  ['Python tests fix','fix(tests): correct assertion',['python/tests/test_enry.py'],null],
+  ['packaging tests fix','fix(tests): correct assertion',['python/packaging_tests/test_versioning.py'],null],
+  ['Python example','feat(examples): show detection',['python/enry.py'],null],
+  ['package documentation','fix(docs): correct API docs',['python/enry/README.md'],null],
+  ['in-package tests','fix(tests): correct assertion',['python/enry/tests/test_api.py'],null],
+  ['package build','fix(python): repair build',['python/build_enry.py'],'0.3.1'],
+  ['package metadata','fix(python): correct metadata',['python/pyproject.toml'],'0.3.1'],
+  ['mixed native and docs','chore(data): sync languages',['data/content.go','python/README.md'],'0.4.0'],
+  ['mixed Python source and tests','fix(python): correct API',['python/enry/__init__.py','python/tests/test_enry.py'],'0.3.1'],
+  ['release policy and Java docs','feat(release): track native changes and repair Java bindings',
+    ['.github/release/native-policy.cjs','java/src/main/java/tech/sourced/enry/Enry.java','python/README.md'],null],
+  ['release metadata','chore(python): release 0.4.0',['python/CHANGELOG.md','.github/.release-please-manifest.json'],null],
+]) {
+  test(name, async () => {
+    const pr = await propose([commit(message,files)]);
+    assert.equal(pr?.version.toString() ?? null, expected);
+    if (pr) assert.deepEqual(pr.updates.map(update=>update.path),['python/CHANGELOG.md']);
+  });
+}
+test('multiple native merges produce one minor bump; next release advances once', async () => {
+  const commits = [commit('Updated data',['data/content.go']),commit('fix: correct parser',['common.go'])];
+  assert.equal((await propose(commits)).version.toString(),'0.4.0');
+  assert.equal((await propose(commits,'0.4.0')).version.toString(),'0.5.0');
+  assert.equal(commits.length,2);
+});
+test('breaking changes retain precedence after 1.0', async () => {
+  const pr=await propose([commit('feat!: remove API',['common.go'])],'1.2.3');
+  assert.equal(pr.version.toString(),'2.0.0');
+});
+
+test('release outputs preserve the workflow dispatch contract', () => {
+  const {writeReleaseOutputs} = require('./run.cjs');
+  const directory=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'enry-release-'));
+  const output=path.join(directory,'output');
+  try {
+    assert.equal(writeReleaseOutputs([],output),false);
+    assert.equal(fs.existsSync(output),false);
+    assert.equal(writeReleaseOutputs([{tagName:'python-v0.4.0'}],output),true);
+    assert.equal(fs.readFileSync(output,'utf8'),'release_created=true\ntag=python-v0.4.0\n');
+    assert.throws(()=>writeReleaseOutputs([{tagName:'python-v0.4.0\nunsafe=true'}],output));
+    assert.throws(()=>writeReleaseOutputs([{tagName:'v0.4.0'}],output));
+    assert.throws(()=>writeReleaseOutputs([{},{}],output));
+    const workflow=fs.readFileSync(path.join(root,'.github/workflows/python-release.yml'),'utf8');
+    assert.ok(workflow.includes('created: ${{ steps.release.outputs.release_created }}'));
+    assert.ok(workflow.includes('tag: ${{ steps.release.outputs.tag }}'));
+  } finally {fs.rmSync(directory,{recursive:true});}
+});
+
+for (const created of [false, true]) {
+  test(`reconcile next release PR after tag creation: ${created}`, async () => {
+    const {runReleaseCycle} = require('./run.cjs');
+    const directory=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'enry-cycle-'));
+    const output=path.join(directory,'output');
+    const calls=[];
+    let loads=0;
+    const load=async()=>{
+      const snapshot=++loads;
+      return {
+        createReleases:async()=>{calls.push('release');return created?[{tagName:'python-v0.4.0'}]:[undefined];},
+        createPullRequests:async()=>{
+          assert.equal(snapshot,2,'prepare the PR using a freshly loaded manifest');
+          calls.push('next PR');
+          return [{title:'chore(python): release 0.5.0'}];
+        },
+      };
+    };
+    try {
+      await runReleaseCycle(load,output);
+      assert.deepEqual(calls,['release','next PR']);
+      assert.equal(fs.existsSync(output),created);
+      if(created) assert.equal(fs.readFileSync(output,'utf8'),'release_created=true\ntag=python-v0.4.0\n');
+    } finally {fs.rmSync(directory,{recursive:true});}
+  });
+}
+
+test('next PR failure retains tag dispatch outputs and propagates the error', async () => {
+  const {runReleaseCycle} = require('./run.cjs');
+  const directory=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'enry-cycle-'));
+  const output=path.join(directory,'output');
+  const load=async()=>({
+    createReleases:async()=>[{tagName:'python-v0.4.0'}],
+    createPullRequests:async()=>{throw new Error('PR API unavailable');},
+  });
+  try {
+    await assert.rejects(runReleaseCycle(load,output),/PR API unavailable/);
+    assert.equal(fs.readFileSync(output,'utf8'),'release_created=true\ntag=python-v0.4.0\n');
+    const workflow=fs.readFileSync(path.join(root,'.github/workflows/python-release.yml'),'utf8');
+    assert.ok(workflow.includes("if: ${{ !cancelled() && needs.release.outputs.created == 'true' }}"));
+  } finally {fs.rmSync(directory,{recursive:true});}
+});
+
+test('failed tag creation cannot dispatch or prepare a new PR', async () => {
+  const {runReleaseCycle} = require('./run.cjs');
+  const load=async()=>({
+    createReleases:async()=>{throw new Error('release API unavailable');},
+    createPullRequests:async()=>assert.fail('must not continue after failed tag creation'),
+  });
+  await assert.rejects(runReleaseCycle(load,undefined),/release API unavailable/);
+});

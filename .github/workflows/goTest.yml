@@ -1,53 +1,51 @@
-on: [push, pull_request]
 name: Go Tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: ['**.go', 'go.mod', 'go.sum', 'internal/**', '_testdata/**', '.github/workflows/goTest.yml']
+  pull_request:
+    paths: ['**.go', 'go.mod', 'go.sum', 'internal/**', '_testdata/**', '.github/workflows/goTest.yml']
+
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
-        # Modernizing Go versions for better 3.12+ compatibility and ARM stability
-        go-version: ['1.21.x', '1.22.x', '1.23.x']
-        platform: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
+        include:
+          - {os: ubuntu-latest, go: '1.25.x'}
+          - {os: ubuntu-latest, go: '1.26.x'}
+          - {os: macos-latest, go: '1.26.x'}
+          - {os: windows-latest, go: '1.26.x'}
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ matrix.go-version }}
-    - name: Set git on win to use LF
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Test
-      run: go test -v ./...
-      env:
-        ENRY_DEBUG: 1
+      - name: Preserve LF in test fixtures
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+      - run: go test ./...
 
   test-oniguruma:
-    strategy:
-      matrix:
-        go-version: ['1.21.x']
     runs-on: ubuntu-latest
-    env:
-      ONIGURUMA_VERSION: 6.9.4
+    timeout-minutes: 15
     steps:
-    - name: Install libonig5
-      run: |
-        wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
-        sudo dpkg -i "libonig5_${ONIGURUMA_VERSION}-1_amd64.deb"
-        wget "http://archive.ubuntu.com/ubuntu/pool/universe/libo/libonig/libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
-        sudo dpkg -i "libonig-dev_${ONIGURUMA_VERSION}-1_amd64.deb"
-
-    - name: Install Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ matrix.go-version }}
-
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Test
-      run: go test -v -tags ${GO_TAGS} ./...
-      env:
-        GO_TAGS: oniguruma
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.26.x'
+      - run: sudo apt-get update && sudo apt-get install -y libonig-dev
+      - run: go test -tags oniguruma ./...

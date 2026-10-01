@@ -61,8 +61,7 @@ def prepare_candidates(candidates: List[str]) -> tuple:
     c_list[len(candidates)] = ffi.NULL
     return c_list, c_strings  # Return c_strings to keep them in scope
 
-def go_guess_to_py(lib, c_ptr) -> Guess:
+def go_guess_to_py(lib, c_ptr, safe: bool) -> Guess:
     """Standardizes the return of single-string 'Guess' functions."""
     lang = go_str_to_py(lib, c_ptr)
-    # Original enry logic: if a language is returned, it's considered safe
-    return Guess(language=lang, safe=bool(lang))
+    return Guess(language=lang, safe=safe)
