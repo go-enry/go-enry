@@ -6,6 +6,10 @@ on:
         description: 'Stable tag override (for example v9.5.0)'
         type: string
         default: ''
+      dry_run:
+        description: 'Validate generation without creating an update PR'
+        type: boolean
+        default: false
   schedule:
     - cron: '17 6 * * 1'
 
@@ -31,28 +35,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           LINGUIST_TAG: ${{ inputs.linguist_tag }}
         run: python3 .github/scripts/sync_linguist.py check
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
-        if: steps.release.outputs.changed == 'true'
-        with:
-          go-version: '1.26.x'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        if: steps.release.outputs.changed == 'true'
-        with:
-          repository: github/linguist
-          ref: ${{ steps.release.outputs.commit }}
-          path: .linguist
-          persist-credentials: false
-      - name: Generate update without write credentials
-        if: steps.release.outputs.changed == 'true'
+      - name: Generate update in an isolated container
+        if: steps.release.outputs.changed == 'true' || inputs.dry_run
         env:
           LINGUIST_TAG: ${{ steps.release.outputs.tag }}
           LINGUIST_COMMIT: ${{ steps.release.outputs.commit }}
-        run: |
-          python3 .github/scripts/sync_linguist.py update
-          make code-generate
-          git diff --binary -- data README.md internal/code-generator/generator > linguist.patch
+        run: bash .github/scripts/generate_linguist.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: steps.release.outputs.changed == 'true'
+        if: steps.release.outputs.changed == 'true' || inputs.dry_run
         with:
           name: linguist-patch
           path: linguist.patch
@@ -61,7 +51,7 @@ jobs:
 
   pull-request:
     needs: prepare
-    if: needs.prepare.outputs.changed == 'true'
+    if: needs.prepare.outputs.changed == 'true' && !inputs.dry_run
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

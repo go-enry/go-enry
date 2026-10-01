@@ -56,3 +56,47 @@ class SyncTests(unittest.TestCase):
                 self.assertEqual(Path("README.md").read_text(), "Linguist version **v9.6.0**.\n")
             finally:
                 os.chdir(old_cwd)
+
+
+class CollectTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        self.source = self.root / "sandbox"
+        self.target = self.root / "checkout"
+        self.target.mkdir()
+        for name in ("README.md", str(sync.GENERATOR), "data/example.go",
+                     "internal/code-generator/generator/test_files/example.gold",
+                     ".github/workflows/untrusted.yml"):
+            path = self.source / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("generated")
+        self.previous = Path.cwd()
+        self.addCleanup(os.chdir, self.previous)
+        os.chdir(self.target)
+
+    def collect(self):
+        with patch.object(sync.sys, "argv", ["sync_linguist.py", "collect", str(self.source)]):
+            sync.collect()
+
+    def test_copies_only_allowed_outputs(self):
+        self.collect()
+        self.assertEqual(Path("data/example.go").read_text(), "generated")
+        self.assertTrue(sync.GENERATOR.is_file())
+        self.assertFalse(Path(".github").exists())
+
+    def test_rejects_symlinks_before_copying_any_output(self):
+        path = self.source / "data/example.go"
+        path.unlink()
+        path.symlink_to(self.source / "README.md")
+        with self.assertRaises(ValueError):
+            self.collect()
+        self.assertFalse(Path("README.md").exists())
+
+    def test_rejects_symlinked_output_directories(self):
+        (self.source / "data").rename(self.source / "hidden")
+        (self.source / "data").symlink_to(self.source / "hidden", target_is_directory=True)
+        with self.assertRaises(ValueError):
+            self.collect()
+        self.assertFalse(Path("README.md").exists())

@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 
@@ -58,5 +59,23 @@ def update():
     readme.write_text(description)
 
 
+def collect():
+    """Copy only regular generated files; never import sandbox code or Git state."""
+    root = Path(sys.argv[2]).resolve()
+    paths = [Path("README.md"), GENERATOR]
+    paths += [path.relative_to(root) for pattern in (
+        "data/*.go", "internal/code-generator/generator/test_files/*.gold"
+    ) for path in root.glob(pattern)]
+    # Validate everything before copying anything back into the trusted checkout.
+    for relative in paths:
+        source = root / relative
+        if source.resolve() != source or not source.is_file():
+            raise ValueError(f"Expected a regular generated file: {relative}")
+    for relative in paths:
+        target = Path(relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / relative, target)
+
+
 if __name__ == "__main__":
-    {"check": check, "update": update}[sys.argv[1]]()
+    {"check": check, "update": update, "collect": collect}[sys.argv[1]]()
