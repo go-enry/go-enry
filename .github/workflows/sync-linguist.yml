@@ -1,130 +1,99 @@
 name: Sync Linguist
-on: 
+on:
   workflow_dispatch:
     inputs:
       linguist_tag:
-        description: 'Linguist tag override'
-        required: False
+        description: 'Stable tag override (for example v9.5.0)'
+        type: string
         default: ''
   schedule:
-    # Run once a day to check for new Linguist updates automatically
-    - cron:  '0 20 * * *'
+    - cron: '17 6 * * 1'
+
+permissions:
+  contents: read
+concurrency:
+  group: sync-linguist
+  cancel-in-progress: false
 
 jobs:
-  sync-linguist:
+  prepare:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      changed: ${{ steps.release.outputs.changed }}
     steps:
-    - uses: actions/setup-go@v5
-    - uses: actions/checkout@v2
-    - name: Find previous Linguist commit
-      id: previous_linguist
-      run: |
-        set -euo pipefail
-        IFS=$'\n\t'
-        commit=$(sed --quiet --regexp-extended 's/[[:space:]]+commit[[:space:]]+=[[:space:]]"([a-f0-9]{40})"/\1/p' internal/code-generator/generator/generator_test.go)
-        echo "::set-output name=commit::$commit"
-        echo "::set-output name=short_commit::${commit::8}"
-    - uses: actions/checkout@v2
-      with:
-        repository: github/linguist
-        path: .linguist
-        fetch-depth: 0
-    - name: check out latest release
-      id: linguist-release
-      # the `grep -v "-"` is to exclude any pre-release versions.
-      # Linguist doesn't have any right now, but just in case.
-      run: |
-        set -euo pipefail
-        IFS=$'\n\t'        
-        cd .linguist
-        if [[ -n "${{ github.event.inputs.linguist_tag }}" ]]; then
-          echo "Using tag override '${{ github.event.inputs.linguist_tag }}'"
-          latest="${{ github.event.inputs.linguist_tag }}"
-        else
-          latest=$(git tag --list | \
-                     grep -v "-" | \
-                     sort --version-sort --reverse | \
-                     head -1)
-        fi
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check for a new stable release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LINGUIST_TAG: ${{ inputs.linguist_tag }}
+        run: python3 .github/scripts/sync_linguist.py check
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        if: steps.release.outputs.changed == 'true'
+        with:
+          go-version: '1.26.x'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: steps.release.outputs.changed == 'true'
+        with:
+          repository: github/linguist
+          ref: ${{ steps.release.outputs.commit }}
+          path: .linguist
+          persist-credentials: false
+      - name: Generate update without write credentials
+        if: steps.release.outputs.changed == 'true'
+        env:
+          LINGUIST_TAG: ${{ steps.release.outputs.tag }}
+          LINGUIST_COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          python3 .github/scripts/sync_linguist.py update
+          make code-generate
+          git diff --binary -- data README.md internal/code-generator/generator > linguist.patch
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: steps.release.outputs.changed == 'true'
+        with:
+          name: linguist-patch
+          path: linguist.patch
+          retention-days: 1
+          if-no-files-found: error
 
-        if [[ -z "$latest" ]]; then
-          echo "could not determine latest Linguist version"
-          exit 1
-        fi
+  pull-request:
+    needs: prepare
+    if: needs.prepare.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # This job never executes generated code or scripts from the prepared artifact.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: linguist-patch
+          path: ${{ runner.temp }}/linguist-update
+      - name: Apply only language data and version metadata
+        run: >-
+          git apply --include='data/*.go' --include='README.md'
+          --include='internal/code-generator/generator/generator_test.go'
+          --include='internal/code-generator/generator/test_files/*.gold'
+          "$RUNNER_TEMP/linguist-update/linguist.patch"
+      - uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        with:
+          branch: feature/sync-linguist
+          title: 'chore(data): update Linguist definitions'
+          commit-message: |
+            chore(data): update Linguist definitions
 
-        echo "::set-output name=linguist_version::$latest"
-        git checkout $latest
-      
-        commit=$(git rev-parse HEAD)
-        if [[ -z "$commit" ]]; then
-          echo "could not determine latest Linguist commit"
-          exit 1
-        fi
-
-        echo "::set-output name=commit::$commit"
-        echo "::set-output name=short_commit::${commit::8}"
-
-        cd ..
-    - name: Update Linguist information
-      run: |
-        set -euo pipefail
-        IFS=$'\n\t'
-
-        sed --in-place --regexp-extended 's/(commit[[:space:]]+=[[:space:]])("[a-f0-9]{40}")/\1"${{ steps.linguist-release.outputs.commit }}"/' internal/code-generator/generator/generator_test.go
-        sed --in-place --regexp-extended 's/version \*\*v.+\*\*\./version \*\*${{ steps.linguist-release.outputs.linguist_version }}\*\*\./' README.md
-    - name: Generate code
-      run: make code-generate
-    - name: Commit changes
-      id: commit
-      run: |
-        set -euo pipefail
-        IFS=$'\n\t'
-        echo "git current state:"
-        git status
-
-        branch_name="feature/sync-linguist-${{ steps.previous_linguist.outputs.short_commit }}"
-        if git rev-parse --quiet --verify $branch_name; then
-          echo "Linguist update branch $branch_name already exists"
-          echo "::set-output name=needs_pr::true"
-          exit 0
-        fi
-
-        if [[ -n "$(git status --porcelain)" ]]; then
-          echo "Creating branch $branch_name for PR"
-          git checkout -b $branch_name
-          echo "::set-output name=branch_name::$branch_name"
-          echo "Creating Linguist update commit"
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "Updated Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
-          git push --set-upstream origin $branch_name
-          echo "Changes committed. Will create PR."
-          echo "::set-output name=needs_pr::true"
-          exit 0
-        fi
-          
-        echo "Linguist update unnecessary"
-        echo "::set-output name=needs_pr::false"
-    - name: Create Pull Request
-      id: open-pr
-      uses: repo-sync/pull-request@v2
-      if: ${{ steps.commit.outputs.needs_pr == 'true' }}
-      with:
-        source_branch: ${{ steps.commit.outputs.branch_name }}
-        pr_title: "Update Linguist to ${{ steps.linguist-release.outputs.linguist_version }}"
-        pr_body: |
-          Automated Linguist update :robot:
-
-          This PR updates Linguist from [${{ steps.previous_linguist.outputs.short_commit }}](https://github.com/github/linguist/commit/${{ steps.previous_linguist.outputs.commit }}) to [${{ steps.linguist-release.outputs.linguist_version }}](https://github.com/github/linguist/releases/tag/${{  steps.linguist-release.outputs.linguist_version }}) ([${{ steps.linguist-release.outputs.short_commit }}](https://github.com/github/linguist/commit/${{ steps.linguist-release.outputs.commit }}))
-
-          * [Linguist release notes](https://github.com/github/linguist/releases/tag/${{ steps.linguist-release.outputs.linguist_version }})
-          * [Compare Linguist code changes](https://github.com/github/linguist/compare/${{ steps.previous_linguist.outputs.commit }}...${{ steps.linguist-release.outputs.linguist_version }})
-        destination_branch: "master"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: output-url
-      if: ${{ steps.commit.outputs.needs_pr == 'true' }}
-      run: echo ${{ steps.open-pr.outputs.pr_url }}
-    - name: No PR Created
-      if: ${{ steps.commit.needs_pr != 'true' }}
-      run: echo "No changes for ${{ steps.linguist-release.outputs.linguist_version }}"
+            - Regenerate language data from the latest selected stable release.
+          body: 'Updates generated Linguist definitions and version metadata. Review the diff and approve any required CI runs before merging.'
+          add-paths: |
+            data/**/*.go
+            README.md
+            internal/code-generator/generator/generator_test.go
+            internal/code-generator/generator/test_files/*.gold

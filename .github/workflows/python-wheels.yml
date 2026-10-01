@@ -1,252 +1,131 @@
 name: Build Python Wheels
 on:
+  workflow_dispatch:
   push:
-    tags:
-      - 'python-v*'
-    branches:
-      - master
+    tags: ['python-v*']
+    branches: [master]
+    paths: ['**.go', '**.c', '**.h', 'go.mod', 'go.sum', 'python/**', 'Makefile', '.github/workflows/python-wheels.yml']
   pull_request:
-    paths:
-      - 'python/**'
-      - 'shared/**'
-      - '.github/workflows/python-wheels.yml'
+    paths: ['**.go', '**.c', '**.h', 'go.mod', 'go.sum', 'python/**', 'Makefile', '.github/workflows/python-wheels.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+env:
+  GO_VERSION: '1.26.x'
+
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        # macos-14 is the standard ARM (M1/M2/M3) runner.
-        # macos-15-intel is the new home for x86_64 builds.
         include:
           - os: ubuntu-22.04
-            macos_arch: ""
+            arch: x86_64
           - os: macos-14
-            macos_arch: arm64
+            arch: arm64
           - os: macos-15-intel
-            macos_arch: x86_64
+            arch: x86_64
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          go-version: '1.21'
-      - name: Build Go shared library and Prep
-        # This builds the binary once. cibuildwheel will see it in the mounted directory.
-        # copy the LICENSE file to python root
+          persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Stage Go toolchain for the manylinux container
+        if: runner.os == 'Linux'
+        shell: bash
         run: |
-          make shared
-          cp LICENSE python/
-      - name: Set up Python
-        uses: actions/setup-python@v5
+          mkdir -p .ci
+          cp -a "$(go env GOROOT)" .ci/go
+      - name: Build and test wheels
+        uses: pypa/cibuildwheel@298ed2fb2c105540f5ed055e8a6ad78d82dd3a7e # v3.3.1
         with:
-          python-version: '3.11'
-      - name: Install cibuildwheel
-        run: python -m pip install -r python/requirements.ci.txt
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
-        with:
-          # This is the correct way to point to a subfolder in v3.x
           package-dir: python
         env:
-          
-          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
-          CIBW_SKIP: "*-win* *-musllinux*"
-
-          # Fix for the Python 3.9 Segfault
-          CIBW_ENVIRONMENT_MACOS: >
-            PYTHONMALLOC=malloc
-            MACOSX_DEPLOYMENT_TARGET=11.0
-          
-          # ARCH handling
-          CIBW_ARCHS_MACOS: ${{ matrix.macos_arch }}
-          CIBW_ARCHS_LINUX: "x86_64"
-
-          # Use a modern manylinux image for Go compatibility
-          CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
-
-          # Building Go inside the container
-          CIBW_BEFORE_ALL_LINUX: >
-            yum install -y make &&
-            curl -L https://go.dev/dl/go1.21.0.linux-amd64.tar.gz | tar -xz -C /usr/local
-          CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/local/go/bin"
-
-          # This hook runs for EVERY wheel. 
-          # It ensures the .so/.dylib matches the architecture of the current wheel build.
-          CIBW_BEFORE_BUILD: |
-            pip install cffi
-
-            # Clean up ANY existing binaries to prevent pollution
-            make clean-shared
-
-            # Set a consistent deployment target
-            export MACOSX_DEPLOYMENT_TARGET=11.0
-
-            # 1. Map cibuildwheel arch to Go/C architectures
-            if [ "$CIBW_ARCHS" = "arm64" ]; then
-              export GOARCH=arm64
-              export CGO_CFLAGS="-arch arm64"
-              export CGO_LDFLAGS="-arch arm64"
-              export LDFLAGS="-arch arm64"
-            elif [ "$CIBW_ARCHS" = "x86_64" ]; then
-              export GOARCH=amd64
-              export CGO_CFLAGS="-arch x86_64"
-              export CGO_LDFLAGS="-arch x86_64"
-            fi
-
-            # Ensure the C compiler knows where the SDK is on macOS
-            if [[ "$(uname)" == "Darwin" ]]; then
-              export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
-              export MACOSX_DEPLOYMENT_TARGET=11.0
-            fi
-
-            # 2. Build via Makefile
-            CGO_ENABLED=1 make shared
-
-            # Defensive: find the lib we just built and make sure it's in the package
-            find .shared -name "libenry.*" -exec cp {} python/enry/ \;
-
-            cp LICENSE python/
-
-            # Debug check: verify what we actually built
-            if [[ "$(uname)" == "Darwin" ]]; then
-              lipo -info python/enry/libenry.dylib
-            fi
-          
-          CIBW_TEST_COMMAND: "python -c 'import enry; result = enry.get_language(\"test.py\", b\"print(123)\"); print(f\"Language detected: {result}\"); assert result == \"Python\", f\"Expected Python, got {result}\"'"
-          CIBW_TEST_REQUIRES: ""
-
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
+          CIBW_BUILD: 'cp312-* cp313-* cp314-*'
+          CIBW_SKIP: '*-win* *-musllinux*'
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_BEFORE_ALL_LINUX: 'cp -a /project/.ci/go /opt/enry-go'
+          CIBW_ENVIRONMENT_LINUX: 'PATH=/opt/enry-go/bin:$PATH'
+          CIBW_ENVIRONMENT_MACOS: 'MACOSX_DEPLOYMENT_TARGET=12.0'
+          CIBW_TEST_REQUIRES: 'pytest>=7 psutil>=5.9'
+          CIBW_TEST_COMMAND: 'python -m pytest {project}/python/tests -q'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: wheels-${{ matrix.os }}
-          path: ./wheelhouse/*.whl
+          path: wheelhouse/*.whl
+          if-no-files-found: error
           retention-days: 7
+
   build_sdist:
-    name: Build source distribution
+    name: Build and test source distribution
+    timeout-minutes: 15
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          go-version: '1.21'
-      - name: Set up Python
-        uses: actions/setup-python@v5
+          persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          python-version: '3.11'
-      - name: Build sdist
+          go-version: ${{ env.GO_VERSION }}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Verify release tag matches package version
+        if: github.ref_type == 'tag'
         run: |
-          cd python
-          cp ../LICENSE .
-          python -m pip install build cffi  # Ensure cffi is available here
-          python -m build --sdist
-      - name: Upload sdist
-        uses: actions/upload-artifact@v4
+          python - <<'PY'
+          import os, tomllib
+          from pathlib import Path
+          version = tomllib.loads(Path('python/pyproject.toml').read_text())['project']['version']
+          assert os.environ['GITHUB_REF_NAME'] == f'python-v{version}', 'Release tag/version mismatch'
+          PY
+      - name: Build sdist and rebuild wheel from it
+        run: |
+          python -m pip install build twine
+          python -m build python
+          python -m twine check python/dist/*
+      - name: Test the wheel rebuilt from the sdist outside the checkout
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/enry-test"
+          "$RUNNER_TEMP/enry-test/bin/python" -m pip install python/dist/*.whl pytest psutil
+          cp -R python/tests "$RUNNER_TEMP/enry-tests"
+          cd "$RUNNER_TEMP"
+          enry-test/bin/python -m pytest enry-tests -q
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: sdist
           path: python/dist/*.tar.gz
+          if-no-files-found: error
           retention-days: 7
-  test_wheels:
-    name: Test wheel on ${{ matrix.os }} Python ${{ matrix.python-version }}
-    needs: build_wheels
-    runs-on: ${{ matrix.os }}
-    strategy:
-        fail-fast: false
-        matrix:
-            os: [ubuntu-22.04, macos-14, macos-15-intel]
-            python-version: ['3.9', '3.12', '3.13']
 
-    steps:
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Download wheels
-        uses: actions/download-artifact@v4
-        with:
-          pattern: wheels-*
-          path: wheels
-          merge-multiple: true
-
-      - name: List available wheels
-        run: ls -lh wheels/
-
-      - name: Install wheel
-        shell: bash
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-
-          PY_VER=$(echo "${{ matrix.python-version }}" | tr -d '.')
-
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-            # manylinux wheel for this CPython version
-            matches=(wheels/*cp${PY_VER}*-manylinux*_x86_64.whl)
-
-          elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            arch="$(uname -m)"  # arm64 on macos-14, x86_64 on macos-15-intel
-            matches=(wheels/*cp${PY_VER}*-macosx_11_0_${arch}.whl)
-
-          else
-            echo "Unsupported runner OS: ${{ runner.os }}"
-            exit 1
-          fi
-
-          if (( ${#matches[@]} == 0 )); then
-            echo "No compatible wheel found for OS=${{ runner.os }} Python=cp${PY_VER} arch=${arch:-x86_64}"
-            echo "Available wheels:"
-            ls -lh wheels/
-            exit 1
-          fi
-
-          echo "Installing: ${matches[0]}"
-          python -m pip install "${matches[0]}"
-
-
-      - name: Test installed package
-        run: |
-          python -c "
-          import enry
-          import sys
-          
-          print(f'Testing enry on Python {sys.version}')
-          
-          # Test basic functionality
-          result = enry.get_language('test.py', b'print(123)')
-          assert result == 'Python', f'Expected Python, got {result}'
-          
-          result = enry.get_language('test.go', b'package main')
-          assert result == 'Go', f'Expected Go, got {result}'
-          
-          print('✓ All tests passed!')
-          "
-
-      - name: Verify Go not required
-        run: |
-          if command -v go &> /dev/null; then
-            echo "Note: Go is installed, but wheel should work without it"
-          else
-            echo "Confirmed: Go not required for wheel installation"
-          fi
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, build_sdist, test_wheels]
+    timeout-minutes: 10
+    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-22.04
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/python-v')
     permissions:
       id-token: write
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
+          pattern: wheels-*
           path: dist
           merge-multiple: true
-      - name: List artifacts
-        run: ls -R dist/
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          skip-existing: true
+          name: sdist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
