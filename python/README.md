@@ -18,7 +18,7 @@ Historically, the Python package shipped a **static** library and used CFFI **AP
 That approach relied on Go-generated headers/types (e.g. `GoString`, `GoSlice`, and struct return wrappers) and a locally-built archive at build time, which made builds and cross-platform packaging more fragile.
 
 We now build a Go-built **shared** library (`-buildmode=c-shared`) that is bundled inside the wheel and loaded via CFFI **out-of-line (ABI)** mode.
-This makes installation simpler and allows `pip install enry` without requiring a Go toolchain. Source builds require Go and a C compiler; the sdist bundles its Go sources under `_go/`.
+This makes installation simpler and allows `pip install enry-python` without requiring a Go toolchain. Source builds require Go and a C compiler; the sdist bundles its Go sources under `_go/`.
 
 **Implementation note:** the shared library is located and loaded at import time in `enry/definitions.py` (see `_load_library()`), which prefers the packaged `enry/libenry.*` shipped in wheels and falls back to local dev build locations.
 
@@ -30,7 +30,7 @@ This makes installation simpler and allows `pip install enry` without requiring 
 
 For Python 3.12+, install pre-built wheels:
 ```bash
-pip install enry
+pip install enry-python
 ```
 
 No Go compiler required! Pre-built wheels are available for:
@@ -56,7 +56,7 @@ pip install -e .
 
 Releases are published by the tagged wheel workflow using **[PyPI Trusted Publishing (OIDC)](https://docs.pypi.org/trusted-publishers/using-a-publisher/)**.
 
-**Note:** CI publishing via OIDC is **gated on PyPI Trusted Publisher configuration** for the `enry` project (must be set up by a PyPI project owner/maintainer for this repo/workflow).
+**Note:** CI publishing via OIDC is **gated on PyPI Trusted Publisher configuration** for the `enry-python` project (must be set up by a PyPI project owner/maintainer for this repo/workflow).
 
 Until that is configured, you can publish manually using a [PyPI API token](https://pypi.org/help/#apitoken).
 
@@ -144,7 +144,7 @@ TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-***' python -m twine upload **/*.w
 ```
 
 Notes:
-- The token must be created on PyPI by an account with upload permission for the enry project.
+- The token must be created on PyPI by an account with upload permission for the enry-python project.
 - This approach is preferred because wheels must be built per-platform/per-arch (Linux manylinux + macOS x86_64/arm64).
 - PyPI token notes: set username to __token__ and password to the token value (including the pypi- prefix).
 
