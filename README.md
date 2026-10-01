@@ -138,13 +138,14 @@ langs := enry.GetLanguagesByFilename("Gemfile", []byte("<content>"), []string{})
 
 ### Java bindings
 
-Generated Java bindings using a C shared library and JNI are available under [`java`](https://github.com/go-enry/go-enry/blob/master/java).
+Java bindings using the current C ABI and JNA are available under [`java`](java/README.md).
+The repaired bindings must be built locally until a new Java artifact is published.
 
 A library is published on Maven as [tech.sourced:enry-java](https://mvnrepository.com/artifact/tech.sourced/enry-java) for macOS and linux platforms. Windows support is planned under [src-d/enry#150](https://github.com/src-d/enry/issues/150).
 
 ### Python bindings
 
-Python bindings using a C shared library and cffi are available for Python 3.9+.
+Python bindings using a C shared library and cffi are available for Python 3.12+.
 
 **Installation:**
 ```bash
@@ -162,10 +163,10 @@ language = enry.get_language("example.go", b"package main")
 print(language)  # Output: Go
 ```
 
-A library is published on pypi as [enry](https://pypi.org/project/enry/) for
+This fork publishes [enry-python](https://pypi.org/project/enry-python/) on PyPI for
 macOS and linux platforms.
 
-For more details, see [python/README.md](https://github.com/go-enry/go-enry/blob/master/python/README.md).
+For more details, see [python/README.md](python/README.md).
 
 
 ### Rust bindings
