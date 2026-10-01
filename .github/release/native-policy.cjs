@@ -10,11 +10,21 @@ function affectsNativeLibrary(path) {
   return !path.includes('/') || /^(shared|data|regex|internal)\//.test(path);
 }
 
+function affectsPythonPackage(path) {
+  if (path === '.github/workflows/python-wheels.yml') return true;
+  if (['python/setup.py', 'python/build_enry.py', 'python/pyproject.toml',
+    'python/MANIFEST.in', 'python/LICENSE'].includes(path)) return true;
+  if (!path.startsWith('python/enry/')) return false;
+  if (/(^|\/)(tests?|docs?|__tests__)(\/|$)/.test(path)) return false;
+  if (/(^|\/)test_[^/]*\.py$/.test(path) || /\.(md|rst)$/.test(path)) return false;
+  return true;
+}
+
 class NativeMinorRelease extends ManifestPlugin {
   async preconfigure(strategies, commitsByPath) {
     const commits = (commitsByPath['.'] || []).filter(commit =>
       (commit.files || []).some(path => affectsNativeLibrary(path) ||
-        path.startsWith('python/') || path === '.github/workflows/python-wheels.yml'));
+        affectsPythonPackage(path)));
     commitsByPath['.'] = commits;
     const nativeCommit = commits.find(commit => (commit.files || []).some(affectsNativeLibrary));
     if (nativeCommit) {
@@ -30,4 +40,4 @@ class NativeMinorRelease extends ManifestPlugin {
     return strategies;
   }
 }
-module.exports = {affectsNativeLibrary, NativeMinorRelease};
+module.exports = {affectsNativeLibrary, affectsPythonPackage, NativeMinorRelease};
