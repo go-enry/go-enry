@@ -15,6 +15,7 @@ import (
 	"text/template"
 
 	"github.com/go-enry/go-enry/v2/internal/tokenizer"
+	"gopkg.in/yaml.v2"
 )
 
 type samplesFrequencies struct {
@@ -28,7 +29,21 @@ type samplesFrequencies struct {
 // Frequencies reads directories in samplesDir, retrieves information about frequencies of languages and tokens, and write
 // the file outPath using tmplName as a template. It complies with type File signature.
 func Frequencies(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit string) error {
-	freqs, err := getFrequencies(samplesDir)
+	source, err := ioutil.ReadFile(fileToParse)
+	if err != nil {
+		return err
+	}
+	metadata := make(map[string]*languageInfo)
+	if err := yaml.Unmarshal(source, &metadata); err != nil {
+		return err
+	}
+	names := make(map[string]string)
+	for name, info := range metadata {
+		if info.FSName != "" {
+			names[info.FSName] = name
+		}
+	}
+	freqs, err := getFrequencies(samplesDir, names)
 	if err != nil {
 		return err
 	}
@@ -56,7 +71,7 @@ func Frequencies(fileToParse, samplesDir, outPath, tmplPath, tmplName, commit st
 	return formatedWrite(outPath, buf.Bytes())
 }
 
-func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
+func getFrequencies(samplesDir string, names map[string]string) (*samplesFrequencies, error) {
 	langDirs, err := ioutil.ReadDir(samplesDir)
 	if err != nil {
 		return nil, err
@@ -76,7 +91,7 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 		lang := langDir.Name()
 		samples, err := readSamples(filepath.Join(samplesDir, lang))
 		if err != nil {
-			log.Println(err)
+			return nil, fmt.Errorf("read samples for %s: %w", lang, err)
 		}
 
 		if len(samples) == 0 {
@@ -85,10 +100,12 @@ func getFrequencies(samplesDir string) (*samplesFrequencies, error) {
 
 		samplesTokens, err := getTokens(samples)
 		if err != nil {
-			log.Println(err)
-			continue
+			return nil, fmt.Errorf("tokenize samples for %s: %w", lang, err)
 		}
 
+		if canonical, ok := names[lang]; ok {
+			lang = canonical
+		}
 		languageTotal += len(samples)
 		languages[lang] = len(samples)
 		tokensTotal += len(samplesTokens)
