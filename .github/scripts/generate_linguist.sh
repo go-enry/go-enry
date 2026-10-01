@@ -13,7 +13,8 @@ git archive HEAD | tar -x -C "$work"
 sandbox=(--rm --read-only --cap-drop=ALL --security-opt=no-new-privileges
   --user "$(id -u):$(id -g)" --tmpfs /tmp:rw,exec,mode=1777
   --mount "type=bind,src=$work,dst=/work" --workdir /work
-  --env HOME=/tmp --env GOCACHE=/tmp/go-build --env GOMODCACHE=/modules
+  --env HOME=/tmp --env GOCACHE=/tmp/go-build
+  --env GOPATH=/modules --env GOMODCACHE=/modules/pkg/mod
   --env GOTOOLCHAIN=local)
 
 # Fetch dependencies and the validated revision without executing upstream code.
