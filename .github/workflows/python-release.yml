@@ -1,0 +1,50 @@
+name: Prepare Python Release
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: python-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      tag: ${{ steps.release.outputs.tag_name }}
+      created: ${{ steps.release.outputs.release_created }}
+    steps:
+      # This job uses the GitHub API; it never checks out or executes project code.
+      - uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4.4.1
+        id: release
+        with:
+          target-branch: master
+          config-file: .github/release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
+
+  build-release:
+    needs: release
+    if: needs.release.outputs.created == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      # Tag pushes made with GITHUB_TOKEN do not trigger another workflow.
+      # Explicit workflow_dispatch does, and builds the immutable release tag.
+      - name: Start tagged wheel build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^python-v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh workflow run python-wheels.yml --repo "$GH_REPO" --ref "$RELEASE_TAG"

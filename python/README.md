@@ -54,7 +54,7 @@ pip install -e .
 
 ## Developer: publishing to PyPI
 
-Releases are intended to be published from CI on tag pushes (`python-v*`) using **[PyPI Trusted Publishing (OIDC)](https://docs.pypi.org/trusted-publishers/using-a-publisher/)**.
+Releases are published by the tagged wheel workflow using **[PyPI Trusted Publishing (OIDC)](https://docs.pypi.org/trusted-publishers/using-a-publisher/)**.
 
 **Note:** CI publishing via OIDC is **gated on PyPI Trusted Publisher configuration** for the `enry` project (must be set up by a PyPI project owner/maintainer for this repo/workflow).
 
@@ -67,18 +67,63 @@ there is no version number to edit in `pyproject.toml`. For example, tagging
 `python-v0.3.0` builds version `0.3.0`. Go's `v*` tags are ignored. Untagged
 commits receive development versions and do not trigger publication.
 
-Choose the release number and push its tag after the changes are ready. This
-automates applying the version, not choosing semantic-version bumps or creating
-releases on every merge. CI fetches the full Git history and validates the built
-artifact versions against the release tag. Source distributions retain their
-version when rebuilt without Git. Build from a Git clone or a published sdist;
-unversioned source copies are not supported.
+### Automated releases
 
-### Manual publish (recommended): upload CI-built artifacts
+The **Prepare Python Release** workflow runs after pushes to `master`. Release
+Please opens or updates a release PR with the next version and changelog.
+Review and merge that PR when ready to publish: the workflow then creates the
+`python-vX.Y.Z` tag and GitHub release, and explicitly starts **Build Python
+Wheels** at that tag. All wheel and source tests must pass before PyPI upload.
+The first proposed release after adopting this workflow is `python-v0.3.0`.
+
+Use conventional commit titles when merging changes:
+
+- `fix(python): ...` requests a patch release.
+- `feat(python): ...` requests a minor release.
+- `feat(python)!: ...` or a `BREAKING CHANGE:` footer requests a breaking release;
+  before 1.0 this increments the minor version, and from 1.0 it increments major.
+- `docs`, `chore` and other non-release types do not request a release themselves.
+
+For squash merges, put the conventional title and any breaking-change footer
+in the squash commit. Review the proposed version before merging the release PR.
+
+`.github/.release-please-manifest.json` records the last released version for
+Release Please; the bot updates it. It is not the Python package's version source.
+The root package configuration includes Go detector and native binding changes.
+The migration boundary (`last-release-sha`) starts the first changelog at the
+Python refresh, excluding imported upstream history; later releases stop at
+their own release commits.
+The Go release strategy writes only the changelog, leaving setuptools-scm to
+supply Python metadata from the tag. CI verifies artifact versions against that
+tag, and sdists retain their version when rebuilt without Git.
+
+The workflow uses the built-in `GITHUB_TOKEN`, with no personal access token.
+Enable **Allow GitHub Actions to create and approve pull requests** in the
+repository's Actions settings. Bot-created PRs and tags do not trigger normal
+PR/push workflows with this token; the explicit wheel workflow dispatch handles
+release validation. If branch rules require PR checks, provide those checks
+before merging (for example, by using a GitHub App token for Release Please).
+Do not bypass required checks. This repository's automation does not configure
+an App or bypass branch protection.
+
+If the dispatch job fails, rerun that failed job. To retry the complete tagged
+build, run:
+
+```bash
+gh workflow run python-wheels.yml --repo Esoiya/go-enry --ref python-vX.Y.Z
+```
+
+This command can publish to PyPI once tests pass. Reuse the existing tag when
+retrying a failed build; never move a published tag. A GitHub release indicates
+tag creation, not successful PyPI publication—check **Build Python Wheels**.
+Build from a Git clone or published sdist; unversioned source copies are unsupported.
+
+### Manual fallback: upload CI-built artifacts
 
 This mirrors what the CI does (cibuildwheel builds platform wheels + an sdist). You simply upload the produced artifacts yourself.
 
-1) Tag a release (this triggers the workflow):
+1) Prefer merging the automated release PR. If automation is unavailable, create
+an unused release tag manually (this triggers the workflow):
 
 ```bash
 git tag python-vX.Y.Z
@@ -168,8 +213,9 @@ cibuildwheel release and satisfying that minimum (currently 3.12–3.14).
 New versions are selected automatically when supported by an updated
 cibuildwheel action; Dependabot proposes these updates, which still need to be
 merged. There is no per-version wheel list to maintain. A new Python release
-does not itself trigger a PyPI upload: push a new `python-vX.Y.Z` tag to publish
-a new enry release with the expanded wheel set.
+does not itself trigger a PyPI upload: merge the next release PR to publish
+a new enry release with the expanded wheel set. If a tooling update needs a
+release, use a `fix(python): ...` commit describing the newly supported wheels.
 
 Python 3.11 and older, prerelease interpreters, free-threaded CPython and PyPy
 are outside the tested support matrix. Wheels do not upgrade the user's Python
