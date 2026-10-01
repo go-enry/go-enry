@@ -57,3 +57,7 @@ git_describe_command = "git describe --dirty --tags --long --match python-v[0-9]
 build = "cp3*-*"
 skip = "cp3*t-* *-win* *-musllinux*"
 test-groups = ["test"]
+# Copy tests away from the checkout so pytest imports the installed wheel.
+# Paths are relative to the repository root used to invoke cibuildwheel.
+test-sources = ["python/tests"]
+test-command = "python -m pytest python/tests -q"
