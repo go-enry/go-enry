@@ -32,7 +32,7 @@ test('native input boundaries', () => {
   }
   for (const file of ['common_test.go','data/heuristics_test.go','README.md','java/Enry.java',
     'cmd/enry/main.go','internal/code-generator/main.go','.github/workflows/goTest.yml',
-    '_testdata/Go/main.go','python/setup.py']) {
+    '_testdata/Go/main.go','internal/tests/utils.go','python/setup.py']) {
     assert.equal(affectsNativeLibrary(file), false, file);
   }
 });
@@ -48,6 +48,8 @@ for (const [name, message, files, expected] of [
   ['CLI only','feat(cli): add flag',['cmd/enry/main.go'],null],
   ['generator only','fix(generator): adjust template',['internal/code-generator/main.go'],null],
   ['native tests only','fix(tests): improve assertion',['common_test.go'],null],
+  ['native test helpers only','fix(tests): repair fixture checkout',['internal/tests/utils.go'],null],
+  ['mixed native and test helpers','fix(detector): correct detection',['common.go','internal/tests/utils.go'],'0.4.0'],
   ['Python README fix','fix(docs): correct installation',['python/README.md'],null],
   ['Python documentation feature','feat(docs): document releases',['python/docs/releases.rst'],null],
   ['Python tests fix','fix(tests): correct assertion',['python/tests/test_enry.py'],null],

@@ -5,7 +5,7 @@ const {ManifestPlugin} = require('release-please/build/src/plugin');
 function affectsNativeLibrary(path) {
   if (path === 'go.mod' || path === 'go.sum') return true;
   if (path.startsWith('internal/code-generator/') || path.startsWith('cmd/')) return false;
-  if (path.endsWith('_test.go')) return false;
+  if (path.startsWith('internal/tests/') || path.endsWith('_test.go')) return false;
   if (!/\.(go|c|h)$/.test(path)) return false;
   return !path.includes('/') || /^(shared|data|regex|internal)\//.test(path);
 }
