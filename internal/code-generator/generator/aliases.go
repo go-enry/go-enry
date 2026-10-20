@@ -44,6 +44,15 @@ func buildAliasLanguageMap(languages map[string]*languageInfo, orderedLangList [
 		}
 	}
 
+	// Keep the existing public map keys, and add Linguist's default alias
+	// for each language without overriding an explicitly registered alias.
+	for _, lang := range orderedLangList {
+		key := strings.ToLower(strings.ReplaceAll(lang, " ", "-"))
+		if _, exists := aliasLangsMap[key]; !exists {
+			aliasLangsMap[key] = lang
+		}
+	}
+
 	return aliasLangsMap
 }
 
