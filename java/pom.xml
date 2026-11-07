@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+  <groupId>tech.sourced</groupId>
+  <artifactId>enry-java</artifactId>
+  <name>enry-java</name>
+  <version>2.9.3-SNAPSHOT</version>
+  <description>Java bindings to the go-enry library</description>
+  <url>https://github.com/go-enry/java-enry</url>
+  <organization>
+    <name>go-enry</name>
+    <url>https://github.com/go-enry</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/go-enry/go-enry</url>
+    <connection>scm:git:https://github.com/go-enry/go-enry.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/go-enry/go-enry.git</developerConnection>
+  </scm>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/go-enry/go-enry/issues</url>
+  </issueManagement>
+  <developers>
+    <developer>
+      <id>abeaumont</id>
+      <name>Alfredo Beaumont</name>
+      <email>alfredo@sourced.tech</email>
+      <url>https://github.com/abeaumont</url>
+    </developer>
+    <developer>
+      <id>bzz</id>
+      <name>Alexander Bezzubov</name>
+      <email>alex@sourced.tech</email>
+      <url>https://github.com/bzz</url>
+    </developer>
+  </developers>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>22</maven.compiler.source>
+    <maven.compiler.target>22</maven.compiler.target>
+    <maven.compiler.release>22</maven.compiler.release>
+    <jextract.skip>false</jextract.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.11.2</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>jextract</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <skip>${jextract.skip}</skip>
+              <target name="jextract">
+                <echo level="info">Generating sources using jextract</echo>
+                <exec osfamily="unix" executable="bash" failonerror="true">
+                  <arg value="-eu"/>
+                  <arg value="${project.basedir}/scripts/jextract.sh"/>
+                  <arg value="${project.basedir}/shared"/>
+                  <arg value="${project.build.directory}"/>
+                </exec>
+                <exec executable="git" dir="${project.build.directory}" failonerror="true">
+                  <arg value="apply"/>
+                  <arg value="--no-index"/>
+                  <arg value="${project.basedir}/scripts/GoEnry_java.patch"/>
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/jextract</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-native-library</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/shared</directory>
+                  <includes>
+                    <inlcude>*/*.so</inlcude>
+                    <inlcude>*/*.dylib</inlcude>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.2</version>
+        <configuration>
+          <reportsDirectory>
+            ${project.build.directory}/reports/surefire
+          </reportsDirectory>
+          <argLine>--enable-native-access=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

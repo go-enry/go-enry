@@ -15,6 +15,13 @@ indent_style = space
 indent_style = space
 indent_size = 4
 
+[*.xml]
+indent_style = space
+
+[*.java]
+indent_style = space
+indent_size = 4
+
 [_testdata/**]
 charset = unset
 indent_size = unset

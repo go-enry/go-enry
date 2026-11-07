@@ -1,88 +1,65 @@
 package tech.sourced.enry;
 
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
-import tech.sourced.enry.nativelib.GoSlice;
-import tech.sourced.enry.nativelib._GoString_;
-import com.ochafik.lang.jnaerator.runtime.NativeSize;
+import tech.sourced.enry.internal.GoEnry;
+import tech.sourced.enry.internal.GoSlice;
+import tech.sourced.enry.internal.GoString;
 
-import java.io.UnsupportedEncodingException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.nio.charset.StandardCharsets;
 
 class GoUtils {
 
-    static _GoString_.ByValue toGoString(String str) {
-        byte[] bytes;
-        try {
-            bytes = str.getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            bytes = str.getBytes();
-        } catch (NullPointerException e) {
-            bytes = null;
-        }
+    static MemorySegment toGoString(Arena arena, String str) {
+        if (str == null) str = "";
 
-        int length = 0;
-        Pointer ptr = null;
-        if (bytes != null) {
-            length = bytes.length;
-            ptr = ptrFromBytes(bytes);
-        }
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+        MemorySegment p = arena.allocateFrom(ValueLayout.JAVA_BYTE, bytes);
 
-        _GoString_.ByValue val = new _GoString_.ByValue();
-        val.n = new NativeSize(length);
-        val.p = ptr;
-        return val;
+        MemorySegment goString = GoString.allocate(arena);
+        GoString.p(goString, p);
+        GoString.n(goString, bytes.length);
+
+        return goString;
     }
 
-    static String toJavaString(_GoString_ str) {
-        if (str.n.intValue() == 0) {
-            return "";
-        }
+    static String toJavaString(MemorySegment str) {
+        long n = GoString.n(str);
+        if (n == 0) return "";
 
-        byte[] bytes = new byte[(int) str.n.intValue()];
-        str.p.read(0, bytes, 0, (int) str.n.intValue());
-        try {
-            return new String(bytes, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("utf-8 encoding is not supported");
-        }
+        MemorySegment p = GoString.p(str);
+        byte[] bytes = p.asSlice(0, n).toArray(GoEnry.C_CHAR);
+
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    static String[] toJavaStringArray(GoSlice slice) {
-        String[] result = new String[(int) slice.len];
-        Pointer[] ptrArr = slice.data.getPointerArray(0, (int) slice.len);
-        for (int i = 0; i < (int) slice.len; i++) {
-            result[i] = ptrArr[i].getString(0);
+    static String[] toJavaStringArray(MemorySegment slice) {
+        long len = GoSlice.len(slice);
+        MemorySegment data = GoSlice.data(slice);
+
+        String[] result = new String[(int) len];
+        for (int i = 0; i < len; i++) {
+            MemorySegment s = data.get(GoEnry.C_POINTER, i * GoEnry.C_POINTER.byteSize());
+            result[i] = s.getString(0);
         }
         return result;
     }
 
-    static GoSlice.ByValue toGoByteSlice(byte[] bytes) {
-        int length = 0;
-        Pointer ptr = null;
-        if (bytes != null && bytes.length > 0) {
-            length = bytes.length;
-            ptr = ptrFromBytes(bytes);
-        }
+    static MemorySegment toGoByteSlice(Arena arena, byte[] bytes) {
+        if (bytes == null) bytes = new byte[0];
 
-        return sliceFromPtr(length, ptr);
-    }
+        MemorySegment data = arena.allocateFrom(ValueLayout.JAVA_BYTE, bytes);
 
-    static GoSlice.ByValue sliceFromPtr(int len, Pointer ptr) {
-        GoSlice.ByValue val = new GoSlice.ByValue();
-        val.cap = len;
-        val.len = len;
-        val.data = ptr;
-        return val;
-    }
+        MemorySegment goSlice = GoSlice.allocate(arena);
+        GoSlice.data(goSlice, data);
+        GoSlice.len(goSlice, bytes.length);
+        GoSlice.cap(goSlice, bytes.length);
 
-    static Pointer ptrFromBytes(byte[] bytes) {
-        Pointer ptr = new Memory(bytes.length);
-        ptr.write(0, bytes, 0, bytes.length);
-        return ptr;
+        return goSlice;
     }
 
     static boolean toJavaBool(byte goBool) {
         return goBool == 1;
     }
-
 }
