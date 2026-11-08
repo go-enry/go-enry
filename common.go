@@ -529,6 +529,7 @@ func GetLanguageGroup(language string) string {
 
 // GetLanguageByAlias returns either the language related to the given alias and ok set to true
 // or Otherlanguage and ok set to false if the alias is not recognized.
+// Names are case-insensitive and may use spaces, legacy underscores, or Linguist-style hyphens.
 func GetLanguageByAlias(alias string) (lang string, ok bool) {
 	lang, ok = data.LanguageByAlias(alias)
 	if !ok {

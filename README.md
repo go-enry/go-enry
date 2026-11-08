@@ -176,6 +176,12 @@ Generated Rust bindings using a C static library are available at https://github
 
 The `enry` library is based on the data from `github/linguist` version **v9.5.0**.
 
+`GetLanguageByAlias` accepts Linguist-style hyphenated names, such as
+`OpenStep-Property-List` and `POV-Ray-SDL`. For backwards compatibility, it also
+accepts the existing underscore spellings (`openstep_property_list` and
+`pov-ray_sdl`), and those keys remain in `data.LanguageByAliasMap`. An existing
+alias takes precedence if an additional hyphenated spelling would conflict with it.
+
 Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
 
 - [Heuristics for ".txt" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521) in Vim Help File could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
