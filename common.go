@@ -206,7 +206,9 @@ func footScope(content []byte, scope int) (index int) {
 }
 
 var (
-	reEmacsModeline = regex.MustCompile(`.*-\*-\s*(.+?)\s*-\*-.*(?m:$)`)
+	// Match the first delimiter on each line, so later XLFD font fragments
+	// such as -*-m-*- are not mistaken for a modeline.
+	reEmacsModeline = regex.MustCompile(`.*?-\*-\s*(.+?)\s*-\*-.*(?m:$)`)
 	reEmacsLang     = regex.MustCompile(`.*(?i:mode)\s*:\s*([^\s;]+)\s*;*.*`)
 	reVimModeline   = regex.MustCompile(`(?:(?m:\s|^)vi(?:m[<=>]?\d+|m)?|[\t\x20]*ex)\s*[:]\s*(.*)(?m:$)`)
 	reVimLang       = regex.MustCompile(`(?i:filetype|ft|syntax)\s*=(\w+)(?:\s|:|$)`)
