@@ -46,7 +46,7 @@ func (s *linguistCorpusSuite) TestLinguistSamples() {
 	filepath.Walk(s.samplesDir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
 			if f.Name() != filenamesDir {
-				expected, _ = data.LanguageByAlias(f.Name())
+				expected = languageBySampleDirectory(f.Name())
 			}
 
 			return nil
@@ -92,7 +92,7 @@ func (s *linguistCorpusSuite) TestLinguistGenericFixtures() {
 	filepath.Walk(filepath.Join(s.testFixturesDir, "Generic"), func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
 			if f.Name() != filenamesDir {
-				expected, _ = data.LanguageByAlias(f.Name())
+				expected = languageBySampleDirectory(f.Name())
 			}
 			return nil
 		}
@@ -125,4 +125,28 @@ func (s *linguistCorpusSuite) TestLinguistGenericFixtures() {
 		return nil
 	})
 	s.T().Logf("\t\ttotal files: %d, ok: %d, failed: %d, multiple: %d\n", total, ok, failed, multiple)
+}
+
+// Linguist uses filesystem-safe directory names that need not be aliases.
+func languageBySampleDirectory(name string) string {
+	if name == "ProC" {
+		name = "Pro*C"
+	}
+	language, _ := data.LanguageByAlias(name)
+	return language
+}
+
+func TestLanguageBySampleDirectory(t *testing.T) {
+	for _, test := range []struct{ directory, expected string }{
+		{"ProC", "Pro*C"},
+		{"GtkRC", "GtkRC"},
+		{"C++", "C++"},
+		{"unknown-language", ""},
+	} {
+		t.Run(test.directory, func(t *testing.T) {
+			if got := languageBySampleDirectory(test.directory); got != test.expected {
+				t.Fatalf("languageBySampleDirectory(%q) = %q, want %q", test.directory, got, test.expected)
+			}
+		})
+	}
 }
