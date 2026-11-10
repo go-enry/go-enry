@@ -328,7 +328,8 @@ println("The shell script says ",vm.arglist.concat(" "));`
 
 		{name: "TestGetLanguagesByShebang_46", content: []byte("#!/usr/bin/env -vS ruby -wKU\nputs ?t+?e+?s+?t"), expected: []string{"Ruby"}},
 		{name: "TestGetLanguagesByShebang_47", content: []byte("#!/usr/bin/env --split-string sed -f\ny/a/A/"), expected: []string{"sed"}},
-		{name: "TestGetLanguagesByShebang_48", content: []byte("#!/usr/bin/env -S GH_TOKEN=ghp_*** deno run --allow-net\nconsole.log(1);"), expected: []string{"TypeScript"}},
+		{name: "TestGetLanguagesByShebang_48", content: []byte("#!/usr/bin/env -S GH_TOKEN=ghp_*** deno run --allow-net\nconsole.log(1);"), expected: []string{"JavaScript", "TypeScript"}},
+		{name: "TestGetLanguagesByShebang_49", content: []byte("#!/usr/bin/env bun\nconsole.log(1);"), expected: []string{"JavaScript", "TypeScript"}},
 	}
 
 	for _, test := range tests {
