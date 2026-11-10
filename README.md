@@ -176,9 +176,11 @@ Generated Rust bindings using a C static library are available at https://github
 
 The `enry` library is based on the data from `github/linguist` version **v9.6.0**.
 
-Parsing [linguist/samples](https://github.com/github/linguist/tree/master/samples) the following `enry` results are different from the Linguist:
+The default RE2 engine cannot compile every Linguist heuristic. The generator preserves Ruby-only patterns using `regex.MustCompileRuby`: RE2 builds skip those matchers, while builds with the `oniguruma` tag compile and use them. Generator warnings about these patterns are expected and do not themselves indicate a test failure.
 
-- [Heuristics for ".txt" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L521) in Vim Help File could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
+Parsing [linguist/samples](https://github.com/github/linguist/tree/v9.6.0/samples) the following `enry` results are different from Linguist:
+
+- [Vim Help File heuristics for ".txt"](https://github.com/github/linguist/blob/1d7ac7ed569bd6edef5d0cfc73feea2573cb0e03/lib/linguist/heuristics.yml#L965-L966) use lookahead unsupported by RE2 (introduced in [Linguist #5365](https://github.com/github/linguist/pull/5365)).
 
 - [Heuristics for ".sol" extension](https://github.com/github/linguist/blob/8083cb5a89cee2d99f5a988f165994d0243f0d1e/lib/linguist/heuristics.yml#L464) in Solidity could not be parsed, due to unsupported negative lookahead in RE2 regexp engine.
 
@@ -190,7 +192,11 @@ Parsing [linguist/samples](https://github.com/github/linguist/tree/master/sample
 
 - [Heuristics for ".csc", ".gsc" and ".gsh" extension](https://github.com/github/linguist/blob/7469c7982d93f2ad922230d712f586a353dc1a42/lib/linguist/heuristics.yml#L650-L651) in GSC could not be parsed, due to unsupported non-backtracking subexpressions in RE2 regexp engine.
 
-- [Heuristic for ".txt"](https://github.com/github/linguist/blob/bf853f1c663903e3ee35935189760191f1c45e1c/lib/linguist/heuristics.yml#L680-L702) detecting 'Adblock Filter List' regexp syntax not supported by RE2
+- [Smarty heuristics for ".tpl"](https://github.com/github/linguist/blob/1d7ac7ed569bd6edef5d0cfc73feea2573cb0e03/lib/linguist/heuristics.yml#L937-L938) use negative lookbehind unsupported by RE2 (introduced in [Linguist #7687](https://github.com/github/linguist/pull/7687)).
+
+- [Hosts File heuristics for ".txt"](https://github.com/github/linguist/blob/1d7ac7ed569bd6edef5d0cfc73feea2573cb0e03/lib/linguist/heuristics.yml#L967-L992) use lookahead, lookbehind, and possessive quantifiers unsupported by RE2 (introduced in [Linguist #7014](https://github.com/github/linguist/pull/7014)).
+
+- [Adblock Filter List heuristics for ".txt"](https://github.com/github/linguist/blob/1d7ac7ed569bd6edef5d0cfc73feea2573cb0e03/lib/linguist/heuristics.yml#L993-L1017) use Ruby regexp syntax unsupported by RE2, including possessive quantifiers and a named subexpression call (introduced in [Linguist #5968](https://github.com/github/linguist/pull/5968)).
 
 - [IsVendor('bootstrap.css') == false](https://github.com/github/linguist/blob/v7.23.0/lib/linguist/vendor.yml#L77) v7.23 first unsupported RE syntax outside content heuristics
 
