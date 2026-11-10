@@ -4,8 +4,8 @@ jobs:
   test:
     strategy:
       matrix:
-        # Modernizing Go versions for better 3.12+ compatibility and ARM stability
-        go-version: ['1.21.x', '1.22.x', '1.23.x']
+        # Go < 1.24 binaries fail to start on recent macOS (missing LC_UUID)
+        go-version: ['stable', 'oldstable']
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -27,7 +27,7 @@ jobs:
   test-oniguruma:
     strategy:
       matrix:
-        go-version: ['1.21.x']
+        go-version: ['stable']
     runs-on: ubuntu-latest
     env:
       ONIGURUMA_VERSION: 6.9.4
