@@ -47,8 +47,16 @@ cd python
 pip install -e .
 ```
 
+To build the published source distribution instead of a Git checkout:
+
+```bash
+pip install --no-binary enry-python enry-python
+```
+
+This compiles the bundled Go sources under `_go/`, so the same Go and C compiler requirements apply.
+
 **Requirements for building:**
-- Go 1.26.x (used by release CI)
+- Go 1.26.x, the version release CI builds with. Older Go versions may work but aren't tested; the Go library's own minimum is tracked separately in [go-enry[#220](https://github.com/go-enry/go-enry/issues/220)]
 - GCC or compatible C compiler
 - Python 3.12 or later
 
