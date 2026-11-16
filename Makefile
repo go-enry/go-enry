@@ -53,13 +53,11 @@ code-generate: $(LINGUIST_PATH)
 # --- Shared Library Targets ---
 
 # Master shared target - detects host OS
-shared: $(SHARED_LIB)
-
-$(SHARED_LIB):
+shared:
 	mkdir -p $(BUILD_DIR)
 	# CGO_ENABLED=1 is required for buildmode=c-shared
 	# We let Go handle GOOS and GOARCH from the environment variables
-	CGO_ENABLED=1 go build -v -buildmode=c-shared -o $(SHARED_LIB) $(NATIVE_LIB)
+	GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) CGO_ENABLED=1 go build -v -buildmode=c-shared -o $(SHARED_LIB) $(NATIVE_LIB)
 	
 	# Move header to a central location
 	mv $(BUILD_DIR)/$(HEADER_FILE) $(RESOURCES_DIR)/$(HEADER_FILE)
@@ -100,4 +98,4 @@ clean-shared:
 
 clean: clean-linguist clean-shared
 
-.PHONY: all shared static clean code-generate benchmarks benchmarks-samples benchmarks-slow
+.PHONY: all shared static clean clean-shared code-generate benchmarks benchmarks-samples benchmarks-slow

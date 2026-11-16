@@ -1,6 +1,6 @@
 package tech.sourced.enry;
 
-import tech.sourced.enry.nativelib.*;
+import com.sun.jna.ptr.IntByReference;
 
 import static tech.sourced.enry.GoUtils.*;
 
@@ -19,8 +19,8 @@ public class Enry {
      */
     public static synchronized String getLanguage(String filename, byte[] content) {
         return toJavaString(nativeLib.GetLanguage(
-                toGoString(filename),
-                toGoByteSlice(content)
+                cString(filename),
+                content, length(content)
         ));
     }
 
@@ -34,11 +34,11 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByContent(String filename, byte[] content) {
-        GetLanguageByContent_return.ByValue res = nativeLib.GetLanguageByContent(
-                toGoString(filename),
-                toGoByteSlice(content)
-        );
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByContentWithSafety(
+                cString(filename),
+                content, length(content), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -50,8 +50,9 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByEmacsModeline(byte[] content) {
-        GetLanguageByEmacsModeline_return.ByValue res = nativeLib.GetLanguageByEmacsModeline(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByEmacsModelineWithSafety(content, length(content), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -63,8 +64,9 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByExtension(String filename) {
-        GetLanguageByExtension_return.ByValue res = nativeLib.GetLanguageByExtension(toGoString(filename));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByExtensionWithSafety(cString(filename), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -76,8 +78,9 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByShebang(byte[] content) {
-        GetLanguageByShebang_return.ByValue res = nativeLib.GetLanguageByShebang(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByShebangWithSafety(content, length(content), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -89,8 +92,9 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByFilename(String filename) {
-        GetLanguageByFilename_return.ByValue res = nativeLib.GetLanguageByFilename(toGoString(filename));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByFilenameWithSafety(cString(filename), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -102,8 +106,9 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByModeline(byte[] content) {
-        GetLanguageByModeline_return.ByValue res = nativeLib.GetLanguageByModeline(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByModelineWithSafety(content, length(content), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -115,8 +120,9 @@ public class Enry {
      * @return guessed result
      */
     public static synchronized Guess getLanguageByVimModeline(byte[] content) {
-        GetLanguageByVimModeline_return.ByValue res = nativeLib.GetLanguageByVimModeline(toGoByteSlice(content));
-        return new Guess(toJavaString(res.r0), toJavaBool(res.r1));
+        IntByReference safe = new IntByReference();
+        String language = toJavaString(nativeLib.GetLanguageByVimModelineWithSafety(content, length(content), safe));
+        return new Guess(language, safe.getValue() != 0);
     }
 
     /**
@@ -126,9 +132,7 @@ public class Enry {
      * @return extensions
      */
     public static synchronized String[] getLanguageExtensions(String language) {
-        GoSlice result = new GoSlice();
-        nativeLib.GetLanguageExtensions(toGoString(language), result);
-        return toJavaStringArray(result);
+        return toJavaStringArray(nativeLib.GetLanguageExtensions(cString(language)));
     }
 
     /**
@@ -139,9 +143,7 @@ public class Enry {
      * @return all possible languages
      */
     public static synchronized String[] getLanguages(String filename, byte[] content) {
-        GoSlice result = new GoSlice();
-        nativeLib.GetLanguages(toGoString(filename), toGoByteSlice(content), result);
-        return toJavaStringArray(result);
+        return toJavaStringArray(nativeLib.GetLanguages(cString(filename), content, length(content)));
     }
 
     /**
@@ -152,7 +154,7 @@ public class Enry {
      * @return mime type
      */
     public static synchronized String getMimeType(String path, String language) {
-        return toJavaString(nativeLib.GetMimeType(toGoString(path), toGoString(language)));
+        return toJavaString(nativeLib.GetMimeType(cString(path), cString(language)));
     }
 
     /**
@@ -162,7 +164,7 @@ public class Enry {
      * @return whether it's binary or not
      */
     public static synchronized boolean isBinary(byte[] content) {
-        return toJavaBool(nativeLib.IsBinary(toGoByteSlice(content)));
+        return toJavaBool(nativeLib.IsBinary(content, length(content)));
     }
 
     /**
@@ -172,7 +174,7 @@ public class Enry {
      * @return whether it's config or not
      */
     public static synchronized boolean isConfiguration(String path) {
-        return toJavaBool(nativeLib.IsConfiguration(toGoString(path)));
+        return toJavaBool(nativeLib.IsConfiguration(cString(path)));
     }
 
     /**
@@ -184,7 +186,7 @@ public class Enry {
      * @return whether it's docs or not
      */
     public static synchronized boolean isDocumentation(String path) {
-        return toJavaBool(nativeLib.IsDocumentation(toGoString(path)));
+        return toJavaBool(nativeLib.IsDocumentation(cString(path)));
     }
 
     /**
@@ -194,7 +196,7 @@ public class Enry {
      * @return whether it's a dotfile or not
      */
     public static synchronized boolean isDotFile(String path) {
-        return toJavaBool(nativeLib.IsDotFile(toGoString(path)));
+        return toJavaBool(nativeLib.IsDotFile(cString(path)));
     }
 
     /**
@@ -204,7 +206,7 @@ public class Enry {
      * @return whether it's an image or not
      */
     public static synchronized boolean isImage(String path) {
-        return toJavaBool(nativeLib.IsImage(toGoString(path)));
+        return toJavaBool(nativeLib.IsImage(cString(path)));
     }
 
     /**
@@ -214,7 +216,7 @@ public class Enry {
      * @return whether it's vendor or not
      */
     public static synchronized boolean isVendor(String path) {
-        return toJavaBool(nativeLib.IsVendor(toGoString(path)));
+        return toJavaBool(nativeLib.IsVendor(cString(path)));
     }
 
     /**
@@ -225,7 +227,7 @@ public class Enry {
      * @return whether it's autogenerated or not
      */
     public static synchronized boolean isGenerated(String path, byte[] content) {
-        return toJavaBool(nativeLib.IsGenerated(toGoString(path), toGoByteSlice(content)));
+        return toJavaBool(nativeLib.IsGenerated(cString(path), content, length(content)));
     }
 
     /**
@@ -235,7 +237,7 @@ public class Enry {
      * @return color code
      */
     public static synchronized String getColor(String language) {
-        return toJavaString(nativeLib.GetColor(toGoString(language)));
+        return toJavaString(nativeLib.GetColor(cString(language)));
     }
 
     /**
@@ -245,7 +247,7 @@ public class Enry {
      * @return whether it's test or not
      */
     public static synchronized boolean isTest(String path) {
-        return toJavaBool(nativeLib.IsTest(toGoString(path)));
+        return toJavaBool(nativeLib.IsTest(cString(path)));
     }
 
     /**
@@ -255,6 +257,6 @@ public class Enry {
      * @return type (data, programming, markup, prose)
      */
     public static synchronized String getLanguageType(String language) {
-        return toJavaString(nativeLib.GetLanguageType(toGoString(language)));
+        return toJavaString(nativeLib.GetLanguageType(cString(language)));
     }
 }

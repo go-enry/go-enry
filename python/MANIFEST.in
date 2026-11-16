@@ -1,3 +1,5 @@
-include README.md
-include ../shared/libenry.h
+include README.md LICENSE build_enry.py
 recursive-include enry *.py
+recursive-include _go *.go *.c *.h go.mod go.sum LICENSE
+global-exclude *.so *.dylib *.dll *.pyc
+exclude enry/_c_enry.py

@@ -30,12 +30,20 @@ func IsConfiguration(path string) bool {
 
 // IsImage tells if a given file is an image (PNG, JPEG or GIF format).
 func IsImage(path string) bool {
-	extension := filepath.Ext(path)
-	if extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" {
-		return true
-	}
+	return imageMIMEType(path) != ""
+}
 
-	return false
+func imageMIMEType(path string) string {
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".gif":
+		return "image/gif"
+	default:
+		return ""
+	}
 }
 
 // GetMIMEType returns a MIME type of a given file based on its languages.
@@ -44,8 +52,8 @@ func GetMIMEType(path string, language string) string {
 		return mime
 	}
 
-	if IsImage(path) {
-		return "image/" + filepath.Ext(path)[1:]
+	if mime := imageMIMEType(path); mime != "" {
+		return mime
 	}
 
 	return "text/plain"

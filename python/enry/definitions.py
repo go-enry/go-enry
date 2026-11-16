@@ -44,10 +44,6 @@ def _load_library():
         if fallback_path.exists():
             lib_path = fallback_path
 
-    # 3. Final Fallback: Current Working Directory
-    if not lib_path.exists():
-        lib_path = Path.cwd() / lib_name
-
     try:
         # ffi.dlopen requires a string path
         return ffi.dlopen(str(lib_path))
@@ -84,8 +80,9 @@ def get_language_by_content(filename: str, content: bytes) -> Guess:
     :param content: array of bytes with the contents of the file (the code)
     :return: guessed result
     """
-    res = lib.GetLanguageByContent(filename.encode(), content, len(content))
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByContentWithSafety(filename.encode(), content, len(content), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_language_by_extension(filename: str) -> Guess:
     """
@@ -96,8 +93,9 @@ def get_language_by_extension(filename: str) -> Guess:
     :param filename: path of the file
     :return: guessed result
     """
-    res = lib.GetLanguageByExtension(filename.encode())
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByExtensionWithSafety(filename.encode(), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_language_by_filename(filename: str) -> Guess:
     """
@@ -108,8 +106,9 @@ def get_language_by_filename(filename: str) -> Guess:
     :param filename: path of the file
     :return: guessed result
     """
-    res = lib.GetLanguageByFilename(filename.encode())
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByFilenameWithSafety(filename.encode(), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_language_by_modeline(content: bytes) -> Guess:
     """
@@ -120,8 +119,9 @@ def get_language_by_modeline(content: bytes) -> Guess:
     :param content: array of bytes with the contents of the file (the code)
     :return: guessed result
     """
-    res = lib.GetLanguageByModeline(content, len(content))
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByModelineWithSafety(content, len(content), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_language_by_shebang(content: bytes) -> Guess:
     """
@@ -132,8 +132,9 @@ def get_language_by_shebang(content: bytes) -> Guess:
     :param content: array of bytes with the contents of the file (the code)
     :return: guessed result
     """
-    res = lib.GetLanguageByShebang(content, len(content))
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByShebangWithSafety(content, len(content), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_language_by_emacs_modeline(content: bytes) -> Guess:
     """
@@ -144,8 +145,9 @@ def get_language_by_emacs_modeline(content: bytes) -> Guess:
     :param content: array of bytes with the contents of the file (the code)
     :return: guessed result
     """
-    res = lib.GetLanguageByEmacsModeline(content, len(content))
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByEmacsModelineWithSafety(content, len(content), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_language_by_vim_modeline(content: bytes) -> Guess:
     """
@@ -156,8 +158,9 @@ def get_language_by_vim_modeline(content: bytes) -> Guess:
     :param content: array of bytes with the contents of the file (the code)
     :return: guessed result
     """
-    res = lib.GetLanguageByVimModeline(content, len(content))
-    return go_guess_to_py(lib, res)
+    safe = ffi.new("int *")
+    res = lib.GetLanguageByVimModelineWithSafety(content, len(content), safe)
+    return go_guess_to_py(lib, res, bool(safe[0]))
 
 def get_mime_type(path: str, language: str) -> str:
     """
@@ -320,7 +323,7 @@ def get_languages_by_filename(filename: str, content: bytes = b"", candidates: L
     :type filename: str
     :param content: array of bytes with the contents of the file (the code)
     :type content: bytes
-    :param candidates: list of candidate languages to consider
+    :param candidates: exact language names to consider; None allows all, [] allows none
     :type candidates: List[str]
     :return: list of languages that are detected in the file
     :rtype: List[str]
@@ -332,7 +335,10 @@ def get_languages_by_filename(filename: str, content: bytes = b"", candidates: L
 
     c_cand, _keep_alive = prepare_candidates(candidates)
     res = lib.GetLanguagesByFilename(filename.encode(), content, len(content), c_cand)
-    return go_str_slice_to_py(lib, res)
+    languages = go_str_slice_to_py(lib, res)
+    if candidates is None:
+        return languages
+    return [language for language in languages if language in candidates]
 
 def get_languages_by_shebang(filename: str, content: bytes = b"", candidates: List[str] = None) -> List[str]:
     """
@@ -342,7 +348,7 @@ def get_languages_by_shebang(filename: str, content: bytes = b"", candidates: Li
     :type filename: str
     :param content: array of bytes with the contents of the file (the code)
     :type content: bytes
-    :param candidates: list of candidate languages to consider
+    :param candidates: exact language names to consider; None allows all, [] allows none
     :type candidates: List[str]
     :return: list of languages that are detected in the file by shebang
     :rtype: List[str]
@@ -355,4 +361,7 @@ def get_languages_by_shebang(filename: str, content: bytes = b"", candidates: Li
 
     c_cand, _keep_alive = prepare_candidates(candidates)
     res = lib.GetLanguagesByShebang(filename.encode(), content, len(content), c_cand)
-    return go_str_slice_to_py(lib, res)
+    languages = go_str_slice_to_py(lib, res)
+    if candidates is None:
+        return languages
+    return [language for language in languages if language in candidates]

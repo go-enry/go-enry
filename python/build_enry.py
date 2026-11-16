@@ -24,6 +24,14 @@ ffibuilder.cdef("""
     char* GetColor(char* language);
     char* GetLanguageType(char* language);
 
+    char* GetLanguageByContentWithSafety(char* filename, char* content, int length, int* out_safe);
+    char* GetLanguageByEmacsModelineWithSafety(char* content, int length, int* out_safe);
+    char* GetLanguageByExtensionWithSafety(char* filename, int* out_safe);
+    char* GetLanguageByFilenameWithSafety(char* filename, int* out_safe);
+    char* GetLanguageByModelineWithSafety(char* content, int length, int* out_safe);
+    char* GetLanguageByShebangWithSafety(char* content, int length, int* out_safe);
+    char* GetLanguageByVimModelineWithSafety(char* content, int length, int* out_safe);
+
     // Boolean API (using int for stability across platforms)
     int IsBinary(char* content, int length);
     int IsConfiguration(char* path);

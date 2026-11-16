@@ -32,7 +32,6 @@ public class Guess {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
 
         Guess guess = (Guess) object;
 
@@ -43,7 +42,7 @@ public class Guess {
     }
 
     public int hashCode() {
-        int result = super.hashCode();
+        int result = 1;
         result = 23 * result + (language != null ? language.hashCode() : 0);
         result = 23 * result + (safe ? 1 : 0);
         return result;

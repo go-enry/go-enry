@@ -1,58 +1,39 @@
-on: [push, pull_request]
 name: Python Tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: ['**.go', 'go.mod', 'go.sum', 'python/**', '.github/**']
+  pull_request:
+    paths: ['**.go', 'go.mod', 'go.sum', 'python/**', '.github/**']
+
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # cibuildwheel covers supported CPython versions. This checks editable installs.
   test:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
-        platform: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          go-version: '1.21'
-
-      - name: Install Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Build Go shared library
-        # We use 'shared' now because ABI mode needs .so or .dylib
-        run: |
-          # Ensure Go architecture matches the Python runner
-          export GOARCH=$(python -c "import platform; m = platform.machine().lower(); print('arm64' if 'arm' in m or 'aarch64' in m else 'amd64')")
-          make shared
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r python/requirements.txt
-          if [ -f python/requirements.dev.txt ]; then pip install -r python/requirements.dev.txt; fi
-
-      - name: Build and install package
-        run: |
-          cp LICENSE python/
-          cd python
-          python build_enry.py
-          pip install -e .
-
-      - name: Run tests
+          go-version: '1.26.x'
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s .github/scripts -p 'test_*.py'
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install --group python/pyproject.toml:test -e ./python
+      - name: Test editable install and long memory regression
         env:
-          PYTHONMALLOC: "malloc"
-          GODEBUG: "cgocheck=0,installgoroot=0"
-
-          # Memory tests:
-          ENRY_MEM_RUN_SMOKE: "1"
-          ENRY_MEM_ITERS_SHORT: "2000"
-          ENRY_MEM_ITERS_SMOKE: "200"
-
-          # Run the long leak regression only on one matrix job (fast CI, strong coverage)
-          ENRY_MEM_RUN_LONG: ${{ matrix.platform == 'ubuntu-latest' && matrix.python-version == '3.11' && '1' || '0' }}
-          ENRY_MEM_ITERS_LONG: "50000"
-        run: pytest python/tests/ -v
+          ENRY_MEM_RUN_LONG: '1'
+          ENRY_MEM_ITERS_LONG: '50000'
+        run: python -m pytest python/tests -q
