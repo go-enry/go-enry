@@ -90,7 +90,7 @@ var GeneratedCodeNameMatchers = []GeneratedCodeNameMatcher{
 	nameEndsWith("deno.lock"),
 
 	// Mise lock
-	nameMatches("(^|\/)mise(\.[^\/]+)?\.lock$"),
+	nameMatches(`(^|\/)mise(\.[^\/]+)?\.lock$`),
 
 	// NPM shrinkwrap
 	nameEndsWith("npm-shrinkwrap.json"),
