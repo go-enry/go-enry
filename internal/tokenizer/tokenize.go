@@ -83,7 +83,7 @@ var (
 	reSingleLineComment   = regex.MustCompile(`(?m)(//|--|#|%|")\s([^\n]*$)`)
 	reMultilineComment    = regex.MustCompile(`(/\*(.|\n)*?\*/|<!--(.|\n)*?-->|\{-(.|\n)*?-\}|\(\*(.|\n)*?\*\)|"""(.|\n)*?"""|'''(.|\n)*?''')`)
 	reLiteralNumber       = regex.MustCompile(`(0x[0-9A-Fa-f]([0-9A-Fa-f]|\.)*|\d(\d|\.)*)([uU][lL]{0,2}|([eE][-+]\d*)?[fFlL]*)`)
-	reShebang             = regex.MustCompile(`(?m)^#!(?:/[0-9A-Za-z_]+)*/(?:([0-9A-Za-z_]+)|[0-9A-Za-z_]+(?:\s*[0-9A-Za-z_]+=[0-9A-Za-z_]+\s*)*\s*([0-9A-Za-z_]+))(?:\s*-[0-9A-Za-z_]+\s*)*$`)
+	reShebang             = regex.MustCompile(`(?m)^#!(?:/[0-9A-Za-z_]+)*/(?:([0-9A-Za-z_]+)|[0-9A-Za-z_]+(?:[ \t]*[0-9A-Za-z_]+=[0-9A-Za-z_]+[ \t]*)*[ \t]*([0-9A-Za-z_]+))(?:[ \t]*-[0-9A-Za-z_]+[ \t]*)*$`)
 	rePunctuation         = regex.MustCompile(`;|\{|\}|\(|\)|\[|\]`)
 	reSGML                = regex.MustCompile(`(<\/?[^\s<>=\d"']+)(?:\s(.|\n)*?\/?>|>)`)
 	reSGMLComment         = regex.MustCompile(`(<!--(.|\n)*?-->)`)
