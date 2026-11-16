@@ -105,16 +105,20 @@ func envInterpreter(source string) string {
 			options = false
 			args = args[1:]
 		} else if options && strings.HasPrefix(arg, "--split-string=") {
-			args[0] = strings.TrimPrefix(arg, "--split-string=")
-			if args[0] == "" {
-				args = args[1:]
+			// env splits the option value again, e.g. --split-string='python3 -u'.
+			rest, ok := splitEnvShebang(strings.TrimPrefix(arg, "--split-string="))
+			if !ok {
+				return ""
 			}
+			args = append(rest, args[1:]...)
 		} else if options && strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && strings.Contains(arg, "S") && strings.TrimLeft(strings.SplitN(arg[1:], "S", 2)[0], "i0v") == "" {
-			// -S and grouped forms such as -vSpython3 carry the command inline.
-			args[0] = strings.SplitN(arg[1:], "S", 2)[1]
-			if args[0] == "" {
-				args = args[1:]
+			// -S and grouped forms such as -vSpython3 carry the command inline,
+			// and env splits that value again, e.g. -S'python3 -u'.
+			rest, ok := splitEnvShebang(strings.SplitN(arg[1:], "S", 2)[1])
+			if !ok {
+				return ""
 			}
+			args = append(rest, args[1:]...)
 		} else if options && envOperandArgs.MatchString(arg) {
 			if len(args) < 2 {
 				return ""

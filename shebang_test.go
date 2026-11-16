@@ -51,3 +51,18 @@ func TestEnvSplitString(t *testing.T) {
 		}
 	}
 }
+
+func TestEnvInterpreterResplitsSplitString(t *testing.T) {
+	for in, want := range map[string]string{
+		"--split-string='python3 -u'":    "python3",
+		"-S --split-string='python3 -u'": "python3",
+		"-S'python3 -u'":                 "python3",
+		"-vS'python3 -u'":                "python3",
+		"-S python3 -u":                  "python3",
+		"-S":                             "",
+	} {
+		if got := envInterpreter(in); got != want {
+			t.Errorf("envInterpreter(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
