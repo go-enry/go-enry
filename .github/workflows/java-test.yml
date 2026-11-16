@@ -19,7 +19,7 @@ jobs:
         include:
           - os: ubuntu-22.04
             java: '17'
-          - os: macos-14
+          - os: macos-15
             java: '21'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
