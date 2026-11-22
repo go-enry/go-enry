@@ -1,5 +1,7 @@
 package tech.sourced.enry;
 
+import java.util.Objects;
+
 /**
  * Guess denotes a language detection result of which enry can be
  * completely sure or not.
@@ -37,9 +39,7 @@ public class Guess {
         Guess guess = (Guess) object;
 
         if (safe != guess.safe) return false;
-        if (language != null ? !language.equals(guess.language) : guess.language != null) return false;
-
-        return true;
+        return Objects.equals(language, guess.language);
     }
 
     public int hashCode() {
